@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rod Diameter Sampling — ENDG 319</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0f1720;
+    --bg-panel:#16212c;
+    --bg-panel-raised:#1c2a37;
+    --grid-line: rgba(232,237,242,0.05);
+    --border-hair: rgba(232,237,242,0.12);
+    --text-primary:#e8edf2;
+    --text-muted:#8ca0af;
+    --text-faint:#5c6f7d;
+    --accent-orange:#e8632c;
+    --pass-green:#4f9d78;
+    --pass-green-dim: rgba(79,157,120,0.28);
+    --fail-rust:#d9552b;
+    --fail-rust-dim: rgba(217,85,43,0.32);
+    --sample-gold:#f5b942;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
+      var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 28px 20px 60px;
+    min-height: 100vh;
+  }
+
+  .wrap{ max-width: 800px; margin: 0 auto; }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap: 20px;
+    border-bottom: 1px solid var(--border-hair);
+    padding-bottom: 20px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+  .title-block h1{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .title-block p{
+    margin:0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    max-width: 46ch;
+    line-height: 1.5;
+  }
+  .spec-stamp{
+    border: 1px solid var(--accent-orange);
+    border-radius: 3px;
+    padding: 10px 16px;
+    text-align:center;
+    position: relative;
+    flex-shrink:0;
+  }
+  .spec-stamp::before{
+    content:"tolerance";
+    position:absolute;
+    top:-9px;
+    left:10px;
+    background: var(--bg-deep);
+    padding: 0 6px;
+    font-size: 0.6rem;
+    color: var(--accent-orange);
+    letter-spacing: 0.08em;
+  }
+  .spec-stamp .val{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:1.15rem;
+    color: var(--accent-orange);
+    white-space:nowrap;
+  }
+  .spec-col{
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink:0;
+  }
+  .p-slider{
+    display:flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .p-slider label{
+    font-size: 0.62rem;
+    color: var(--text-faint);
+    letter-spacing: 0.02em;
+    text-align:center;
+  }
+  .p-slider input[type="range"]{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border-hair);
+    outline: none;
+    cursor: pointer;
+  }
+  .p-slider input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--sample-gold);
+    border: 2px solid var(--bg-deep);
+    box-shadow: 0 0 6px rgba(245,185,66,0.55);
+    cursor: pointer;
+  }
+  .p-slider input[type="range"]::-moz-range-thumb{
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--sample-gold);
+    border: 2px solid var(--bg-deep);
+    box-shadow: 0 0 6px rgba(245,185,66,0.55);
+    cursor: pointer;
+  }
+
+  /* ---------- Stat cards ---------- */
+  .stats-row{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .card{
+    background: var(--bg-panel);
+    border: 1px solid var(--border-hair);
+    border-radius: 3px;
+    padding: 14px 16px;
+  }
+  .card h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+    letter-spacing: 0.02em;
+  }
+  .card .big{
+    font-size: 1.7rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .card .sub{
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    margin-top: 6px;
+    line-height:1.5;
+  }
+  .card.population .big{ color: var(--text-faint); letter-spacing: 0.05em; font-size: 1.4rem;}
+  .card.population.revealed .big{ color: var(--text-primary); }
+  .card.sample .big{ color: var(--sample-gold); }
+  .reveal-btn{
+    margin-top:10px;
+    background:none;
+    border: 1px solid var(--border-hair);
+    color: var(--text-muted);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor:pointer;
+  }
+  .reveal-btn:hover{ border-color: var(--text-muted); color: var(--text-primary); }
+
+  /* history dot line */
+  .history-line{
+    position: relative;
+    height: 34px;
+    margin-top: 8px;
+    border-bottom: 1px solid var(--border-hair);
+  }
+  .history-line .true-mark{
+    position:absolute;
+    bottom:-1px;
+    width:1px;
+    height: 34px;
+    background: var(--accent-orange);
+  }
+  .history-line .true-mark::after{
+    content:"p";
+    position:absolute;
+    top:-14px;
+    left:-4px;
+    font-size:0.6rem;
+    color: var(--accent-orange);
+  }
+  .history-line .dot{
+    position:absolute;
+    bottom: -4px;
+    width: 7px;
+    height: 7px;
+    border-radius:50%;
+    background: var(--text-faint);
+    transform: translateX(-50%);
+  }
+  .history-line .dot.latest{
+    background: var(--sample-gold);
+    width:9px; height:9px;
+    bottom:-5px;
+    box-shadow: 0 0 8px rgba(245,185,66,0.7);
+  }
+
+  /* ---------- Convergence panel ---------- */
+  .convergence-panel{
+    background: var(--bg-panel);
+    border: 1px solid var(--border-hair);
+    border-radius: 3px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .convergence-panel .head-row{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .convergence-panel h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .convergence-panel .readout{
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .convergence-panel .readout b{ color: var(--sample-gold); }
+  #convergenceChart{
+    width: 100%;
+    height: 120px;
+    display:block;
+  }
+
+  /* ---------- Controls ---------- */
+  .controls{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  button.primary{
+    background: var(--sample-gold);
+    color: #21170a;
+    border: none;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 11px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.15s ease;
+    box-shadow: 0 0 0 rgba(245,185,66,0);
+  }
+  button.primary:hover{ box-shadow: 0 0 18px rgba(245,185,66,0.35); }
+  button.primary:active{ transform: scale(0.97); }
+  button.primary:disabled{ opacity: 0.5; cursor: not-allowed; box-shadow:none; }
+
+  button.secondary{
+    background: none;
+    color: var(--text-primary);
+    border: 1px solid var(--accent-orange);
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 10px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  button.secondary:hover{ background: rgba(232,99,44,0.12); }
+  button.secondary:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+  .draw-count{
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+  .draw-count b{ color: var(--text-primary); }
+
+  /* ---------- Legend ---------- */
+  .legend{
+    display:flex;
+    gap: 18px;
+    margin-bottom: 12px;
+    flex-wrap:wrap;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .legend span{ display:flex; align-items:center; gap:6px; }
+  .swatch{ width:11px; height:11px; border-radius:2px; display:inline-block; }
+  .swatch.pass{ background: var(--pass-green); }
+  .swatch.fail{ background: var(--fail-rust); }
+  .swatch.sel{ background: transparent; border: 2px solid var(--sample-gold); box-shadow: 0 0 6px rgba(245,185,66,0.6);}
+
+  /* ---------- Rod grid ---------- */
+  .grid-panel{
+    background: var(--bg-panel);
+    border: 1px solid var(--border-hair);
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+  }
+  .rod-grid{
+    display:grid;
+    grid-template-columns: repeat(40, 15px);
+    grid-auto-rows: 15px;
+    gap: 2px;
+    width: max-content;
+    margin: 0 auto;
+  }
+  .rod{
+    width:15px;
+    height:15px;
+    border-radius:2px;
+    background: var(--pass-green-dim);
+    cursor: default;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+  }
+  .rod.fail{ background: var(--fail-rust-dim); }
+  .rod.selected{
+    box-shadow: 0 0 0 2px var(--sample-gold), 0 0 8px rgba(245,185,66,0.65);
+    transform: scale(1.15);
+    z-index: 2;
+    position: relative;
+  }
+  .rod.pass.selected{ background: var(--pass-green); }
+  .rod.fail.selected{ background: var(--fail-rust); }
+
+  footer{
+    margin-top: 22px;
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    line-height: 1.6;
+    border-top: 1px solid var(--border-hair);
+    padding-top: 14px;
+  }
+
+  @media (max-width: 720px){
+    .stats-row{ grid-template-columns: 1fr; }
+    .rod-grid{ grid-template-columns: repeat(40, 13px); grid-auto-rows: 13px; }
+    .rod{ width:13px; height:13px; }
+    .controls{ flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <h1>Rod diameter sampling</h1>
+      <p>A machine has produced 1000 steel rods. Each square below is one rod. Draw random samples of 50 and watch how the sample proportion moves around, even though the population never changes.</p>
+    </div>
+    <div class="spec-col">
+      <div class="spec-stamp">
+        <div class="val">D = 0.45 ± 0.02 cm</div>
+      </div>
+      <div class="p-slider">
+        <label for="pSlider">population pass rate — drag to set</label>
+        <input type="range" id="pSlider" min="0.5" max="0.999" step="0.001" value="0.94">
+      </div>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span><i class="swatch pass"></i> meets spec</span>
+    <span><i class="swatch fail"></i> out of spec</span>
+    <span><i class="swatch sel"></i> in current sample (n = 50)</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="card population" id="popCard">
+      <h2>Population — N = 1000</h2>
+      <div class="big" id="popBig">p = ? ? ?</div>
+      <div class="sub">The true proportion meeting spec. Unknown to us in practice — here it's hidden until you reveal it.</div>
+      <button class="reveal-btn" id="revealBtn">Reveal true p</button>
+    </div>
+
+    <div class="card sample">
+      <h2>Current sample — n = 50</h2>
+      <div class="big" id="sampleBig">p̂ = —</div>
+      <div class="sub" id="sampleSub">Press "Draw sample" to select 50 rods at random.</div>
+    </div>
+
+    <div class="card">
+      <h2>Most recent draws</h2>
+      <div class="history-line" id="historyLine"></div>
+      <div class="sub" id="historySub">Draws taken: 0</div>
+    </div>
+  </div>
+
+  <div class="convergence-panel">
+    <div class="head-row">
+      <h2>Running average of p̂ across all draws</h2>
+      <div class="readout" id="convergenceReadout">no draws yet</div>
+    </div>
+    <canvas id="convergenceChart"></canvas>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="drawBtn">Draw sample of 50</button>
+    <button class="secondary" id="batchBtn">Run 200 draws</button>
+    <button class="secondary" id="batchBtnBig">Run 2000 draws</button>
+    <button class="secondary" id="resetBtn">Reset draws</button>
+    <span class="draw-count" id="drawCountLabel"></span>
+  </div>
+
+  <div class="grid-panel">
+    <div class="rod-grid" id="rodGrid"></div>
+  </div>
+
+  <footer>
+    Rod IDs R-0001 – R-1000. Diameters are simulated measurements; hover a square to see one rod's reading. "Draw sample of 50" pulls one sample and highlights it on the grid. "Run 200 draws" repeats that 200 times fast and plots the running average of p̂ — this is the law of large numbers: individual samples still bounce around, but their average settles in on the true population proportion.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const N = 1000;
+  const SAMPLE_SIZE = 50;
+  let TRUE_P = 0.94; // population pass rate — set by the hidden-value slider
+  const LOW = 0.43, HIGH = 0.47;
+
+  // ---- helpers ----
+  function randNormal(mean, std){
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random();
+    while(v === 0) v = Math.random();
+    return mean + std * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+  }
+  function truncatedNormalInside(mean, std, lo, hi){
+    let v;
+    do { v = randNormal(mean, std); } while (v < lo || v > hi);
+    return v;
+  }
+  function truncatedNormalOutside(mean, std, lo, hi){
+    let v, tries = 0;
+    do {
+      v = randNormal(mean, std);
+      tries++;
+      if (tries > 200){
+        v = Math.random() < 0.5 ? lo - (0.001 + Math.random()*0.012) : hi + (0.001 + Math.random()*0.012);
+        break;
+      }
+    } while (v >= lo && v <= hi);
+    return v;
+  }
+
+  // ---- build population (called on load, and again whenever the slider moves) ----
+  let rods = [];
+  function buildPopulation(p){
+    const passCount = Math.round(N * p);
+    const flags = new Array(N).fill(false);
+    for (let i = 0; i < passCount; i++) flags[i] = true;
+    for (let i = N - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [flags[i], flags[j]] = [flags[j], flags[i]];
+    }
+    rods = flags.map((pass, i) => {
+      const diameter = pass
+        ? truncatedNormalInside(0.45, 0.008, LOW, HIGH)
+        : truncatedNormalOutside(0.45, 0.02, LOW, HIGH);
+      return { id: i + 1, diameter: diameter, pass: pass };
+    });
+  }
+  buildPopulation(TRUE_P);
+
+  // ---- render grid ----
+  const gridEl = document.getElementById('rodGrid');
+  const cellEls = [];
+  const frag = document.createDocumentFragment();
+  rods.forEach(r => {
+    const div = document.createElement('div');
+    frag.appendChild(div);
+    cellEls.push(div);
+  });
+  gridEl.appendChild(frag);
+
+  function paintGrid(){
+    rods.forEach((r, i) => {
+      const div = cellEls[i];
+      div.className = 'rod ' + (r.pass ? 'pass' : 'fail');
+      div.title = 'R-' + String(r.id).padStart(4, '0') + '  ·  ' + r.diameter.toFixed(4) + ' cm  ·  ' + (r.pass ? 'meets spec' : 'out of spec');
+    });
+  }
+  paintGrid();
+
+  // ---- reveal true p ----
+  const popCard = document.getElementById('popCard');
+  const popBig = document.getElementById('popBig');
+  const revealBtn = document.getElementById('revealBtn');
+  let revealed = false;
+  function setRevealed(state){
+    revealed = state;
+    if (revealed){
+      popBig.textContent = 'p = ' + TRUE_P.toFixed(3) + '  (' + (TRUE_P*100).toFixed(1) + '%)';
+      popCard.classList.add('revealed');
+      revealBtn.textContent = 'Hide true p';
+      drawTrueMark();
+    } else {
+      popBig.textContent = 'p = ? ? ?';
+      popCard.classList.remove('revealed');
+      revealBtn.textContent = 'Reveal true p';
+      const mark = document.getElementById('trueMark');
+      if (mark) mark.remove();
+    }
+    drawChart();
+  }
+  revealBtn.addEventListener('click', () => setRevealed(!revealed));
+
+  const pSlider = document.getElementById('pSlider');
+  pSlider.addEventListener('input', () => {
+    TRUE_P = parseFloat(pSlider.value);
+    buildPopulation(TRUE_P);
+    paintGrid();
+    resetDraws();
+    if (revealed) setRevealed(true); // refresh the displayed number to match the new setting
+  });
+
+  // ---- history line (last few draws) ----
+  const historyLine = document.getElementById('historyLine');
+  const historySub = document.getElementById('historySub');
+  const recentHistory = [];
+  const RANGE_LO = 0.78, RANGE_HI = 1.0;
+
+  function pctToLeft(p){
+    const clamped = Math.min(Math.max(p, RANGE_LO), RANGE_HI);
+    return ((clamped - RANGE_LO) / (RANGE_HI - RANGE_LO)) * 100 + '%';
+  }
+
+  function drawTrueMark(){
+    let mark = document.getElementById('trueMark');
+    if (!mark){
+      mark = document.createElement('div');
+      mark.id = 'trueMark';
+      mark.className = 'true-mark';
+      historyLine.appendChild(mark);
+    }
+    mark.style.left = pctToLeft(TRUE_P);
+  }
+
+  function renderRecentHistory(){
+    historyLine.querySelectorAll('.dot').forEach(d => d.remove());
+    recentHistory.forEach((phat, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (idx === recentHistory.length - 1 ? ' latest' : '');
+      dot.style.left = pctToLeft(phat);
+      historyLine.appendChild(dot);
+    });
+    historySub.textContent = 'Draws taken: ' + totalDraws;
+  }
+
+  // ---- cumulative stats + convergence chart ----
+  const canvas = document.getElementById('convergenceChart');
+  const ctx = canvas.getContext('2d');
+  const convergenceReadout = document.getElementById('convergenceReadout');
+  const drawCountLabel = document.getElementById('drawCountLabel');
+
+  let totalDraws = 0;
+  let sumPhat = 0;
+  let minPhat = null;
+  let maxPhat = null;
+  const runningAverages = []; // one point per draw: {n, avg}
+
+  function fitCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = 120 * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function drawChart(){
+    fitCanvas();
+    const w = canvas.getBoundingClientRect().width;
+    const h = 120;
+    const padL = 34, padR = 10, padT = 10, padB = 18;
+    ctx.clearRect(0, 0, w, h);
+
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
+
+    const yLo = 0.80, yHi = 1.0;
+    function yFor(v){
+      const clamped = Math.min(Math.max(v, yLo), yHi);
+      return padT + plotH - ((clamped - yLo) / (yHi - yLo)) * plotH;
+    }
+
+    // gridlines + y labels
+    ctx.strokeStyle = 'rgba(232,237,242,0.08)';
+    ctx.fillStyle = '#5c6f7d';
+    ctx.font = '10px IBM Plex Mono, monospace';
+    ctx.lineWidth = 1;
+    [0.80, 0.85, 0.90, 0.95, 1.00].forEach(v => {
+      const y = yFor(v);
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(w - padR, y);
+      ctx.stroke();
+      ctx.fillText(v.toFixed(2), 2, y + 3);
+    });
+
+    if (runningAverages.length === 0){
+      ctx.fillStyle = '#5c6f7d';
+      ctx.fillText('no draws yet — press Draw sample or Run 200 draws', padL, h/2);
+      return;
+    }
+
+    const maxN = runningAverages[runningAverages.length - 1].n;
+    function xFor(n){
+      return padL + (maxN <= 1 ? 0 : (n - 1) / (maxN - 1) * plotW);
+    }
+
+    // true-p reference line
+    if (revealed){
+      ctx.strokeStyle = '#e8632c';
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(padL, yFor(TRUE_P));
+      ctx.lineTo(w - padR, yFor(TRUE_P));
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // running average line
+    ctx.strokeStyle = '#f5b942';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    runningAverages.forEach((pt, idx) => {
+      const x = xFor(pt.n);
+      const y = yFor(pt.avg);
+      if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // latest point marker
+    const last = runningAverages[runningAverages.length - 1];
+    ctx.fillStyle = '#f5b942';
+    ctx.beginPath();
+    ctx.arc(xFor(last.n), yFor(last.avg), 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function updateReadout(){
+    if (totalDraws === 0){
+      convergenceReadout.innerHTML = 'no draws yet';
+      return;
+    }
+    const avg = sumPhat / totalDraws;
+    convergenceReadout.innerHTML = totalDraws + ' draw' + (totalDraws === 1 ? '' : 's') +
+      '  ·  running average p̂ = <b>' + avg.toFixed(4) + '</b>' +
+      '  ·  range so far: <b>' + minPhat.toFixed(3) + '</b> to <b>' + maxPhat.toFixed(3) + '</b>';
+  }
+
+  // ---- sampling core ----
+  function pickSample(){
+    const pool = Array.from({length: N}, (_, i) => i);
+    for (let i = 0; i < SAMPLE_SIZE; i++){
+      const j = i + Math.floor(Math.random() * (N - i));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const indices = pool.slice(0, SAMPLE_SIZE);
+    let passInSample = 0;
+    indices.forEach(i => { if (rods[i].pass) passInSample++; });
+    return { indices, phat: passInSample / SAMPLE_SIZE, passInSample };
+  }
+
+  function recordDraw(phat){
+    totalDraws++;
+    sumPhat += phat;
+    minPhat = (minPhat === null) ? phat : Math.min(minPhat, phat);
+    maxPhat = (maxPhat === null) ? phat : Math.max(maxPhat, phat);
+    runningAverages.push({ n: totalDraws, avg: sumPhat / totalDraws });
+    if (runningAverages.length > 6000) runningAverages.shift(); // safety cap
+    recentHistory.push(phat);
+    if (recentHistory.length > 20) recentHistory.shift();
+  }
+
+  let selectedIndices = [];
+  const sampleBig = document.getElementById('sampleBig');
+  const sampleSub = document.getElementById('sampleSub');
+
+  function drawSingle(){
+    selectedIndices.forEach(i => cellEls[i].classList.remove('selected'));
+    const { indices, phat, passInSample } = pickSample();
+    selectedIndices = indices;
+    selectedIndices.forEach(i => cellEls[i].classList.add('selected'));
+
+    recordDraw(phat);
+
+    sampleBig.textContent = 'p̂ = ' + phat.toFixed(3) + '  (' + passInSample + '/' + SAMPLE_SIZE + ')';
+    sampleSub.textContent = revealed
+      ? 'Off the true p by ' + Math.abs(phat - TRUE_P).toFixed(3) + '. Same population, different draw.'
+      : 'Draw #' + totalDraws + '. Reveal the true p to compare.';
+
+    drawCountLabel.innerHTML = 'Total draws: <b>' + totalDraws + '</b>';
+    renderRecentHistory();
+    updateReadout();
+    drawChart();
+  }
+
+  // ---- batch of 200 draws, animated ----
+  const drawBtn = document.getElementById('drawBtn');
+  const batchBtn = document.getElementById('batchBtn');
+  const batchBtnBig = document.getElementById('batchBtnBig');
+  const resetBtn = document.getElementById('resetBtn');
+  let batchRunning = false;
+
+  function runBatch(totalToRun, triggerBtn){
+    if (batchRunning) return;
+    batchRunning = true;
+    drawBtn.disabled = true;
+    batchBtn.disabled = true;
+    batchBtnBig.disabled = true;
+    resetBtn.disabled = true;
+    const originalLabel = triggerBtn.textContent;
+    triggerBtn.textContent = 'Running…';
+
+    // clear current grid highlight while batch runs
+    selectedIndices.forEach(i => cellEls[i].classList.remove('selected'));
+    selectedIndices = [];
+
+    let done = 0;
+    const perTick = Math.max(4, Math.round(totalToRun / 60)); // draws processed per animation tick, scaled so big batches don't take forever
+
+    function tick(){
+      const thisTick = Math.min(perTick, totalToRun - done);
+      let lastPhat = null, lastIndices = null;
+      for (let k = 0; k < thisTick; k++){
+        const { indices, phat } = pickSample();
+        recordDraw(phat);
+        lastPhat = phat;
+        lastIndices = indices;
+      }
+      done += thisTick;
+
+      drawCountLabel.innerHTML = 'Total draws: <b>' + totalDraws + '</b>';
+      updateReadout();
+      drawChart();
+      renderRecentHistory();
+
+      if (done < totalToRun){
+        requestAnimationFrame(tick);
+      } else {
+        // highlight the final sample drawn, and show it as "current sample"
+        if (lastIndices){
+          selectedIndices = lastIndices;
+          selectedIndices.forEach(i => cellEls[i].classList.add('selected'));
+          sampleBig.textContent = 'p̂ = ' + lastPhat.toFixed(3) + '  (last of ' + totalToRun + ' draws)';
+          sampleSub.textContent = revealed
+            ? 'Running average is now within ' + Math.abs(sumPhat/totalDraws - TRUE_P).toFixed(4) + ' of the true p.'
+            : 'Reveal the true p to see how close the running average has gotten.';
+        }
+        batchRunning = false;
+        drawBtn.disabled = false;
+        batchBtn.disabled = false;
+        batchBtnBig.disabled = false;
+        resetBtn.disabled = false;
+        triggerBtn.textContent = originalLabel;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function resetDraws(){
+    selectedIndices.forEach(i => cellEls[i].classList.remove('selected'));
+    selectedIndices = [];
+    totalDraws = 0;
+    sumPhat = 0;
+    minPhat = null;
+    maxPhat = null;
+    runningAverages.length = 0;
+    recentHistory.length = 0;
+    sampleBig.textContent = 'p̂ = —';
+    sampleSub.textContent = 'Press "Draw sample" to select 50 rods at random.';
+    drawCountLabel.textContent = '';
+    renderRecentHistory();
+    updateReadout();
+    drawChart();
+  }
+
+  drawBtn.addEventListener('click', drawSingle);
+  batchBtn.addEventListener('click', () => runBatch(200, batchBtn));
+  batchBtnBig.addEventListener('click', () => runBatch(2000, batchBtnBig));
+  resetBtn.addEventListener('click', resetDraws);
+  window.addEventListener('resize', drawChart);
+
+  renderRecentHistory();
+  updateReadout();
+  drawChart();
+})();
+</script>
+</body>
+</html>

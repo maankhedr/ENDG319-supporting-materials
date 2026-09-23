@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>From Population to Posterior</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #ECEFE7;
+    --card: #FFFFFF;
+    --ink: #1B2A2A;
+    --ink-soft: #4B615E;
+    --line: rgba(27,42,42,.14);
+    --accent: #2E6F6E;
+    --accent-ink: #EAF3F2;
+    --flag: #B8501F;
+    --flag-ink: #FBEDE4;
+    --ok: #3E7A49;
+    --ok-ink: #E9F3EA;
+    --warn-bg: #F4E8D6;
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-num: 'IBM Plex Mono', ui-monospace, monospace;
+    --radius: 10px;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper: #14201F;
+      --card: #1C2A29;
+      --ink: #E8ECE8;
+      --ink-soft: #A8BAB6;
+      --line: rgba(232,236,232,.16);
+      --accent: #6FBDB8;
+      --accent-ink: #123331;
+      --flag: #E28B5C;
+      --flag-ink: #3A2416;
+      --ok: #7FBE8B;
+      --ok-ink: #17301C;
+      --warn-bg: #362C1B;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #14201F;
+    --card: #1C2A29;
+    --ink: #E8ECE8;
+    --ink-soft: #A8BAB6;
+    --line: rgba(232,236,232,.16);
+    --accent: #6FBDB8;
+    --accent-ink: #123331;
+    --flag: #E28B5C;
+    --flag-ink: #3A2416;
+    --ok: #7FBE8B;
+    --ok-ink: #17301C;
+    --warn-bg: #362C1B;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
+  html, body { height: auto; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+
+  header.top {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--paper) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .top-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; padding: 12px 20px; max-width:920px; margin:0 auto; flex-wrap:wrap; }
+  .brand { font-family: var(--font-display); font-weight:600; font-size: 1.05rem; }
+  .jumpnav { display:flex; gap:8px; flex-wrap:wrap; }
+  .jumpnav a {
+    font-family: var(--font-body); font-size:.82rem; font-weight:600; text-decoration:none;
+    color: var(--ink); border:1px solid var(--line); border-radius: 999px; padding: 6px 13px;
+    white-space:nowrap;
+  }
+  .jumpnav a:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero { padding: 56px 0 30px; }
+  .hero h1 {
+    font-family: var(--font-display); font-weight:600; font-size: clamp(1.9rem, 4.4vw, 2.7rem);
+    line-height:1.12; margin: 0 0 14px; max-width: 16ch;
+  }
+  .hero p.lede { font-size: 1.05rem; color: var(--ink-soft); max-width: 62ch; margin: 0 0 6px; }
+  .hero .pipeline {
+    margin-top: 26px; display:flex; flex-wrap:wrap; gap:8px 6px; font-family: var(--font-num); font-size:.78rem;
+    color: var(--ink-soft);
+  }
+  .hero .pipeline span.step { border:1px dashed var(--line); border-radius:6px; padding:4px 9px; }
+  .hero .pipeline span.arrow { padding: 4px 0; }
+
+  section.example { padding: 10px 0 64px; border-top: 1px solid var(--line); }
+  .example-head { padding-top: 44px; margin-bottom: 8px; }
+  .example-kicker { font-family: var(--font-num); font-size:.78rem; color: var(--accent); letter-spacing:.02em; margin-bottom:6px; }
+  .example-head h2 { font-family: var(--font-display); font-size: clamp(1.5rem,3vw,2rem); margin: 0 0 10px; }
+  .example-head p { color: var(--ink-soft); max-width: 68ch; margin: 0; }
+
+  .stage { margin-top: 40px; }
+  .stage-num-row { display:flex; align-items:baseline; gap:12px; margin-bottom: 14px; }
+  .stage-num {
+    font-family: var(--font-display); font-weight:600; font-size:1.5rem; color: var(--accent);
+    min-width: 2ch;
+  }
+  .stage-title { font-family: var(--font-display); font-weight:600; font-size: 1.28rem; }
+  .stage-body { padding-left: calc(2ch + 12px); }
+  .stage p.intro { color: var(--ink-soft); max-width: 68ch; margin: 0 0 16px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 20px; margin-bottom: 14px;
+  }
+  .card h4 { margin: 0 0 10px; font-family: var(--font-body); font-weight:600; font-size:.95rem; }
+  .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 680px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .kv-row { display:flex; justify-content:space-between; gap:10px; padding: 5px 0; border-bottom: 1px dotted var(--line); font-size:.92rem; }
+  .kv-row:last-child { border-bottom:none; }
+  .kv-row .k { color: var(--ink-soft); }
+  .kv-row .v { font-family: var(--font-num); font-weight:500; }
+
+  table.datatable { width:100%; border-collapse: collapse; font-size:.88rem; }
+  table.datatable th, table.datatable td { padding: 7px 9px; text-align:center; border: 1px solid var(--line); }
+  table.datatable th { background: color-mix(in srgb, var(--accent) 10%, var(--card)); font-weight:600; }
+  table.datatable td.num { font-family: var(--font-num); }
+  table.datatable td.rowlabel, table.datatable th.corner { text-align:left; font-weight:600; background: color-mix(in srgb, var(--accent) 6%, var(--card)); }
+  table.datatable tr.total td, table.datatable td.total { font-weight:700; }
+
+  .pill { display:inline-block; font-family: var(--font-num); font-size:.78rem; padding: 2px 9px; border-radius:999px; }
+  .pill.pos { background: var(--flag-ink); color: var(--flag); }
+  .pill.neg { background: var(--ok-ink); color: var(--ok); }
+
+  .result-callout {
+    border-left: 3px solid var(--accent); padding: 10px 14px; background: color-mix(in srgb, var(--accent) 7%, var(--card));
+    border-radius: 0 6px 6px 0; font-size: .95rem; margin-top: 10px;
+  }
+  .result-callout b { font-family: var(--font-num); }
+
+  .reveal-block { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; }
+  .reveal-q { font-weight:600; font-size:.94rem; margin: 0 0 9px; }
+  .reveal-btn {
+    font-family: var(--font-body); font-weight:600; font-size:.82rem; cursor:pointer;
+    background: none; border: 1px solid var(--accent); color: var(--accent); border-radius: 999px;
+    padding: 6px 14px;
+  }
+  .reveal-btn:hover { background: var(--accent); color: var(--accent-ink); }
+  .reveal-a {
+    margin-top: 11px; font-size: .92rem; color: var(--ink); background: color-mix(in srgb, var(--accent) 6%, var(--card));
+    border-radius: 6px; padding: 11px 13px; border: 1px solid var(--line);
+  }
+  .reveal-a.hidden { display:none; }
+
+  .match-card h4 { margin-bottom: 4px; }
+  .match-item { border-top: 1px dotted var(--line); padding: 14px 0; }
+  .match-item:first-of-type { border-top: none; padding-top: 4px; }
+  .match-stmt { margin: 0 0 10px; font-size: .92rem; }
+  .match-options { display:flex; flex-wrap:wrap; gap:8px; }
+  .match-opt {
+    font-family: var(--font-num); font-size:.85rem; font-weight:500; cursor:pointer;
+    background: var(--card); border: 1px solid var(--line); color: var(--ink);
+    border-radius: 7px; padding: 7px 13px;
+  }
+  .match-opt:hover:not(:disabled) { border-color: var(--accent); }
+  .match-opt:disabled { cursor:default; }
+  .match-opt.opt-correct { background: var(--ok-ink); border-color: var(--ok); color: var(--ok); }
+  .match-opt.opt-incorrect { background: var(--flag-ink); border-color: var(--flag); color: var(--flag); }
+  .match-opt.opt-dim { opacity: .45; }
+  .match-feedback {
+    margin-top: 11px; font-size:.9rem; background: color-mix(in srgb, var(--accent) 6%, var(--card));
+    border: 1px solid var(--line); border-radius: 6px; padding: 10px 13px;
+  }
+  .match-feedback.hidden { display:none; }
+  .match-answer { margin-bottom: 6px; font-family: var(--font-body); }
+  .match-answer b:last-child { font-family: var(--font-num); }
+
+  svg.diagram { width:100%; height:auto; display:block; }
+  .tree-edge-label { font-family: var(--font-num); font-size: 11px; fill: var(--ink-soft); }
+  .tree-node-label { font-family: var(--font-body); font-size: 12px; font-weight:600; fill: var(--ink); }
+  .tree-leaf-prob { font-family: var(--font-num); font-size: 11px; fill: var(--ink-soft); }
+
+  .chart-wrap { position: relative; height: 240px; }
+  .chart-wrap.short { height: 200px; }
+
+  .boxplot-wrap { padding: 6px 4px 2px; }
+
+  footer.page-footer { padding: 40px 20px 56px; text-align:center; color: var(--ink-soft); font-size:.82rem; border-top: 1px solid var(--line); }
+
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">Population → Posterior</div>
+    <nav class="jumpnav">
+      <a href="#imu">IMU chip inspection</a>
+      <a href="#disease">Disease screening</a>
+      <a href="#bearing">Bearing monitoring</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Three worked examples, one pipeline</h1>
+    <p class="lede">The same reasoning chain, run three times: a fabrication line, a clinic, and a monitoring fleet. Each stage below builds on the last &mdash; and at every choice point, there's a question you can try before revealing the reasoning. The first two end in a discrete random variable (PMF/CDF); the third ends in a continuous one (PDF/CDF) instead.</p>
+    <div class="pipeline">
+      <span class="step">population &amp; sample</span><span class="arrow">&rarr;</span>
+      <span class="step">descriptive stats &amp; the right chart</span><span class="arrow">&rarr;</span>
+      <span class="step">events &amp; counting</span><span class="arrow">&rarr;</span>
+      <span class="step">Bayes on one test</span><span class="arrow">&rarr;</span>
+      <span class="step">two tests &amp; a random variable</span><span class="arrow">&rarr;</span>
+      <span class="step">PMF/CDF or PDF/CDF</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <section class="example" id="imu"><div class="wrap"><div id="imu-mount"></div></div></section>
+  <section class="example" id="disease"><div class="wrap"><div id="disease-mount"></div></div></section>
+  <section class="example" id="bearing"><div class="wrap"><div id="bearing-mount"></div></div></section>
+</main>
+
+<footer class="page-footer">Built for ENDG 319 &middot; conditional probability, counting, Bayes' rule, and random variables &mdash; discrete and continuous &mdash; in one thread.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/* =========================================================================
+   DATA — everything example-specific lives here. Rendering code below is
+   shared between the two examples.
+   ========================================================================= */
+
+const IMU = {
+  id: 'imu',
+  mode: 'discrete',
+  kicker: 'Example 1 — Manufacturing',
+  title: 'Screening IMU chips on the fab line',
+  intro: 'A plant makes inertial-sensor chips. Some fraction are truly out of spec; an automated inspection tool flags chips before they ship. We\'ll trace the whole pipeline on this one scenario.',
+  accentVar: '--accent',
+  population: {
+    N: 50000, p: 0.008,
+    unitSingular: 'chip', unitPlural: 'chips',
+    popBlurb: 'Every chip made this month. The true defect rate p is a population parameter — real, but unknown to the QA team in practice.',
+    sampleN: 120,
+    sampleBlurb: 'QA pulls 120 chips and measures a continuous variable: bias-drift error (&micro;rad/s). This sample is what a statistic like p&#770; will be built from.',
+    threshold: 0.75,
+    thresholdVar: 'bias drift',
+    thresholdUnit: '&micro;rad/s',
+    flaggedInSample: 1
+  },
+  stats: {
+    mean: 0.42, median: 0.39, sd: 0.11, min: 0.18, q1: 0.34, q3: 0.49, max: 0.81, iqr: 0.15,
+    varName: 'Bias-drift error', varUnit: '&micro;rad/s',
+    shape: 'roughly symmetric, one high-side outlier near the spec limit',
+    histBins: ['0.15–0.25','0.25–0.35','0.35–0.45','0.45–0.55','0.55–0.65','0.65–0.75','0.75–0.85'],
+    histCounts: [6, 22, 34, 32, 16, 7, 3],
+    pdfModel: 'normal',
+    visualQ: 'Why pair a histogram with a boxplot here, instead of a bar chart?',
+    visualA: 'Bias drift is a continuous measurement, not a category, so a histogram is what shows its shape (here: roughly symmetric with a thin high-side tail). The boxplot adds the five-number summary and flags the outlier near 0.81 explicitly. A bar chart is for counts within discrete categories &mdash; that only becomes appropriate once we threshold the variable into pass/fail.'
+  },
+  events: {
+    Dname: 'D', Dlabel: 'chip is truly defective', Dclabel: 'chip is truly within spec',
+    Tname: 'T', Tlabel: 'inspection tool flags positive',
+    countingSetup: 'Today\'s screening pass flags 12 chips. Lab capacity allows a destructive teardown on only 5 of them.',
+    countingQ: 'Should QA use combinations or permutations to count the ways to pick those 5 chips?',
+    countingA: 'Combinations. The teardown group is just a <i>set</i> of 5 chips &mdash; which 5 get picked, not what order they\'re picked in. That\'s C(12,5) = 792 possible groups. Permutations would count "chip A then chip B" as different from "chip B then chip A," which makes no sense for an unordered selection.',
+    countingFormula: 'C(12,5) = 792',
+    permSetup: 'Separately, one chip goes through three confirmatory tests &mdash; vibration, thermal, and X-ray &mdash; run one after another.',
+    permQ: 'Why does counting the possible test orders use permutations instead?',
+    permA: 'Because order now matters: running vibration &rarr; thermal &rarr; X-ray is a genuinely different plan from X-ray &rarr; vibration &rarr; thermal (earlier stress could affect a later reading). Counting ordered arrangements of all 3 tests gives 3! = 6 possible sequences.',
+    permFormula: '3! = 6'
+  },
+  bayes: {
+    sens: 0.97, fpr: 0.02,
+    testSymbol: 'T',
+    treeQ: 'Why build the full tree instead of jumping straight to Bayes\' formula?',
+    treeA: 'Bayes\' denominator, P(T&#8314;), is not given anywhere &mdash; it has to be assembled from <i>every</i> route to a positive result. The tree forces you to walk both the true-positive branch (defective &amp; flagged) and the false-positive branch (in-spec &amp; flagged) before you\'re allowed to divide. Skipping straight to a formula is exactly how people forget the false-positive term.'
+  },
+  matchExercise: [
+    {
+      statement: 'Before any inspection happens, what share of chips coming off the line are truly defective?',
+      correctKey: 'D',
+      distractorKeys: ['D_given_T', 'T_given_D', 'D_and_T'],
+      explanation: 'No test result is involved yet &mdash; this is the unconditional population rate, the prior P(D), not anything conditioned on or intersected with a test outcome.'
+    },
+    {
+      statement: 'Before any inspection happens, what share of chips are truly within spec?',
+      correctKey: 'Dc',
+      distractorKeys: ['Tn_given_Dc', 'D', 'D_given_Tn'],
+      explanation: 'Same idea as the previous question, just the complementary event &mdash; still nothing about a test result yet, so it\'s the marginal P(D\u1D9C).'
+    },
+    {
+      statement: 'Among chips that are truly defective, what fraction does the inspection tool actually catch?',
+      correctKey: 'T_given_D',
+      distractorKeys: ['D_given_T', 'D_and_T', 'T'],
+      explanation: 'The chip being defective is the given condition; we\'re asking about the test result. That\'s sensitivity, P(T+|D). Flipping it to P(D|T+) instead starts from the test result and asks about the truth &mdash; a different question entirely.'
+    },
+    {
+      statement: 'Among chips that are truly defective, what fraction slip through inspection completely undetected?',
+      correctKey: 'Tn_given_D',
+      distractorKeys: ['T_given_D', 'D_given_Tn', 'Tn'],
+      explanation: 'Still conditioning on "truly defective," but now asking about a negative (missed) result &mdash; the false-negative rate, P(T\u2212|D) = 1 &minus; sensitivity.'
+    },
+    {
+      statement: 'Among chips that are actually within spec, what fraction get wrongly flagged as defective anyway?',
+      correctKey: 'T_given_Dc',
+      distractorKeys: ['Dc_and_T', 'T_given_D', 'D_given_T'],
+      explanation: 'The condition is "truly within spec" (D\u1D9C); we want the chance of a false alarm &mdash; the false-positive rate, P(T+|D\u1D9C).'
+    },
+    {
+      statement: 'Among chips that are actually within spec, what fraction does the tool correctly wave through?',
+      correctKey: 'Tn_given_Dc',
+      distractorKeys: ['T_given_Dc', 'Dc', 'Dc_and_Tn'],
+      explanation: 'Conditioning on D\u1D9C again, but asking about a correct negative result this time &mdash; specificity, P(T\u2212|D\u1D9C).'
+    },
+    {
+      statement: 'Across the entire production run, what fraction of chips are BOTH truly defective AND end up flagged by the tool?',
+      correctKey: 'D_and_T',
+      distractorKeys: ['D_given_T', 'T_given_D', 'T'],
+      explanation: '"Both ... and" with no conditioning is the signature of a joint probability &mdash; this is one cell of the 2\u00d72 table, P(D\u2229T+), not a conditional rate.'
+    },
+    {
+      statement: 'Across the entire production run, what fraction of chips are truly defective but still pass inspection undetected?',
+      correctKey: 'D_and_Tn',
+      distractorKeys: ['Tn_given_D', 'D_given_Tn', 'D_and_T'],
+      explanation: 'Again "both ... and" across the whole batch &mdash; the joint cell for missed defects, P(D\u2229T\u2212), which is different from P(T\u2212|D), the rate among defective chips only.'
+    },
+    {
+      statement: 'Across the entire production run, what fraction of chips are actually fine but still get flagged (a false alarm)?',
+      correctKey: 'Dc_and_T',
+      distractorKeys: ['T_given_Dc', 'D_given_T', 'D_and_T'],
+      explanation: 'The other off-diagonal joint cell, P(D\u1D9C\u2229T+) &mdash; the false-alarm share of the whole batch, not the false-alarm rate among in-spec chips (that would be P(T+|D\u1D9C)).'
+    },
+    {
+      statement: 'Regardless of whether a chip is actually defective or not, what fraction of the whole batch ends up flagged by the tool?',
+      correctKey: 'T',
+      distractorKeys: ['T_given_D', 'D_and_T', 'D_given_T'],
+      explanation: '"Regardless of" is the tell for a marginal probability &mdash; ignore the D/D\u1D9C split and ask about T+ overall. It\'s the row total in the joint table, built from both branches by total probability.'
+    },
+    {
+      statement: 'A chip just came back flagged by the inspection tool. Given only that, what\'s the chance it\'s actually defective?',
+      correctKey: 'D_given_T',
+      distractorKeys: ['T_given_D', 'D_and_T', 'D'],
+      explanation: 'We\'re told the RESULT (flagged) and asked about the TRUTH (defective) &mdash; the posterior, exactly what Bayes\' rule computes: P(D|T+). This is the reverse direction from sensitivity.'
+    },
+    {
+      statement: 'A chip just passed inspection cleanly. Given only that, what\'s the chance it\'s actually defective and slipped through?',
+      correctKey: 'D_given_Tn',
+      distractorKeys: ['Tn_given_D', 'D_and_Tn', 'D_given_T'],
+      explanation: 'Same reverse-direction logic, conditioned on a negative result instead &mdash; the "missed defect" risk, P(D|T\u2212). Notice it comes out far below the original prior P(D): passing a good test is genuinely reassuring.'
+    }
+  ],
+  extension: {
+    testAName: 'Vibration test (A)', testASens: 0.95, testAFpr: 0.03,
+    testBName: 'Thermal test (B)', testBSens: 0.98, testBFpr: 0.01,
+    indepQ: 'Why can P(A&#8314; and B&#8314; | D) just be P(A&#8314;|D) &times; P(B&#8314;|D)?',
+    indepA: 'Only because we\'re assuming the two tests are <i>conditionally independent given the true defect status</i>: once we know a chip really is defective, whether the vibration test catches it tells us nothing extra about whether the thermal test will. That\'s an assumption, not a free fact &mdash; if both tests were fooled by the same underlying cause (say, a shared calibration drift), this multiplication would overstate our confidence.'
+  },
+  dist: {
+    pmfQ: 'What\'s actually different between this bar chart and the histogram back in Stage 2?',
+    pmfA: 'The histogram summarized <i>observed sample data</i> for a continuous variable &mdash; bar heights are counts in a bin. This bar chart is a <i>theoretical model</i> for a discrete random variable X = number of positive tests: each bar height IS the exact probability P(X=x), computed from the tree, and by construction the three heights sum to exactly 1.',
+    cdfQ: 'Why does the CDF only jump at X = 0, 1, 2, and why do the jump sizes match the PMF?',
+    cdfA: 'F(x) = P(X&le;x) can only change where X actually places probability. Since X is discrete with just three possible values, F is flat everywhere else and jumps by exactly P(X=x) at each one &mdash; that\'s the defining link between a PMF and its CDF.',
+    pdfQ: 'Why is P(bias drift = exactly 0.4200&hellip;) equal to 0, even though the curve is clearly positive there?',
+    pdfA: 'For a continuous variable, probability is <i>area</i> under the density curve. A single point has zero width, so it has zero area under any finite-height curve &mdash; hence zero probability. Only intervals (like P(0.35 &lt; drift &lt; 0.45)) carry positive probability. That\'s why we integrate a PDF over a range but read a PMF value directly at a point.'
+  }
+};
+
+const DISEASE = {
+  id: 'disease',
+  mode: 'discrete',
+  kicker: 'Example 2 — Public health',
+  title: 'Screening a population for a rare disease',
+  intro: 'The classic setup, run through the same six stages: a screening biomarker, a threshold, a confirmatory test, and a random variable built from two tests instead of one.',
+  accentVar: '--flag',
+  population: {
+    N: 1000000, p: 0.005,
+    unitSingular: 'person', unitPlural: 'people',
+    popBlurb: 'Everyone in the screening region. True prevalence p is the population parameter &mdash; unknown in practice, here set at 0.5%.',
+    sampleN: 2000,
+    sampleBlurb: 'A pilot program samples 2,000 people and measures a continuous biomarker (ng/mL) associated with the disease.',
+    threshold: 20,
+    thresholdVar: 'biomarker level',
+    thresholdUnit: 'ng/mL',
+    flaggedInSample: 30
+  },
+  stats: {
+    mean: 18.4, median: 16.9, sd: 7.2, min: 4.1, q1: 13.0, q3: 22.5, max: 61.3, iqr: 9.5,
+    varName: 'Biomarker level', varUnit: 'ng/mL',
+    shape: 'right-skewed, with a thin tail of high readings',
+    histBins: ['0–5','5–10','10–15','15–20','20–25','25–30','30–35','35–40','40–45','45–50','50–55','55–60','60–65'],
+    histCounts: [15,120,340,480,430,280,160,90,45,20,10,6,4],
+    pdfModel: 'lognormal',
+    visualQ: 'Why pair a histogram with a boxplot here, instead of a bar chart?',
+    visualA: 'Biomarker level is continuous and clearly skewed, so a histogram is what reveals that shape &mdash; a single symmetric summary would hide the long right tail. The boxplot\'s five-number summary flags exactly how far the high outliers sit past Q3. A bar chart only becomes appropriate once we threshold the biomarker into a positive/negative category.'
+  },
+  events: {
+    Dname: 'D', Dlabel: 'person truly has the disease', Dclabel: 'person truly does not',
+    Tname: 'T', Tlabel: 'screening test positive',
+    countingSetup: 'The pilot\'s screening pass flags 30 people. The lab can only run confirmatory PCR on 10 of them today.',
+    countingQ: 'Should the lab use combinations or permutations to count the ways to pick those 10 people?',
+    countingA: 'Combinations. The confirmatory batch is an unordered set of 10 patients &mdash; who\'s in it, not what order they\'re processed in. That\'s C(30,10) = 30,045,015 possible groups. Permutations would treat "test patient X first" as a different outcome from "test patient X last," which isn\'t a meaningful distinction for choosing who gets tested.',
+    countingFormula: 'C(30,10) = 30,045,015',
+    permSetup: 'Separately, three clinicians review the same three flagged case files, one after another, before a team meeting.',
+    permQ: 'Why does counting review orders use permutations instead?',
+    permA: 'Because order matters here: reviewer 1 seeing case A before case B can anchor their read on case B, so "A then B then C" is a genuinely different process from "C then A then B." Counting ordered arrangements of all 3 cases gives 3! = 6 possible review sequences.',
+    permFormula: '3! = 6'
+  },
+  bayes: {
+    sens: 0.99, fpr: 0.01,
+    testSymbol: 'T',
+    treeQ: 'Why build the full tree instead of jumping straight to Bayes\' formula?',
+    treeA: 'Bayes\' denominator, P(T&#8314;), isn\'t handed to you &mdash; it has to be built from <i>every</i> route to a positive result. The tree forces you to walk both the true-positive branch (disease &amp; positive) and the false-positive branch (no disease &amp; positive) before dividing. This is exactly the step that produces the famous "99% accurate test, only 33% chance of disease" surprise: most positives come from the huge healthy population, not the rare sick one.'
+  },
+  matchExercise: [
+    {
+      statement: 'Before anyone is screened, what share of the population truly has the disease?',
+      correctKey: 'D',
+      distractorKeys: ['D_given_T', 'T_given_D', 'D_and_T'],
+      explanation: 'No test result is involved yet &mdash; this is the unconditional prevalence, the prior P(D), not anything conditioned on or intersected with a test outcome.'
+    },
+    {
+      statement: 'Before anyone is screened, what share of the population is truly disease-free?',
+      correctKey: 'Dc',
+      distractorKeys: ['Tn_given_Dc', 'D', 'D_given_Tn'],
+      explanation: 'Same idea, just the complementary event &mdash; still nothing about a test result yet, so it\'s the marginal P(D\u1D9C).'
+    },
+    {
+      statement: 'Among people who truly have the disease, what fraction does the screening test actually catch?',
+      correctKey: 'T_given_D',
+      distractorKeys: ['D_given_T', 'D_and_T', 'T'],
+      explanation: 'Having the disease is the given condition; we\'re asking about the test result. That\'s sensitivity, P(T+|D). Flipping it to P(D|T+) starts from the test result and asks about the truth &mdash; a different question.'
+    },
+    {
+      statement: 'Among people who truly have the disease, what fraction does the test miss entirely?',
+      correctKey: 'Tn_given_D',
+      distractorKeys: ['T_given_D', 'D_given_Tn', 'Tn'],
+      explanation: 'Still conditioning on "truly has the disease," but asking about a negative (missed) result &mdash; the false-negative rate, P(T\u2212|D) = 1 &minus; sensitivity.'
+    },
+    {
+      statement: 'Among people who are truly disease-free, what fraction get wrongly flagged as positive anyway?',
+      correctKey: 'T_given_Dc',
+      distractorKeys: ['Dc_and_T', 'T_given_D', 'D_given_T'],
+      explanation: 'The condition is "truly disease-free" (D\u1D9C); we want the chance of a false alarm &mdash; the false-positive rate, P(T+|D\u1D9C).'
+    },
+    {
+      statement: 'Among people who are truly disease-free, what fraction does the test correctly clear?',
+      correctKey: 'Tn_given_Dc',
+      distractorKeys: ['T_given_Dc', 'Dc', 'Dc_and_Tn'],
+      explanation: 'Conditioning on D\u1D9C again, but asking about a correct negative result this time &mdash; specificity, P(T\u2212|D\u1D9C).'
+    },
+    {
+      statement: 'Across the whole population, what fraction of people are BOTH truly sick AND test positive?',
+      correctKey: 'D_and_T',
+      distractorKeys: ['D_given_T', 'T_given_D', 'T'],
+      explanation: '"Both ... and" with no conditioning is the signature of a joint probability &mdash; one cell of the 2\u00d72 table, P(D\u2229T+), not a conditional rate.'
+    },
+    {
+      statement: 'Across the whole population, what fraction of people are truly sick but still test negative (a missed case)?',
+      correctKey: 'D_and_Tn',
+      distractorKeys: ['Tn_given_D', 'D_given_Tn', 'D_and_T'],
+      explanation: 'Again "both ... and" across the whole population &mdash; the joint cell for missed cases, P(D\u2229T\u2212), different from P(T\u2212|D), the miss rate among sick people only.'
+    },
+    {
+      statement: 'Across the whole population, what fraction of people are actually healthy but still test positive (a false alarm)?',
+      correctKey: 'Dc_and_T',
+      distractorKeys: ['T_given_Dc', 'D_given_T', 'D_and_T'],
+      explanation: 'The other off-diagonal joint cell, P(D\u1D9C\u2229T+) &mdash; the false-alarm share of the whole population, not the false-alarm rate among healthy people (that\'s P(T+|D\u1D9C)).'
+    },
+    {
+      statement: 'Regardless of true disease status, what fraction of the whole population tests positive?',
+      correctKey: 'T',
+      distractorKeys: ['T_given_D', 'D_and_T', 'D_given_T'],
+      explanation: '"Regardless of" signals a marginal probability &mdash; ignore the D/D\u1D9C split and ask about T+ overall. It\'s the row total in the joint table, built from both branches by total probability.'
+    },
+    {
+      statement: 'A person just tested positive. Given only that, what\'s the chance they actually have the disease?',
+      correctKey: 'D_given_T',
+      distractorKeys: ['T_given_D', 'D_and_T', 'D'],
+      explanation: 'We\'re told the RESULT (positive) and asked about the TRUTH (has the disease) &mdash; the posterior, exactly what Bayes\' rule computes: P(D|T+). Reverse direction from sensitivity.'
+    },
+    {
+      statement: 'A person just tested negative. Given only that, what\'s the chance they actually have the disease and were missed?',
+      correctKey: 'D_given_Tn',
+      distractorKeys: ['Tn_given_D', 'D_and_Tn', 'D_given_T'],
+      explanation: 'Same reverse-direction logic, conditioned on a negative result &mdash; the "missed case" risk, P(D|T\u2212). It comes out far below the prior P(D): a negative result on a good test is genuinely reassuring.'
+    }
+  ],
+  extension: {
+    testAName: 'Rapid test (A)', testASens: 0.92, testAFpr: 0.05,
+    testBName: 'PCR test (B)', testBSens: 0.995, testBFpr: 0.005,
+    indepQ: 'Why can P(A&#8314; and B&#8314; | D) just be P(A&#8314;|D) &times; P(B&#8314;|D)?',
+    indepA: 'Only under the assumption that the two tests are <i>conditionally independent given true disease status</i>: once we know a person genuinely has the disease, whether the rapid test catches it tells us nothing extra about whether PCR will. This is a modeling assumption &mdash; if both tests reacted to the same cross-reacting substance, this multiplication would overstate the combined confidence.'
+  },
+  dist: {
+    pmfQ: 'What\'s actually different between this bar chart and the histogram back in Stage 2?',
+    pmfA: 'The histogram summarized <i>observed sample data</i> for a continuous variable &mdash; bar heights are counts in a bin. This bar chart is a <i>theoretical model</i> for a discrete random variable X = number of positive tests: each bar height IS the exact probability P(X=x), computed from the tree, and the three heights sum to exactly 1 by construction.',
+    cdfQ: 'Why does the CDF only jump at X = 0, 1, 2, and why do the jump sizes match the PMF?',
+    cdfA: 'F(x) = P(X&le;x) can only change where X actually places probability. Since X is discrete with just three possible values, F is flat everywhere else and jumps by exactly P(X=x) at each one &mdash; that\'s the defining link between a PMF and its CDF.',
+    pdfQ: 'Why is P(biomarker = exactly 18.400&hellip; ng/mL) equal to 0, even though the curve is clearly positive there?',
+    pdfA: 'For a continuous variable, probability is <i>area</i> under the density curve. A single point has zero width, so it contributes zero area under any finite-height curve &mdash; hence zero probability. Only intervals (like P(15 &lt; biomarker &lt; 20)) carry positive probability. That\'s why we integrate a PDF over a range but read a PMF value directly at a point.'
+  }
+};
+
+/* Example 3 — same pipeline, but the Stage 5/6 random variable is CONTINUOUS
+   instead of a discrete count, so it closes on a PDF (and a continuous CDF)
+   rather than a PMF. */
+const BEARING = {
+  id: 'bearing',
+  mode: 'continuous',
+  kicker: 'Example 3 — Condition monitoring',
+  title: 'Detecting bearing failure onset from vibration',
+  intro: 'A fleet of machines is fitted with vibration sensors on their bearings. Stages 1–4 run exactly like the first two examples. Stage 5 then combines two continuous sensor readings into a single continuous score instead of counting positives &mdash; which is why Stage 6 closes on a PDF, not a PMF.',
+  accentVar: '--ok',
+  population: {
+    N: 20000, p: 0.012,
+    unitSingular: 'bearing', unitPlural: 'bearings',
+    popBlurb: 'Every bearing in service across the fleet. The true failure-onset rate p is a population parameter &mdash; unknown to the maintenance team in practice.',
+    sampleN: 150,
+    sampleBlurb: 'The team pulls vibration logs from 150 bearings and measures a continuous variable: RMS vibration acceleration (g). This sample is what a statistic like p&#770; will be built from.',
+    threshold: 1.05,
+    thresholdVar: 'vibration RMS',
+    thresholdUnit: 'g',
+    flaggedInSample: 4
+  },
+  stats: {
+    mean: 0.86, median: 0.81, sd: 0.24, min: 0.31, q1: 0.68, q3: 1.01, max: 1.78, iqr: 0.33,
+    varName: 'Vibration RMS acceleration', varUnit: 'g',
+    shape: 'right-skewed, with a thin high tail from bearings already in distress',
+    histBins: ['0.2–0.4','0.4–0.6','0.6–0.8','0.8–1.0','1.0–1.2','1.2–1.4','1.4–1.6','1.6–1.8'],
+    histCounts: [8, 28, 42, 35, 20, 10, 5, 2],
+    pdfModel: 'lognormal',
+    visualQ: 'Why pair a histogram with a boxplot here, instead of a bar chart?',
+    visualA: 'Vibration RMS is a continuous measurement, and clearly skewed, so a histogram is what reveals that shape &mdash; a single symmetric summary would hide the thin high-vibration tail. The boxplot\'s five-number summary flags how far those high readings sit past Q3. A bar chart only becomes appropriate once we threshold the reading into flagged/not-flagged.'
+  },
+  events: {
+    Dname: 'D', Dlabel: 'bearing truly has failure onset', Dclabel: 'bearing is truly healthy',
+    Tname: 'T', Tlabel: 'vibration test flags positive (RMS above threshold)',
+    countingSetup: 'Today\'s vibration sweep flags 14 bearings. Maintenance can only pull 6 of them offline for teardown this shift.',
+    countingQ: 'Should maintenance use combinations or permutations to count the ways to pick those 6 bearings?',
+    countingA: 'Combinations. The teardown group is just a <i>set</i> of 6 bearings &mdash; which 6 get pulled, not what order. That\'s C(14,6) = 3,003 possible groups. Permutations would count "bearing 3 first" as different from "bearing 3 last," which isn\'t meaningful for an unordered selection.',
+    countingFormula: 'C(14,6) = 3,003',
+    permSetup: 'Separately, one flagged bearing goes through three diagnostic passes &mdash; radial scan, axial scan, and acoustic emission &mdash; run one after another.',
+    permQ: 'Why does counting the possible pass orders use permutations instead?',
+    permA: 'Because order matters: running radial &rarr; axial &rarr; acoustic is a genuinely different diagnostic plan from acoustic &rarr; radial &rarr; axial (an earlier pass can change what a later sensor picks up). Counting ordered arrangements of all 3 passes gives 3! = 6 possible sequences.',
+    permFormula: '3! = 6'
+  },
+  bayes: {
+    sens: 0.93, fpr: 0.04,
+    testSymbol: 'T',
+    treeQ: 'Why build the full tree instead of jumping straight to Bayes\' formula?',
+    treeA: 'Bayes\' denominator, P(T&#8314;), isn\'t handed to you &mdash; it has to be built from <i>every</i> route to a positive result. The tree forces you to walk both the true-positive branch (failing &amp; flagged) and the false-positive branch (healthy &amp; flagged) before dividing. Because failure onset is rare (p = 1.2%), most flagged bearings still turn out to be the false-positive branch &mdash; the tree makes that visible instead of surprising.'
+  },
+  matchExercise: [
+    {
+      statement: 'Before any vibration test, what share of bearings in the fleet truly have failure onset?',
+      correctKey: 'D',
+      distractorKeys: ['D_given_T', 'T_given_D', 'D_and_T'],
+      explanation: 'No test result is involved yet &mdash; this is the unconditional fleet-wide rate, the prior P(D), not anything conditioned on or intersected with a test outcome.'
+    },
+    {
+      statement: 'Before any vibration test, what share of bearings are truly healthy?',
+      correctKey: 'Dc',
+      distractorKeys: ['Tn_given_Dc', 'D', 'D_given_Tn'],
+      explanation: 'Same idea, just the complementary event &mdash; still nothing about a test result yet, so it\'s the marginal P(D\u1D9C).'
+    },
+    {
+      statement: 'Among bearings that truly have failure onset, what fraction does the vibration test actually flag?',
+      correctKey: 'T_given_D',
+      distractorKeys: ['D_given_T', 'D_and_T', 'T'],
+      explanation: 'Truly having failure onset is the given condition; we\'re asking about the test result. That\'s sensitivity, P(T+|D). Flipping it to P(D|T+) starts from the test result and asks about the truth &mdash; a different question.'
+    },
+    {
+      statement: 'Among bearings that truly have failure onset, what fraction does the test miss entirely?',
+      correctKey: 'Tn_given_D',
+      distractorKeys: ['T_given_D', 'D_given_Tn', 'Tn'],
+      explanation: 'Still conditioning on "truly has failure onset," but asking about a negative (missed) result &mdash; the false-negative rate, P(T\u2212|D) = 1 &minus; sensitivity.'
+    },
+    {
+      statement: 'Among bearings that are truly healthy, what fraction get wrongly flagged as failing anyway?',
+      correctKey: 'T_given_Dc',
+      distractorKeys: ['Dc_and_T', 'T_given_D', 'D_given_T'],
+      explanation: 'The condition is "truly healthy" (D\u1D9C); we want the chance of a false alarm &mdash; the false-positive rate, P(T+|D\u1D9C).'
+    },
+    {
+      statement: 'Among bearings that are truly healthy, what fraction does the test correctly clear?',
+      correctKey: 'Tn_given_Dc',
+      distractorKeys: ['T_given_Dc', 'Dc', 'Dc_and_Tn'],
+      explanation: 'Conditioning on D\u1D9C again, but asking about a correct negative result this time &mdash; specificity, P(T\u2212|D\u1D9C).'
+    },
+    {
+      statement: 'Across the whole fleet, what fraction of bearings are BOTH truly failing AND flagged by the test?',
+      correctKey: 'D_and_T',
+      distractorKeys: ['D_given_T', 'T_given_D', 'T'],
+      explanation: '"Both ... and" with no conditioning is the signature of a joint probability &mdash; one cell of the 2\u00d72 table, P(D\u2229T+), not a conditional rate.'
+    },
+    {
+      statement: 'Across the whole fleet, what fraction of bearings are truly failing but still pass the vibration test undetected?',
+      correctKey: 'D_and_Tn',
+      distractorKeys: ['Tn_given_D', 'D_given_Tn', 'D_and_T'],
+      explanation: 'Again "both ... and" across the whole fleet &mdash; the joint cell for missed failures, P(D\u2229T\u2212), different from P(T\u2212|D), the miss rate among failing bearings only.'
+    },
+    {
+      statement: 'Across the whole fleet, what fraction of bearings are actually healthy but still get flagged (a false alarm)?',
+      correctKey: 'Dc_and_T',
+      distractorKeys: ['T_given_Dc', 'D_given_T', 'D_and_T'],
+      explanation: 'The other off-diagonal joint cell, P(D\u1D9C\u2229T+) &mdash; the false-alarm share of the whole fleet, not the false-alarm rate among healthy bearings (that\'s P(T+|D\u1D9C)).'
+    },
+    {
+      statement: 'Regardless of true condition, what fraction of the whole fleet gets flagged by the vibration test?',
+      correctKey: 'T',
+      distractorKeys: ['T_given_D', 'D_and_T', 'D_given_T'],
+      explanation: '"Regardless of" signals a marginal probability &mdash; ignore the D/D\u1D9C split and ask about T+ overall. It\'s the row total in the joint table, built from both branches by total probability.'
+    },
+    {
+      statement: 'A bearing just got flagged by the vibration test. Given only that, what\'s the chance it actually has failure onset?',
+      correctKey: 'D_given_T',
+      distractorKeys: ['T_given_D', 'D_and_T', 'D'],
+      explanation: 'We\'re told the RESULT (flagged) and asked about the TRUTH (failing) &mdash; the posterior, exactly what Bayes\' rule computes: P(D|T+). Reverse direction from sensitivity.'
+    },
+    {
+      statement: 'A bearing just passed the vibration test cleanly. Given only that, what\'s the chance it actually has failure onset and was missed?',
+      correctKey: 'D_given_Tn',
+      distractorKeys: ['Tn_given_D', 'D_and_Tn', 'D_given_T'],
+      explanation: 'Same reverse-direction logic, conditioned on a negative result &mdash; the "missed failure" risk, P(D|T\u2212). It comes out far below the prior P(D): passing a good vibration test is genuinely reassuring.'
+    }
+  ],
+  /* Continuous-mode extension: two continuous sensor channels, conditionally
+     independent given D, averaged into one continuous score S. */
+  extension: {
+    sensorA: { name: 'Radial accelerometer (A)', muD: 1.30, sdD: 0.22, muDc: 0.78, sdDc: 0.15 },
+    sensorB: { name: 'Axial accelerometer (B)', muD: 1.22, sdD: 0.20, muDc: 0.74, sdDc: 0.13 },
+    scoreLabel: 'S = (A + B) / 2',
+    scoreUnit: 'g',
+    indepQ: 'Why is S = (A + B)/2 normally distributed, and why can we get its mean and variance so directly?',
+    indepA: 'A sum (or average) of independent normal random variables is itself normal &mdash; that\'s a standalone property of the normal distribution, not something we need Bayes for. The mean of an average is the average of the means; because A and B are conditionally independent given the true status, their variances (not standard deviations) add before dividing by 4, giving Var(S|status) = (Var(A|status) + Var(B|status)) / 4. Skipping to standard deviations directly (just averaging them) would be the wrong operation.'
+  },
+  dist: {
+    pdfCompareQ: 'What is this pair of curves actually showing, and how is it different from a single PMF table?',
+    pdfCompareA: 'Each curve is the conditional density of the continuous score S under one hypothesis &mdash; f(s|D) for failing bearings, f(s|D&#7497;) for healthy ones. There\'s no table of exact probabilities to read off, because S can take any value in an interval; every question about S (like "P(1.0 &lt; S &lt; 1.2 | D)") has to be answered as an area under one of these curves, not a lookup.',
+    posteriorQ: 'Why is the posterior curve &pi;(s) = P(D | S = s) still meaningful, even though P(S = s) itself is 0?',
+    posteriorA: 'Bayes\' rule for continuous evidence replaces probabilities with densities in the same ratio: &pi;(s) = [p&middot;f(s|D)] / [p&middot;f(s|D) + (1&minus;p)&middot;f(s|D&#7497;)]. Both numerator and denominator involve densities evaluated at the same point s, so the "zero probability of an exact point" problem cancels out of the ratio &mdash; what survives is a well-defined posterior probability at every value of s, not just over intervals.',
+    mixQ: 'Where does the population-level density f(s), shown as the shaded curve, come from?',
+    mixA: 'It\'s the same total-probability idea as the two-test extension in Examples 1 and 2, just continuous: f(s) = p&middot;f(s|D) + (1&minus;p)&middot;f(s|D&#7497;), a weighted mixture of the two conditional densities. Because failure onset is rare, the healthy curve dominates almost everywhere &mdash; the failing curve only pulls the mixture up in the high-s tail.',
+    cdfQ: 'Why is this CDF a smooth curve instead of the staircase from Examples 1 and 2?',
+    cdfA: 'F(s) = P(S&le;s) accumulates probability continuously as s sweeps across an interval, because S itself can land anywhere in that interval &mdash; there\'s no finite set of "supported values" to jump at. The discrete X in Examples 1–2 could only add probability mass at 0, 1, or 2, which is exactly what produced those flat-then-jump steps.'
+  }
+};
+
+/* =========================================================================
+   MATH HELPERS
+   ========================================================================= */
+const fmtPct = (x, d=2) => (x*100).toFixed(d) + '%';
+const fmtNum = (x, d=4) => x.toFixed(d);
+const fmtInt = (x) => Math.round(x).toLocaleString();
+
+function normalPDF(x, mean, sd){ return Math.exp(-0.5*Math.pow((x-mean)/sd,2)) / (sd*Math.sqrt(2*Math.PI)); }
+function lognormalPDF(x, mean, sd){
+  if (x<=0) return 0;
+  const sigma2 = Math.log(1 + (sd*sd)/(mean*mean));
+  const sigma = Math.sqrt(sigma2);
+  const mu = Math.log(mean) - sigma2/2;
+  return Math.exp(-0.5*Math.pow((Math.log(x)-mu)/sigma,2)) / (x*sigma*Math.sqrt(2*Math.PI));
+}
+
+/* Build the single-test tree: Start -> {D, Dc} -> {T+, T-} */
+function singleTestTree(ex){
+  const p = ex.bayes.prior !== undefined ? ex.bayes.prior : ex.population.p;
+  const sens = ex.bayes.sens, fpr = ex.bayes.fpr;
+  const root = { label:'Start', prob:1, branch:null, children:[
+    { label: ex.events.Dname, prob:p, branch:'D', children:[
+      { label: ex.events.Tname+'+', prob:sens, branch:'D', children:[] },
+      { label: ex.events.Tname+'\u2212', prob:1-sens, branch:'D', children:[] }
+    ]},
+    { label: ex.events.Dname+'\u1D9C', prob:1-p, branch:'Dc', children:[
+      { label: ex.events.Tname+'+', prob:fpr, branch:'Dc', children:[] },
+      { label: ex.events.Tname+'\u2212', prob:1-fpr, branch:'Dc', children:[] }
+    ]}
+  ]};
+  computeJoint(root, 1);
+  return root;
+}
+
+/* Build the two-test extension tree: Start -> {D,Dc} -> {A+,A-} -> {B+,B-}, tracking posCount */
+function extTree(ex){
+  const p = ex.population.p;
+  const a = ex.extension, sd = a.testASens, fd = a.testAFpr, sb = a.testBSens, fb = a.testBFpr;
+  function branchNode(condIsD){
+    const sensA = condIsD ? sd : fd;
+    const sensB = condIsD ? sb : fb;
+    return [
+      { label:'A+', prob:sensA, isPos:true, children:[
+        { label:'B+', prob:sensB, isPos:true, children:[] },
+        { label:'B\u2212', prob:1-sensB, isPos:false, children:[] }
+      ]},
+      { label:'A\u2212', prob:1-sensA, isPos:false, children:[
+        { label:'B+', prob:sensB, isPos:true, children:[] },
+        { label:'B\u2212', prob:1-sensB, isPos:false, children:[] }
+      ]}
+    ];
+  }
+  const root = { label:'Start', prob:1, branch:null, isPos:null, children:[
+    { label: ex.events.Dname, prob:p, branch:'D', isPos:null, children: branchNode(true) },
+    { label: ex.events.Dname+'\u1D9C', prob:1-p, branch:'Dc', isPos:null, children: branchNode(false) }
+  ]};
+  // propagate branch tag down
+  (function tagBranch(n, b){ if(b) n.branch=b; (n.children||[]).forEach(c=>tagBranch(c, n.branch)); })(root, null);
+  computeJoint(root, 1);
+  computePosCount(root, 0);
+  return root;
+}
+
+function computeJoint(node, parentJoint){
+  node.jointProb = parentJoint * node.prob;
+  (node.children||[]).forEach(c => computeJoint(c, node.jointProb));
+}
+function computePosCount(node, parentCount){
+  node.posCount = parentCount + (node.isPos ? 1 : 0);
+  (node.children||[]).forEach(c => computePosCount(c, node.posCount));
+}
+function collectLeaves(node, acc){
+  acc = acc || [];
+  if(!node.children || node.children.length===0){ acc.push(node); return acc; }
+  node.children.forEach(c => collectLeaves(c, acc));
+  return acc;
+}
+
+function pmfFromExtTree(root){
+  const leaves = collectLeaves(root);
+  const pmf = [0,0,0], pmfD = [0,0,0], pmfDc = [0,0,0];
+  leaves.forEach(l => {
+    pmf[l.posCount] += l.jointProb;
+    if (l.branch==='D') pmfD[l.posCount] += l.jointProb;
+    else pmfDc[l.posCount] += l.jointProb;
+  });
+  return { pmf, pmfD, pmfDc };
+}
+
+/* ---- Continuous-mode helpers: combine two independent normal sensors into
+   one continuous score S = (A+B)/2, then work entirely with densities. ---- */
+function linspace(a, b, n){
+  const out = new Array(n);
+  for(let i=0;i<n;i++) out[i] = a + (b-a)*i/(n-1);
+  return out;
+}
+function combineNormal(sensorA, sensorB){
+  const meanD = (sensorA.muD + sensorB.muD) / 2;
+  const varD  = (sensorA.sdD*sensorA.sdD + sensorB.sdD*sensorB.sdD) / 4;
+  const meanDc = (sensorA.muDc + sensorB.muDc) / 2;
+  const varDc  = (sensorA.sdDc*sensorA.sdDc + sensorB.sdDc*sensorB.sdDc) / 4;
+  return { meanD, sdD: Math.sqrt(varD), meanDc, sdDc: Math.sqrt(varDc) };
+}
+function buildContinuousData(ex){
+  const p = ex.population.p;
+  const combo = combineNormal(ex.extension.sensorA, ex.extension.sensorB);
+  const lo = Math.min(combo.meanDc - 4*combo.sdDc, combo.meanD - 4*combo.sdD);
+  const hi = Math.max(combo.meanD + 4*combo.sdD, combo.meanDc + 4*combo.sdDc);
+  const steps = 160;
+  const grid = linspace(Math.max(lo,0), hi, steps);
+  const fD = grid.map(s => normalPDF(s, combo.meanD, combo.sdD));
+  const fDc = grid.map(s => normalPDF(s, combo.meanDc, combo.sdDc));
+  const mix = grid.map((s,i) => p*fD[i] + (1-p)*fDc[i]);
+  const posterior = grid.map((s,i) => mix[i] > 1e-12 ? (p*fD[i])/mix[i] : 0);
+  // cumulative trapezoidal integration of the mixture density -> continuous CDF
+  const cdf = new Array(steps).fill(0);
+  for(let i=1;i<steps;i++){
+    const dx = grid[i]-grid[i-1];
+    cdf[i] = cdf[i-1] + 0.5*(mix[i]+mix[i-1])*dx;
+  }
+  return { combo, grid, fD, fDc, mix, posterior, cdf };
+}
+
+/* =========================================================================
+   SVG TREE LAYOUT + RENDER
+   ========================================================================= */
+function layoutTree(root){
+  let leafCounter = 0;
+  const leafGap = 56;
+  function assignY(node, depth){
+    node.depth = depth;
+    if(!node.children || node.children.length===0){
+      node.y = leafCounter*leafGap; leafCounter++;
+    } else {
+      node.children.forEach(c=>assignY(c, depth+1));
+      node.y = node.children.reduce((s,c)=>s+c.y,0)/node.children.length;
+    }
+  }
+  assignY(root,0);
+  const depthGap = 165;
+  (function assignX(node){ node.x = 20 + node.depth*depthGap; (node.children||[]).forEach(assignX); })(root);
+  return { leafCount: leafCounter, maxDepth: (function md(n){ return (n.children&&n.children.length)? 1+Math.max(...n.children.map(md)) : 0; })(root) };
+}
+
+function renderTreeSVG(root, opts){
+  opts = opts || {};
+  const layout = layoutTree(root);
+  const width = 20 + layout.maxDepth*165 + 180;
+  const height = Math.max(120, layout.leafCount*56 + 20);
+  let edges = '', nodes = '', leafLabels = '';
+  function walk(node){
+    (node.children||[]).forEach(c=>{
+      const midx = (node.x+c.x)/2, midy = (node.y+c.y)/2 - 6;
+      edges += `<line x1="${node.x}" y1="${node.y+10}" x2="${c.x}" y2="${c.y+10}" stroke="var(--line)" stroke-width="1.5"/>`;
+      edges += `<text class="tree-edge-label" x="${midx}" y="${midy+10}" text-anchor="middle">${(c.prob*100).toFixed(1)}%</text>`;
+      walk(c);
+    });
+    const isLeaf = !node.children || node.children.length===0;
+    const fill = node.depth===0 ? 'var(--ink-soft)' : (node.branch==='D' ? 'var(--flag)' : 'var(--ok)');
+    if(node.depth>0){
+      nodes += `<circle cx="${node.x}" cy="${node.y+10}" r="4.5" fill="${fill}"/>`;
+      nodes += `<text class="tree-node-label" x="${node.x+9}" y="${node.y+14}">${node.label}</text>`;
+    }
+    if(isLeaf){
+      const extra = opts.showPosCount ? ` &middot; X=${node.posCount}` : '';
+      leafLabels += `<text class="tree-leaf-prob" x="${node.x+16}" y="${node.y+28}">p=${(node.jointProb*100).toFixed(3)}%${extra}</text>`;
+    }
+  }
+  walk(root);
+  return `<svg class="diagram" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${edges}${nodes}${leafLabels}</svg>`;
+}
+
+/* =========================================================================
+   BOXPLOT SVG
+   ========================================================================= */
+function renderBoxplotSVG(stats, accentVar){
+  const w = 900, h = 170, padL = 60, padR = 40;
+  const domainMin = stats.min - (stats.max-stats.min)*0.08;
+  const domainMax = stats.max + (stats.max-stats.min)*0.08;
+  const scaleX = v => padL + (v-domainMin)/(domainMax-domainMin) * (w-padL-padR);
+  const midY = 78, boxH = 62;
+  const color = `var(${accentVar})`;
+  const ticks = [stats.min, stats.q1, stats.median, stats.q3, stats.max];
+  let tickMarks = '';
+  ticks.forEach(t=>{
+    tickMarks += `<line x1="${scaleX(t)}" y1="${midY+boxH/2+6}" x2="${scaleX(t)}" y2="${midY+boxH/2+16}" stroke="var(--ink-soft)" stroke-width="1.5"/>`;
+    tickMarks += `<text x="${scaleX(t)}" y="${midY+boxH/2+38}" text-anchor="middle" font-size="15" class="tree-leaf-prob">${t.toFixed(2)}</text>`;
+  });
+  return `<svg class="diagram" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+    <line x1="${scaleX(stats.min)}" y1="${midY}" x2="${scaleX(stats.q1)}" y2="${midY}" stroke="var(--ink-soft)" stroke-width="2"/>
+    <line x1="${scaleX(stats.q3)}" y1="${midY}" x2="${scaleX(stats.max)}" y2="${midY}" stroke="var(--ink-soft)" stroke-width="2"/>
+    <line x1="${scaleX(stats.min)}" y1="${midY-16}" x2="${scaleX(stats.min)}" y2="${midY+16}" stroke="var(--ink-soft)" stroke-width="2"/>
+    <line x1="${scaleX(stats.max)}" y1="${midY-16}" x2="${scaleX(stats.max)}" y2="${midY+16}" stroke="var(--ink-soft)" stroke-width="2"/>
+    <rect x="${scaleX(stats.q1)}" y="${midY-boxH/2}" width="${scaleX(stats.q3)-scaleX(stats.q1)}" height="${boxH}" fill="color-mix(in srgb, ${color} 18%, var(--card))" stroke="${color}" stroke-width="2"/>
+    <line x1="${scaleX(stats.median)}" y1="${midY-boxH/2}" x2="${scaleX(stats.median)}" y2="${midY+boxH/2}" stroke="${color}" stroke-width="3.5"/>
+    ${tickMarks}
+  </svg>`;
+}
+
+/* =========================================================================
+   CHART.JS SETUP
+   ========================================================================= */
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+Chart.defaults.font.size = 11;
+
+function makeHistogramChart(canvas, ex){
+  const s = ex.stats;
+  const accent = cssVar(ex.accentVar);
+  const inkSoft = cssVar('--ink-soft');
+  const centers = s.histBins.map((b)=>{
+    const parts = b.split('\u2013').map(Number);
+    return (parts[0]+parts[1])/2;
+  });
+  const binWidth = centers[1]-centers[0];
+  const pdfFn = s.pdfModel==='lognormal' ? lognormalPDF : normalPDF;
+  const n = ex.population.sampleN;
+  // Sample the density curve at each bin center so it aligns with the categorical bar axis.
+  const curveCounts = centers.map(c => pdfFn(Math.max(c,0.0001), s.mean, s.sd) * n * binWidth);
+  return new Chart(canvas.getContext('2d'), {
+    data: {
+      labels: s.histBins,
+      datasets: [
+        { type:'bar', label:'Sample count', data: s.histCounts, backgroundColor: accent+'55', borderColor: accent, borderWidth:1, order:2 },
+        { type:'line', label:'Illustrative density (scaled to counts)', data: curveCounts, borderColor: inkSoft, borderWidth:2, pointRadius:2, tension:0.35, order:1 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      scales: {
+        x: { title:{ display:true, text: s.varName+' ('+s.varUnit.replace(/&micro;/,'\u00b5')+')' }, grid:{ display:false } },
+        y: { title:{ display:true, text:'Count (n='+n+')' }, beginAtZero:true }
+      },
+      plugins: { legend: { position:'bottom' } }
+    }
+  });
+}
+
+function makePMFChart(canvas, pmf, accent){
+  return new Chart(canvas.getContext('2d'), {
+    type:'bar',
+    data: { labels:['X = 0','X = 1','X = 2'], datasets:[{ label:'P(X = x)', data: pmf.map(v=>v), backgroundColor: accent+'88', borderColor: accent, borderWidth:1.5 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { y: { beginAtZero:true, max:1, ticks:{ callback:v=>(v*100).toFixed(0)+'%' } } },
+      plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: c => 'P(X='+c.dataIndex+') = '+(c.raw*100).toFixed(3)+'%' } } }
+    }
+  });
+}
+
+function makeCDFChart(canvas, pmf, accent){
+  const cdf = [pmf[0], pmf[0]+pmf[1], pmf[0]+pmf[1]+pmf[2]];
+  return new Chart(canvas.getContext('2d'), {
+    type:'line',
+    data: { labels:['X < 0','0','1','2'], datasets:[{ label:'F(x) = P(X\u2264x)', data:[0, cdf[0], cdf[1], cdf[2]], stepped:'before', borderColor: accent, backgroundColor: accent+'33', borderWidth:2, pointRadius:4, pointBackgroundColor: accent, fill:true }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { y: { min:0, max:1, ticks:{ callback:v=>(v*100).toFixed(0)+'%' } } },
+      plugins: { legend:{ display:false } }
+    }
+  });
+}
+
+function makePosteriorChart(canvas, posteriors, prior, accent){
+  return new Chart(canvas.getContext('2d'), {
+    type:'bar',
+    data: { labels:['X = 0','X = 1','X = 2'], datasets:[
+      { label:'P(D | X = x)', data: posteriors, backgroundColor: accent+'88', borderColor: accent, borderWidth:1.5 }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { y: { beginAtZero:true, max:1, ticks:{ callback:v=>(v*100).toFixed(0)+'%' } } },
+      plugins: { legend:{ display:false }, tooltip:{ callbacks:{ label: c => 'P(D|X='+c.dataIndex+') = '+(c.raw*100).toFixed(2)+'%' } } },
+      elements:{},
+    },
+    plugins: [{
+      id:'priorLine',
+      afterDraw(chart){
+        const {ctx, scales:{y, x}} = chart;
+        const yPix = y.getPixelForValue(prior);
+        ctx.save();
+        ctx.strokeStyle = cssVar('--ink-soft'); ctx.setLineDash([4,3]); ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x.left, yPix); ctx.lineTo(x.right, yPix); ctx.stroke();
+        ctx.fillStyle = cssVar('--ink-soft'); ctx.font = '10px IBM Plex Sans, sans-serif'; ctx.textAlign='right';
+        ctx.fillText('prior p = '+(prior*100).toFixed(2)+'%', x.right, yPix-4);
+        ctx.restore();
+      }
+    }]
+  });
+}
+
+/* ---- Continuous-mode charts: all use the numeric grid from buildContinuousData ---- */
+function gridLabels(grid){ return grid.map(v => v.toFixed(2)); }
+
+function makeDensityCompareChart(canvas, cont, ex){
+  const flag = cssVar('--flag'), ok = cssVar('--ok');
+  return new Chart(canvas.getContext('2d'), {
+    type:'line',
+    data: { labels: gridLabels(cont.grid), datasets: [
+      { label:'f(s | '+ex.events.Dname+')', data: cont.fD, borderColor: flag, backgroundColor: flag+'22', borderWidth:2, pointRadius:0, fill:false, tension:0.25 },
+      { label:'f(s | '+ex.events.Dname+'\u1D9C)', data: cont.fDc, borderColor: ok, backgroundColor: ok+'22', borderWidth:2, pointRadius:0, fill:false, tension:0.25 }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { x: { title:{ display:true, text: ex.extension.scoreLabel+' ('+ex.extension.scoreUnit+')' }, ticks:{ autoSkip:true, maxTicksLimit:7 }, grid:{ display:false } },
+                y: { title:{ display:true, text:'density' }, beginAtZero:true } },
+      plugins: { legend: { position:'bottom' } }
+    }
+  });
+}
+
+function makePosteriorCurveChart(canvas, cont, accent){
+  return new Chart(canvas.getContext('2d'), {
+    type:'line',
+    data: { labels: gridLabels(cont.grid), datasets:[
+      { label:'\u03C0(s) = P(D | S = s)', data: cont.posterior, borderColor: accent, backgroundColor: accent+'2A', borderWidth:2, pointRadius:0, fill:true, tension:0.25 }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { x: { ticks:{ autoSkip:true, maxTicksLimit:7 }, grid:{ display:false } }, y: { min:0, max:1, ticks:{ callback:v=>(v*100).toFixed(0)+'%' } } },
+      plugins: { legend: { display:false } }
+    }
+  });
+}
+
+function makeMixturePDFChart(canvas, cont, accent){
+  return new Chart(canvas.getContext('2d'), {
+    type:'line',
+    data: { labels: gridLabels(cont.grid), datasets:[
+      { label:'f(s) — population mixture density', data: cont.mix, borderColor: accent, backgroundColor: accent+'33', borderWidth:2, pointRadius:0, fill:true, tension:0.25 }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { x: { title:{ display:true, text:'composite score s' }, ticks:{ autoSkip:true, maxTicksLimit:7 }, grid:{ display:false } }, y: { title:{ display:true, text:'density' }, beginAtZero:true } },
+      plugins: { legend: { display:false } }
+    }
+  });
+}
+
+function makeContinuousCDFChart(canvas, cont, accent){
+  return new Chart(canvas.getContext('2d'), {
+    type:'line',
+    data: { labels: gridLabels(cont.grid), datasets:[
+      { label:'F(s) = P(S\u2264s)', data: cont.cdf, borderColor: accent, backgroundColor: accent+'22', borderWidth:2, pointRadius:0, fill:true, tension:0.15 }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { x: { ticks:{ autoSkip:true, maxTicksLimit:7 }, grid:{ display:false } }, y: { min:0, max:1, ticks:{ callback:v=>(v*100).toFixed(0)+'%' } } },
+      plugins: { legend: { display:false } }
+    }
+  });
+}
+
+/* =========================================================================
+   HTML RENDER — one function builds an entire example section
+   ========================================================================= */
+function reveal(qHtml, aHtml){
+  return `<div class="reveal-block">
+    <p class="reveal-q">${qHtml}</p>
+    <button class="reveal-btn" type="button">Reveal answer</button>
+    <div class="reveal-a hidden">${aHtml}</div>
+  </div>`;
+}
+
+/* ---- "Match the statement to the probability" checkpoint (Stage 4) ---- */
+function computeStage4Values(p, sens, fpr){
+  const D_and_T = p*sens;
+  const D_and_Tn = p*(1-sens);
+  const Dc_and_T = (1-p)*fpr;
+  const Dc_and_Tn = (1-p)*(1-fpr);
+  const T = D_and_T + Dc_and_T;
+  const Tn = D_and_Tn + Dc_and_Tn;
+  return {
+    D: p, Dc: 1-p,
+    T_given_D: sens, Tn_given_D: 1-sens,
+    T_given_Dc: fpr, Tn_given_Dc: 1-fpr,
+    D_and_T, D_and_Tn, Dc_and_T, Dc_and_Tn,
+    T, Tn,
+    D_given_T: D_and_T/T,
+    D_given_Tn: D_and_Tn/Tn
+  };
+}
+function stage4Labels(ex){
+  const D = ex.events.Dname, Dc = ex.events.Dname+'\u1D9C', T = ex.events.Tname;
+  return {
+    D: `P(${D})`, Dc: `P(${Dc})`,
+    T_given_D: `P(${T}+|${D})`, Tn_given_D: `P(${T}\u2212|${D})`,
+    T_given_Dc: `P(${T}+|${Dc})`, Tn_given_Dc: `P(${T}\u2212|${Dc})`,
+    D_and_T: `P(${D}\u2229${T}+)`, D_and_Tn: `P(${D}\u2229${T}\u2212)`,
+    Dc_and_T: `P(${Dc}\u2229${T}+)`, Dc_and_Tn: `P(${Dc}\u2229${T}\u2212)`,
+    T: `P(${T}+)`, Tn: `P(${T}\u2212)`,
+    D_given_T: `P(${D}|${T}+)`, D_given_Tn: `P(${D}|${T}\u2212)`
+  };
+}
+function smartPct(v){ return v < 0.001 ? fmtPct(v,4) : fmtPct(v,2); }
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function renderMatchExercise(ex, p, sens, fpr){
+  const vals = computeStage4Values(p, sens, fpr);
+  const labels = stage4Labels(ex);
+  let itemsHtml = '';
+  ex.matchExercise.forEach((item, i) => {
+    const allKeys = shuffle([item.correctKey, ...item.distractorKeys]);
+    const optsHtml = allKeys.map(k => {
+      const correct = k === item.correctKey;
+      return `<button class="match-opt" data-correct="${correct}">${labels[k]}</button>`;
+    }).join('');
+    itemsHtml += `
+      <div class="match-item">
+        <p class="match-stmt"><b>Q${i+1}.</b> ${item.statement}</p>
+        <div class="match-options">${optsHtml}</div>
+        <div class="match-feedback hidden">
+          <div class="match-answer">Correct: <b>${labels[item.correctKey]}</b> = <b>${smartPct(vals[item.correctKey])}</b></div>
+          <div class="match-explain">${item.explanation}</div>
+        </div>
+      </div>`;
+  });
+  return `
+    <div class="card match-card" style="margin-top:14px">
+      <h4>Checkpoint &mdash; match the real-world statement to its probability</h4>
+      <p style="margin:0 0 12px;font-size:.86rem;color:var(--ink-soft)">Each statement below describes something you'd actually want to know about the chips. Pick the notation that computes it &mdash; then check.</p>
+      ${itemsHtml}
+    </div>`;
+}
+
+function renderExample(ex){
+  const p = ex.bayes.prior = ex.population.p;
+  const sens = ex.bayes.sens, fpr = ex.bayes.fpr;
+  const pD_T = (p*sens) / (p*sens + (1-p)*fpr);
+
+  const s = ex.stats;
+
+  const single = singleTestTree(ex);
+
+  const headHtml = `
+    <div class="example-head">
+      <div class="example-kicker">${ex.kicker}</div>
+      <h2>${ex.title}</h2>
+      <p>${ex.intro}</p>
+    </div>
+
+    <!-- STAGE 1 -->
+    <div class="stage">
+      <div class="stage-num-row"><span class="stage-num">1</span><span class="stage-title">Population &amp; sample</span></div>
+      <div class="stage-body">
+        <div class="grid2">
+          <div class="card">
+            <h4>Population</h4>
+            <div class="kv-row"><span class="k">Size, N</span><span class="v">${fmtInt(ex.population.N)} ${ex.population.unitPlural}</span></div>
+            <div class="kv-row"><span class="k">True rate, p (parameter)</span><span class="v">${fmtPct(ex.population.p,1)}</span></div>
+            <p style="margin:10px 0 0;font-size:.88rem;color:var(--ink-soft)">${ex.population.popBlurb}</p>
+          </div>
+          <div class="card">
+            <h4>Sample</h4>
+            <div class="kv-row"><span class="k">Size, n</span><span class="v">${fmtInt(ex.population.sampleN)} ${ex.population.unitPlural}</span></div>
+            <div class="kv-row"><span class="k">Flagged at threshold (${ex.population.threshold} ${ex.population.thresholdUnit.replace(/&micro;/,'\u00b5')})</span><span class="v">${ex.population.flaggedInSample} / ${ex.population.sampleN}</span></div>
+            <div class="kv-row"><span class="k">Sample proportion, p&#770;</span><span class="v">${fmtPct(ex.population.flaggedInSample/ex.population.sampleN,2)}</span></div>
+            <p style="margin:10px 0 0;font-size:.88rem;color:var(--ink-soft)">${ex.population.sampleBlurb}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 2 -->
+    <div class="stage">
+      <div class="stage-num-row"><span class="stage-num">2</span><span class="stage-title">Sample statistics &amp; the right visual</span></div>
+      <div class="stage-body">
+        <p class="intro">${s.varName} across the sample of ${ex.population.sampleN}: ${s.shape}.</p>
+        <div class="card">
+          <h4>Numeric summary</h4>
+          <div class="kv-row"><span class="k">Mean</span><span class="v">${s.mean}</span></div>
+          <div class="kv-row"><span class="k">Median</span><span class="v">${s.median}</span></div>
+          <div class="kv-row"><span class="k">Std. dev.</span><span class="v">${s.sd}</span></div>
+          <div class="kv-row"><span class="k">Min / Q1</span><span class="v">${s.min} / ${s.q1}</span></div>
+          <div class="kv-row"><span class="k">Q3 / Max</span><span class="v">${s.q3} / ${s.max}</span></div>
+          <div class="kv-row"><span class="k">IQR</span><span class="v">${s.iqr}</span></div>
+        </div>
+        <div class="card">
+          <h4>Five-number summary (boxplot)</h4>
+          <div class="boxplot-wrap">${renderBoxplotSVG(s, ex.accentVar)}</div>
+        </div>
+        <div class="card">
+          <h4>Histogram (sample) with illustrative population density overlaid</h4>
+          <div class="chart-wrap"><canvas id="hist-${ex.id}"></canvas></div>
+        </div>
+        ${reveal(s.visualQ, s.visualA)}
+      </div>
+    </div>
+
+    <!-- STAGE 3 -->
+    <div class="stage">
+      <div class="stage-num-row"><span class="stage-num">3</span><span class="stage-title">Defining events &amp; choosing a counting method</span></div>
+      <div class="stage-body">
+        <div class="grid2">
+          <div class="card">
+            <h4>Events</h4>
+            <div class="kv-row"><span class="k">${ex.events.Dname}</span><span class="v" style="font-family:var(--font-body);font-weight:400">${ex.events.Dlabel}</span></div>
+            <div class="kv-row"><span class="k">${ex.events.Dname}\u1D9C</span><span class="v" style="font-family:var(--font-body);font-weight:400">${ex.events.Dclabel}</span></div>
+            <div class="kv-row"><span class="k">${ex.events.Tname}+</span><span class="v" style="font-family:var(--font-body);font-weight:400">${ex.events.Tlabel}</span></div>
+          </div>
+          <div class="card">
+            <h4>Counting: choosing a subset</h4>
+            <p style="margin:0 0 8px;font-size:.88rem;color:var(--ink-soft)">${ex.events.countingSetup}</p>
+            <div class="result-callout">${ex.events.countingFormula}</div>
+          </div>
+        </div>
+        ${reveal(ex.events.countingQ, ex.events.countingA)}
+        <div class="card" style="margin-top:14px">
+          <h4>Counting: choosing an order</h4>
+          <p style="margin:0 0 8px;font-size:.88rem;color:var(--ink-soft)">${ex.events.permSetup}</p>
+          <div class="result-callout">${ex.events.permFormula}</div>
+        </div>
+        ${reveal(ex.events.permQ, ex.events.permA)}
+      </div>
+    </div>
+
+    <!-- STAGE 4 -->
+    <div class="stage">
+      <div class="stage-num-row"><span class="stage-num">4</span><span class="stage-title">One test: the tree, the joint table, Bayes</span></div>
+      <div class="stage-body">
+        <p class="intro">Sensitivity P(${ex.events.Tname}+|${ex.events.Dname}) = ${fmtPct(sens,0)}, false-positive rate P(${ex.events.Tname}+|${ex.events.Dname}\u1D9C) = ${fmtPct(fpr,0)}, prior P(${ex.events.Dname}) = ${fmtPct(p,1)}.</p>
+        <div class="card">${renderTreeSVG(single)}</div>
+        ${reveal(ex.bayes.treeQ, ex.bayes.treeA)}
+        <div class="card" style="margin-top:14px">
+          <h4>Joint probability table</h4>
+          <table class="datatable">
+            <tr><th class="corner"></th><th>${ex.events.Dname}</th><th>${ex.events.Dname}\u1D9C</th><th>row total</th></tr>
+            <tr><td class="rowlabel">${ex.events.Tname}+</td><td class="num">${fmtNum(p*sens)}</td><td class="num">${fmtNum((1-p)*fpr)}</td><td class="num total">${fmtNum(p*sens+(1-p)*fpr)}</td></tr>
+            <tr><td class="rowlabel">${ex.events.Tname}\u2212</td><td class="num">${fmtNum(p*(1-sens))}</td><td class="num">${fmtNum((1-p)*(1-fpr))}</td><td class="num total">${fmtNum(p*(1-sens)+(1-p)*(1-fpr))}</td></tr>
+            <tr class="total"><td class="rowlabel">col total</td><td class="num">${fmtNum(p)}</td><td class="num">${fmtNum(1-p)}</td><td class="num">1.0000</td></tr>
+          </table>
+          <div class="result-callout">P(${ex.events.Dname} | ${ex.events.Tname}+) = ${fmtNum(p*sens)} / ${fmtNum(p*sens+(1-p)*fpr)} = <b>${fmtPct(pD_T,2)}</b></div>
+        </div>
+        ${ex.matchExercise ? renderMatchExercise(ex, p, sens, fpr) : ''}
+      </div>
+    </div>
+  `;
+
+  const tail = ex.mode === 'continuous' ? buildContinuousTail(ex, p) : buildDiscreteTail(ex, p);
+
+  const mount = document.getElementById(ex.id+'-mount');
+  mount.innerHTML = headHtml + tail.html;
+
+  makeHistogramChart(document.getElementById('hist-'+ex.id), ex);
+  tail.mountCharts();
+}
+
+/* Stage 5 + 6 for the discrete-random-variable examples (IMU, disease):
+   two binary tests -> X = count of positives -> PMF + CDF. */
+function buildDiscreteTail(ex, p){
+  const ext = extTree(ex);
+  const { pmf, pmfD, pmfDc } = pmfFromExtTree(ext);
+  const posteriors = pmf.map((v,x)=> v>0 ? (pmfD[x]/v) : 0);
+  const pAonly = (p*ex.extension.testASens)/(p*ex.extension.testASens+(1-p)*ex.extension.testAFpr);
+  const pBonly = (p*ex.extension.testBSens)/(p*ex.extension.testBSens+(1-p)*ex.extension.testBFpr);
+  const s = ex.stats;
+
+  const html = `
+    <!-- STAGE 5 -->
+    <div class="stage">
+      <div class="stage-num-row"><span class="stage-num">5</span><span class="stage-title">Two tests &amp; a random variable</span></div>
+      <div class="stage-body">
+        <p class="intro">Add ${ex.extension.testAName} (sens ${fmtPct(ex.extension.testASens,1)}, FPR ${fmtPct(ex.extension.testAFpr,1)}) and ${ex.extension.testBName} (sens ${fmtPct(ex.extension.testBSens,1)}, FPR ${fmtPct(ex.extension.testBFpr,1)}), conditionally independent given the true status. Define <b>X = number of positive tests</b>, X &isin; {0, 1, 2}.</p>
+        <div class="card">${renderTreeSVG(ext, {showPosCount:true})}</div>
+        ${reveal(ex.extension.indepQ, ex.extension.indepA)}
+        <div class="card" style="margin-top:14px">
+          <h4>Conditional PMF of X</h4>
+          <table class="datatable">
+            <tr><th class="corner"></th><th>X = 0</th><th>X = 1</th><th>X = 2</th></tr>
+            <tr><td class="rowlabel">given ${ex.events.Dname}</td><td class="num">${fmtNum(pmfD[0]/p)}</td><td class="num">${fmtNum(pmfD[1]/p)}</td><td class="num">${fmtNum(pmfD[2]/p)}</td></tr>
+            <tr><td class="rowlabel">given ${ex.events.Dname}\u1D9C</td><td class="num">${fmtNum(pmfDc[0]/(1-p))}</td><td class="num">${fmtNum(pmfDc[1]/(1-p))}</td><td class="num">${fmtNum(pmfDc[2]/(1-p))}</td></tr>
+          </table>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <h4>Posterior P(${ex.events.Dname} | X = x)</h4>
+            <div class="chart-wrap short"><canvas id="post-${ex.id}"></canvas></div>
+          </div>
+          <div class="card">
+            <h4>Single-test comparison</h4>
+            <div class="kv-row"><span class="k">P(${ex.events.Dname} | ${ex.extension.testAName.split(' (')[0]} alone)</span><span class="v">${fmtPct(pAonly,2)}</span></div>
+            <div class="kv-row"><span class="k">P(${ex.events.Dname} | ${ex.extension.testBName.split(' (')[0]} alone)</span><span class="v">${fmtPct(pBonly,2)}</span></div>
+            <div class="kv-row"><span class="k">P(${ex.events.Dname} | both positive, X=2)</span><span class="v">${fmtPct(posteriors[2],2)}</span></div>
+            <div class="kv-row"><span class="k">P(${ex.events.Dname} | both negative, X=0)</span><span class="v">${fmtPct(posteriors[0],4)}</span></div>
+            <p style="margin:10px 0 0;font-size:.85rem;color:var(--ink-soft)">Two independent positives push the posterior far past what either test manages alone.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAGE 6 -->
+    <div class="stage">
+      <div class="stage-num-row"><span class="stage-num">6</span><span class="stage-title">Same random variable, three lenses: PMF, CDF, PDF</span></div>
+      <div class="stage-body">
+        <p class="intro">X is discrete, so it gets a PMF and a CDF. The underlying measurement back in Stage 2 is continuous, so it gets a PDF instead &mdash; the three are related but not interchangeable.</p>
+        <div class="grid2">
+          <div class="card">
+            <h4>PMF of X (from Stage 5's tree)</h4>
+            <div class="chart-wrap short"><canvas id="pmf-${ex.id}"></canvas></div>
+          </div>
+          <div class="card">
+            <h4>CDF of X</h4>
+            <div class="chart-wrap short"><canvas id="cdf-${ex.id}"></canvas></div>
+          </div>
+        </div>
+        ${reveal(ex.dist.pmfQ, ex.dist.pmfA)}
+        ${reveal(ex.dist.cdfQ, ex.dist.cdfA)}
+        <div class="card" style="margin-top:14px">
+          <h4>PDF: the histogram's theoretical counterpart</h4>
+          <p style="margin:0 0 4px;font-size:.86rem;color:var(--ink-soft)">The grey curve on Stage 2's histogram is a ${s.pdfModel==='lognormal'?'log-normal':'normal'} density fit to the sample's mean and sd &mdash; a model for the population, not a count of anything. Its total area equals 1, and area under a slice gives probability.</p>
+        </div>
+        ${reveal(ex.dist.pdfQ, ex.dist.pdfA)}
+      </div>
+    </div>
+  `;
+
+  return { html, mountCharts: () => {
+    makePMFChart(document.getElementById('pmf-'+ex.id), pmf, cssVar(ex.accentVar));
+    makeCDFChart(document.getElementById('cdf-'+ex.id), pmf, cssVar(ex.accentVar));
+    makePosteriorChart(document.getElementById('post-'+ex.id), posteriors, p, cssVar(ex.accentVar));
+  }};
+}
+
+/* Stage 5 + 6 for the continuous-random-variable example (bearing):
+   two continuous sensors -> S = average -> normal densities, posterior
+   curve, mixture PDF, and a smooth (non-stepped) CDF. */
+function buildContinuousTail(ex, p){
+  const cont = buildContinuousData(ex);
+  const accent = 'var(--ok)';
+
+  const html = `
+    <!-- STAGE 5 -->
+    <div class="stage">
+      <div class="stage-num-row"><span class="stage-num">5</span><span class="stage-title">Two sensors &amp; a continuous random variable</span></div>
+      <div class="stage-body">
+        <p class="intro">Add ${ex.extension.sensorA.name} and ${ex.extension.sensorB.name}, each continuous and conditionally independent given the true status. Define <b>${ex.extension.scoreLabel}</b>, a continuous random variable &mdash; not a count.</p>
+        <div class="card">
+          <h4>Conditional densities of S</h4>
+          <div class="chart-wrap"><canvas id="densc-${ex.id}"></canvas></div>
+          <div class="kv-row"><span class="k">S | ${ex.events.Dname}</span><span class="v">Normal(mean = ${cont.combo.meanD.toFixed(2)}, sd = ${cont.combo.sdD.toFixed(3)})</span></div>
+          <div class="kv-row"><span class="k">S | ${ex.events.Dname}\u1D9C</span><span class="v">Normal(mean = ${cont.combo.meanDc.toFixed(2)}, sd = ${cont.combo.sdDc.toFixed(3)})</span></div>
+        </div>
+        ${reveal(ex.extension.indepQ, ex.extension.indepA)}
+        ${reveal(ex.dist.pdfCompareQ, ex.dist.pdfCompareA)}
+        <div class="card" style="margin-top:14px">
+          <h4>Posterior curve &mdash; P(${ex.events.Dname} | S = s)</h4>
+          <div class="chart-wrap short"><canvas id="postc-${ex.id}"></canvas></div>
+          <p style="margin:10px 0 0;font-size:.85rem;color:var(--ink-soft)">Unlike the discrete examples' three-bar posterior, this is a continuous function of s &mdash; there's a posterior probability at every possible score, not just at three outcomes.</p>
+        </div>
+        ${reveal(ex.dist.posteriorQ, ex.dist.posteriorA)}
+      </div>
+    </div>
+
+    <!-- STAGE 6 -->
+    <div class="stage">
+      <div class="stage-num-row"><span class="stage-num">6</span><span class="stage-title">Same random variable, two lenses: PDF, CDF</span></div>
+      <div class="stage-body">
+        <p class="intro">S is continuous, so there is no PMF table to build &mdash; only a density and its cumulative curve.</p>
+        <div class="grid2">
+          <div class="card">
+            <h4>Population mixture density f(s)</h4>
+            <div class="chart-wrap short"><canvas id="pdf-${ex.id}"></canvas></div>
+          </div>
+          <div class="card">
+            <h4>CDF of S</h4>
+            <div class="chart-wrap short"><canvas id="cdf-${ex.id}"></canvas></div>
+          </div>
+        </div>
+        ${reveal(ex.dist.mixQ, ex.dist.mixA)}
+        ${reveal(ex.dist.cdfQ, ex.dist.cdfA)}
+      </div>
+    </div>
+  `;
+
+  return { html, mountCharts: () => {
+    makeDensityCompareChart(document.getElementById('densc-'+ex.id), cont, ex);
+    makePosteriorCurveChart(document.getElementById('postc-'+ex.id), cont, cssVar(ex.accentVar));
+    makeMixturePDFChart(document.getElementById('pdf-'+ex.id), cont, cssVar(ex.accentVar));
+    makeContinuousCDFChart(document.getElementById('cdf-'+ex.id), cont, cssVar(ex.accentVar));
+  }};
+}
+
+renderExample(IMU);
+renderExample(DISEASE);
+renderExample(BEARING);
+
+document.addEventListener('click', function(e){
+  if(e.target.classList.contains('reveal-btn')){
+    const block = e.target.nextElementSibling;
+    const hidden = block.classList.toggle('hidden');
+    e.target.textContent = hidden ? 'Reveal answer' : 'Hide answer';
+  }
+  if(e.target.classList.contains('match-opt')){
+    const item = e.target.closest('.match-item');
+    if(item.classList.contains('answered')) return;
+    item.classList.add('answered');
+    const wasCorrect = e.target.dataset.correct === 'true';
+    item.querySelectorAll('.match-opt').forEach(btn => {
+      btn.disabled = true;
+      if(btn.dataset.correct === 'true') btn.classList.add('opt-correct');
+      else btn.classList.add('opt-dim');
+    });
+    if(!wasCorrect) e.target.classList.add('opt-incorrect');
+    item.querySelector('.match-feedback').classList.remove('hidden');
+  }
+});
+</script>
+</body>
+</html>

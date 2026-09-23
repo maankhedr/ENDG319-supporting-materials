@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Counting Methods — ENDG 319, Lecture 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,560;0,9..144,650;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F4EF;
+    --panel:#FFFFFF;
+    --ink:#1E2330;
+    --ink-soft:#5B6472;
+    --ink-faint:#8A93A0;
+    --line:#DEDACE;
+    --line-soft:#EAE7DD;
+    --principle:#3B4A6B;
+    --principle-bg:#EDF0F6;
+    --perm:#A85A1E;
+    --perm-bg:#FBF0E4;
+    --comb:#2E6E62;
+    --comb-bg:#E8F2EE;
+    --group2:#6B4E9E;
+    --group3:#2B6CA3;
+    --correct:#2E6E62;
+    --correct-bg:#E8F2EE;
+    --wrong:#A23B3B;
+    --wrong-bg:#FBEBEA;
+    --shadow: 0 1px 2px rgba(30,35,48,0.06), 0 6px 18px rgba(30,35,48,0.06);
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Fraunces', serif;
+    font-weight:650;
+    letter-spacing:-0.01em;
+    margin:0 0 0.4em;
+    color:var(--ink);
+  }
+  h2{font-size:1.9rem; font-weight:650;}
+  h3{font-size:1.25rem; font-weight:650;}
+  p{margin:0 0 1em; max-width:66ch;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  ::selection{background:#D9CBB0;}
+
+  /* ---------- layout ---------- */
+  .layout{
+    display:grid;
+    grid-template-columns: 250px minmax(0,1fr);
+    max-width:1180px;
+    margin:0 auto;
+  }
+  nav.side{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    padding:2.2rem 1.2rem 2rem 1.6rem;
+    border-right:1px solid var(--line);
+    overflow-y:auto;
+  }
+  nav.side .brand{
+    font-family:'Fraunces', serif;
+    font-weight:650;
+    font-size:1.05rem;
+    margin-bottom:0.15rem;
+  }
+  nav.side .brand-sub{
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin-bottom:1.6rem;
+  }
+  nav.side ul{list-style:none; margin:0; padding:0;}
+  nav.side li{margin-bottom:0.15rem;}
+  nav.side a.navlink{
+    display:block;
+    padding:0.4rem 0.6rem;
+    border-radius:7px;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    text-decoration:none;
+    border-left:2px solid transparent;
+  }
+  nav.side a.navlink:hover{color:var(--ink); background:var(--line-soft);}
+  nav.side a.navlink.active{
+    color:var(--ink);
+    border-left:2px solid var(--principle);
+    background:var(--principle-bg);
+    font-weight:500;
+  }
+  main{padding: 0 0 6rem;}
+
+  header.hero{
+    padding: 3.6rem 3rem 3rem;
+    border-bottom:1px solid var(--line);
+  }
+  header.hero .kicker{
+    color:var(--ink-soft);
+    font-size:0.9rem;
+    margin-bottom:0.9rem;
+  }
+  header.hero h1{
+    font-size:2.6rem;
+    max-width:16ch;
+    line-height:1.08;
+  }
+  header.hero p.lede{
+    font-size:1.08rem;
+    color:var(--ink-soft);
+    max-width:56ch;
+  }
+  .hero-question{
+    margin-top:1.8rem;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1.4rem 1.6rem;
+    max-width:560px;
+    box-shadow:var(--shadow);
+  }
+  .hero-question .q{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:1.15rem;
+    margin-bottom:0.9rem;
+  }
+  .hero-toggle{display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.8rem;}
+  .hero-toggle button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:1rem;
+    padding:0.5rem 1rem;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    cursor:pointer;
+  }
+  .hero-toggle button.active{
+    background:var(--principle);
+    color:#fff;
+    border-color:var(--principle);
+  }
+  .hero-note{font-size:0.88rem; color:var(--ink-soft); margin:0;}
+
+  section.block{
+    padding: 3rem 3rem 0.5rem;
+    max-width:980px;
+  }
+  section.block .eyebrow{
+    font-size:0.82rem;
+    color:var(--ink-faint);
+    margin-bottom:0.5rem;
+  }
+  .accent-principle{color:var(--principle);}
+  .accent-perm{color:var(--perm);}
+  .accent-comb{color:var(--comb);}
+
+  .tag{
+    display:inline-block;
+    font-size:0.75rem;
+    padding:0.15rem 0.55rem;
+    border-radius:999px;
+    font-weight:500;
+    margin-right:0.4rem;
+  }
+  .tag-principle{background:var(--principle-bg); color:var(--principle);}
+  .tag-perm{background:var(--perm-bg); color:var(--perm);}
+  .tag-comb{background:var(--comb-bg); color:var(--comb);}
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1.6rem;
+    box-shadow:var(--shadow);
+    margin: 1.2rem 0 1.8rem;
+  }
+  .panel-note{
+    border-left:3px solid var(--line);
+    padding-left:0.9rem;
+    color:var(--ink-soft);
+    font-size:0.92rem;
+    margin:1rem 0;
+  }
+
+  /* ---------- tree diagrams ---------- */
+  .tree-wrap{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1.2rem 1.2rem 1.4rem;
+    box-shadow:var(--shadow);
+    margin:1.2rem 0;
+  }
+  .tree-controls{
+    display:flex;
+    align-items:center;
+    gap:0.7rem;
+    flex-wrap:wrap;
+    margin-bottom:0.9rem;
+  }
+  .btn{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.88rem;
+    font-weight:500;
+    padding:0.55rem 1.1rem;
+    border-radius:8px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+    cursor:pointer;
+    transition: transform 0.06s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn:disabled{opacity:0.4; cursor:default; transform:none;}
+  .btn.secondary{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+  }
+  .btn.secondary:hover{border-color:var(--ink);}
+  .step-status{font-size:0.85rem; color:var(--ink-soft);}
+
+  .tree-svg{width:100%; height:auto; display:block;}
+  .tree-link{stroke:var(--line); stroke-width:1.6; }
+  .tree-link.on{stroke:var(--principle); stroke-width:2;}
+  .tree-node rect{fill:var(--panel); stroke:var(--line); stroke-width:1.4; rx:6;}
+  .tree-node text{font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--ink);}
+  .tree-node.on rect{fill:var(--principle); stroke:var(--principle);}
+  .tree-node.on text{fill:#fff;}
+  .tree-node.more rect{fill:transparent; stroke-dasharray:3 3; stroke:var(--ink-faint);}
+  .tree-node.more text{fill:var(--ink-faint); font-size:10px;}
+  .tree-node.root circle{fill:var(--ink);}
+  .tree-node{cursor:default;}
+  .tree-node.clickable{cursor:pointer;}
+  .tree-leaf circle{fill:var(--ink-faint);}
+  .tree-leaf.colored circle{fill:var(--leafcolor, var(--ink-faint));}
+  .tree-leaf text{font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--ink-soft);}
+
+  .formula-row{
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+    flex-wrap:wrap;
+    margin-top:1rem;
+    padding-top:1rem;
+    border-top:1px dashed var(--line);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:1.05rem;
+  }
+  .formula-row .factor{
+    padding:0.3rem 0.6rem;
+    border-radius:6px;
+    background:var(--line-soft);
+    color:var(--ink-faint);
+    transition: background 0.2s, color 0.2s;
+  }
+  .formula-row .factor.active{
+    background:var(--principle);
+    color:#fff;
+  }
+  .formula-row .op, .formula-row .eq{color:var(--ink-faint);}
+  .formula-row .total{
+    padding:0.3rem 0.6rem;
+    border-radius:6px;
+    font-weight:600;
+  }
+  .formula-row .total.active{background:var(--ink); color:#fff;}
+
+  /* ---------- grouping legend ---------- */
+  .legend{display:flex; gap:1.2rem; flex-wrap:wrap; margin-top:1rem; font-size:0.85rem; color:var(--ink-soft);}
+  .legend .swatch{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:0.4rem; vertical-align:middle;}
+
+  /* ---------- exercise cards ---------- */
+  .card-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap:1rem;
+    margin:1.2rem 0 1.8rem;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1.3rem;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+  }
+  .card .scenario-label{
+    font-size:0.75rem;
+    color:var(--ink-faint);
+    margin-bottom:0.5rem;
+  }
+  .card .scenario-text{
+    font-size:0.98rem;
+    margin-bottom:1rem;
+    flex-grow:1;
+  }
+  .reveal-btn{
+    align-self:flex-start;
+    margin-bottom:0.9rem;
+  }
+  .reveal-panel{
+    display:none;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:0.95rem 1.05rem;
+    font-size:0.92rem;
+  }
+  .reveal-panel.open{display:block;}
+  .reveal-panel .method-name{
+    font-weight:650;
+    font-family:'Fraunces', serif;
+    font-size:1.05rem;
+    margin-bottom:0.35rem;
+  }
+  .reveal-panel .formula{
+    font-family:'IBM Plex Mono', monospace;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:0.5rem 0.7rem;
+    display:inline-block;
+    margin:0.4rem 0 0.6rem;
+    font-size:0.92rem;
+  }
+
+  /* wrong-approach cards (slides 22-23) */
+  .wrong-card .approach{
+    font-family:'IBM Plex Mono', monospace;
+    background:var(--wrong-bg);
+    color:var(--wrong);
+    border:1px solid #EBC9C6;
+    border-radius:8px;
+    padding:0.6rem 0.8rem;
+    margin-bottom:0.9rem;
+    font-size:1rem;
+  }
+  .wrong-card .reveal-panel .correct-line{
+    font-family:'IBM Plex Mono', monospace;
+    background:var(--correct-bg);
+    color:var(--correct);
+    border:1px solid #C9E1D9;
+    border-radius:8px;
+    padding:0.5rem 0.75rem;
+    margin-top:0.7rem;
+    font-size:0.95rem;
+  }
+
+  /* ---------- four-checks scenario exercise ---------- */
+  .check-scenario{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:1.4rem 1.5rem;
+    margin:1.2rem 0 1.8rem;
+  }
+  .check-scenario .scenario-text{
+    font-size:1.02rem;
+    margin-bottom:1.1rem;
+    padding-bottom:1rem;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .check-row{
+    display:grid;
+    grid-template-columns: 26px 1fr;
+    gap:0.7rem;
+    margin-bottom:1rem;
+  }
+  .check-num{
+    width:26px; height:26px;
+    border-radius:50%;
+    background:var(--line-soft);
+    color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.85rem;
+    font-weight:600;
+  }
+  .check-q{font-weight:500; margin-bottom:0.4rem;}
+  .chip-group{display:flex; gap:0.5rem; margin-bottom:0.4rem;}
+  .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.85rem;
+    padding:0.35rem 0.8rem;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    cursor:pointer;
+  }
+  .chip.selected{border-color:var(--ink); background:var(--ink); color:#fff;}
+  .check-scenario.revealed .chip.correct{
+    border-color:var(--correct); background:var(--correct-bg); color:var(--correct); font-weight:600;
+  }
+  .check-scenario.revealed .chip.incorrect{
+    border-color:var(--wrong); background:var(--wrong-bg); color:var(--wrong); text-decoration:line-through;
+  }
+  .static-answer{color:var(--ink-soft); font-size:0.92rem;}
+  .q1-placeholder{font-style:italic;}
+  .check-scenario.revealed .q1-placeholder{display:none;}
+  .final-answer{
+    display:none;
+    margin-top:0.4rem;
+    background:var(--paper);
+    border:1px dashed var(--line);
+    border-radius:8px;
+    padding:0.8rem 1rem;
+    font-size:0.92rem;
+  }
+  .check-scenario.revealed .final-answer{display:block;}
+  .check-scenario.revealed .static-hidden{display:block !important;}
+  .static-hidden{display:none;}
+
+  /* ---------- summary table ---------- */
+  table.summary{
+    width:100%;
+    border-collapse:collapse;
+    margin:1.2rem 0 1.8rem;
+    font-size:0.94rem;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  table.summary th{
+    text-align:left;
+    background:var(--ink);
+    color:#fff;
+    padding:0.7rem 0.9rem;
+    font-weight:500;
+    font-size:0.85rem;
+  }
+  table.summary td{
+    padding:0.7rem 0.9rem;
+    border-top:1px solid var(--line-soft);
+  }
+  table.summary td.f{font-family:'IBM Plex Mono', monospace;}
+
+  footer.page-end{
+    padding:2.5rem 3rem 4rem;
+    color:var(--ink-faint);
+    font-size:0.85rem;
+    border-top:1px solid var(--line);
+    margin-top:2rem;
+  }
+
+  @media (max-width: 880px){
+    .layout{grid-template-columns: 1fr;}
+    nav.side{
+      position:static;
+      height:auto;
+      border-right:none;
+      border-bottom:1px solid var(--line);
+      padding:1.2rem;
+      overflow-x:auto;
+    }
+    nav.side ul{display:flex; gap:0.3rem;}
+    nav.side li{margin:0;}
+    nav.side a.navlink{white-space:nowrap; border-left:none; border-bottom:2px solid transparent;}
+    nav.side a.navlink.active{border-left:none; border-bottom:2px solid var(--principle);}
+    header.hero, section.block{padding-left:1.4rem; padding-right:1.4rem;}
+    header.hero h1{font-size:2rem;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .btn:hover{transform:none;}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="side">
+    <div class="brand">Counting Methods</div>
+    <div class="brand-sub">ENDG 319 · Lecture 5 companion</div>
+    <ul>
+      <li><a class="navlink" href="#principle">Fundamental principle</a></li>
+      <li><a class="navlink" href="#plates">Sequences with repetition</a></li>
+      <li><a class="navlink" href="#permutations">Permutations</a></li>
+      <li><a class="navlink" href="#combinations">Combinations</a></li>
+      <li><a class="navlink" href="#choose-method">Exercise · Choose a method</a></li>
+      <li><a class="navlink" href="#four-checks">Exercise · Four checks</a></li>
+      <li><a class="navlink" href="#find-error">Exercise · Find the error</a></li>
+      <li><a class="navlink" href="#summary">Summary</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="kicker">ENDG 319 — Probability, Statistics and Machine Learning</div>
+      <h1>What makes two outcomes different?</h1>
+      <p class="lede">Every counting problem comes down to that one question. Answer it correctly and the right formula — fundamental principle, permutation, or combination — falls out on its own.</p>
+
+      <div class="hero-question">
+        <div class="q">Are <span class="mono">AB</span> and <span class="mono">BA</span> the same outcome, or two different ones?</div>
+        <div class="hero-toggle">
+          <button id="btn-order-matters" class="active">Order matters</button>
+          <button id="btn-order-ignored">Order ignored</button>
+        </div>
+        <p class="hero-note" id="hero-explain">They're <strong>different</strong> — swapping the letters changes the outcome. That's a <span class="accent-perm">permutation</span>: 2 letters, 2 arrangements each.</p>
+      </div>
+    </header>
+
+    <!-- ================= FUNDAMENTAL PRINCIPLE ================= -->
+    <section class="block" id="principle">
+      <div class="eyebrow"><span class="tag tag-principle">Method 1</span>Fundamental counting principle</div>
+      <h2>Example 4 — Build a computer, one stage at a time</h2>
+      <p>A task completed through <span class="mono">k</span> successive stages, with <span class="mono">n<sub>i</sub></span> choices at stage <span class="mono">i</span>, has <span class="mono">N = n<sub>1</sub> × n<sub>2</sub> × ⋯ × n<sub>k</sub></span> possible outcomes. Walk one path down the tree below to see why the choices multiply instead of add.</p>
+
+      <div class="tree-wrap">
+        <div class="tree-controls">
+          <button class="btn" id="ex4-expand">Expand next stage →</button>
+          <button class="btn secondary" id="ex4-reset">Reset</button>
+          <span class="step-status" id="ex4-status">Stage 0 of 4 expanded — click a node to follow a different branch.</span>
+        </div>
+        <div id="ex4-tree"></div>
+        <div class="formula-row" id="ex4-formula"></div>
+      </div>
+      <p class="panel-note">Only one branch is drawn all the way down — the other branches at every stage behave identically, so the total is still every stage's count multiplied together, even though we only trace a single path.</p>
+    </section>
+
+    <!-- ================= SEQUENCES WITH REPETITION ================= -->
+    <section class="block" id="plates">
+      <div class="eyebrow"><span class="tag tag-principle">Method 1, extended</span>Ordered strings, repetition allowed</div>
+      <h2>Example 5 — Three letters, then three digits</h2>
+      <p>Same principle, six stages instead of four — and this time each stage has far more options (26 letters, then 10 digits). Reusing a character at one stage never reduces the choices at the next.</p>
+
+      <div class="tree-wrap">
+        <div class="tree-controls">
+          <button class="btn" id="ex5-expand">Expand next stage →</button>
+          <button class="btn secondary" id="ex5-reset">Reset</button>
+          <span class="step-status" id="ex5-status">Stage 0 of 6 expanded.</span>
+        </div>
+        <div id="ex5-tree"></div>
+        <div class="formula-row" id="ex5-formula"></div>
+      </div>
+      <p class="panel-note">Each letter stage is drawn with only its first few options — the dashed node stands in for the rest. Nothing about the branching changes: every stage still has a fixed number of choices no matter what was picked before.</p>
+    </section>
+
+    <!-- ================= PERMUTATIONS ================= -->
+    <section class="block" id="permutations">
+      <div class="eyebrow"><span class="tag tag-perm">Method 2</span>Ordered arrangements — distinct objects, no repetition</div>
+      <h2>Example 6 — Arranging vs. selecting-and-ordering</h2>
+      <p>Take three distinct items, <span class="mono">X</span>, <span class="mono">Y</span>, <span class="mono">Z</span>. These two small trees are fully drawn (nothing condensed) so you can see every arrangement. The same branching pattern is what scales up to the runners and lifeguards from the slides — it just gets too wide to draw once <span class="mono">n</span> reaches 5.</p>
+
+      <div class="card-grid">
+        <div class="tree-wrap" style="margin:0;">
+          <h3 style="font-size:1rem;">A. Arrange all 3 items — <span class="mono">3! = 6</span></h3>
+          <div id="perm-full-tree"></div>
+          <p class="panel-note">Scaled up: 5 people in a line → <span class="mono">n = k = 5</span> → <span class="mono">5! = 120</span> orders.</p>
+        </div>
+        <div class="tree-wrap" style="margin:0;">
+          <h3 style="font-size:1rem;">B. Choose and order 2 of 3 items — <span class="mono">₃P₂ = 6</span></h3>
+          <div id="perm-partial-tree"></div>
+          <p class="panel-note">Scaled up: 5 lifeguards, 3 stations → <span class="mono">n = 5, k = 3</span> → <span class="mono">₅P₃ = 5 × 4 × 3 = 60</span> assignments.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= COMBINATIONS ================= -->
+    <section class="block" id="combinations">
+      <div class="eyebrow"><span class="tag tag-comb">Method 3</span>Unordered groups — why we divide by k!</div>
+      <h2>Same 6 leaves, grouped by combination</h2>
+      <p>Reuse tree B from above. Every pair of leaves that contains the <em>same two letters</em> — just in a different order — collapses into one combination once order stops mattering. That's exactly why <span class="mono">ₙCₖ = ₙPₖ / k!</span>.</p>
+
+      <div class="tree-wrap">
+        <div id="comb-group-tree"></div>
+        <div class="legend">
+          <span><span class="swatch" style="background:var(--comb);"></span>{X, Y} — from XY, YX</span>
+          <span><span class="swatch" style="background:var(--group2);"></span>{X, Z} — from XZ, ZX</span>
+          <span><span class="swatch" style="background:var(--group3);"></span>{Y, Z} — from YZ, ZY</span>
+        </div>
+      </div>
+      <p class="panel-note">6 ordered arrangements ÷ 2! orderings per group = 3 distinct combinations. Scaled up: choosing 5 identical door prizes for 5 of 30 guests → <span class="mono">₃₀C₅ = 142,506</span> groups (no ×5!, because the prizes aren't distinguishable).</p>
+    </section>
+
+    <!-- ================= EXERCISE: CHOOSE A METHOD ================= -->
+    <section class="block" id="choose-method">
+      <div class="eyebrow">Exercise</div>
+      <h2>Choose a method</h2>
+      <p>Each scenario below maps to exactly one of the four counting methods. Decide first, then reveal the answer.</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="scenario-label">Scenario A</div>
+          <div class="scenario-text">A password is made of 8 lowercase letters. Any letter may be reused at any position.</div>
+          <button class="btn reveal-btn">Reveal method</button>
+          <div class="reveal-panel">
+            <div class="method-name accent-principle">Fundamental counting principle</div>
+            <div class="formula">26⁸ = 208,827,064,576</div>
+            <p style="margin:0;">One outcome is a sequence of 8 independent stages, each with 26 choices — and repetition is explicitly allowed, so no stage ever loses an option.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="scenario-label">Scenario B</div>
+          <div class="scenario-text">6 finalists in a photography contest are ranked 1st through 6th, with no ties.</div>
+          <button class="btn reveal-btn">Reveal method</button>
+          <div class="reveal-panel">
+            <div class="method-name accent-perm">All-object permutation</div>
+            <div class="formula">6! = 720</div>
+            <p style="margin:0;">Every one of the 6 finalists gets a distinct rank, and all 6 are placed — order matters, nothing repeats, and every object is used exactly once.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="scenario-label">Scenario C</div>
+          <div class="scenario-text">A starting lineup needs 5 named positions (PG, SG, SF, PF, C) filled from a 12-player roster. No player can fill two positions.</div>
+          <button class="btn reveal-btn">Reveal method</button>
+          <div class="reveal-panel">
+            <div class="method-name accent-perm">Permutation of k of n</div>
+            <div class="formula">₁₂P₅ = 12 × 11 × 10 × 9 × 8 = 95,040</div>
+            <p style="margin:0;">Only 5 of the 12 players are chosen, and the 5 named positions make the selection ordered — swapping who plays PG vs. C is a different lineup.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="scenario-label">Scenario D</div>
+          <div class="scenario-text">A study group of 4 students is formed from a class of 20. No roles — everyone in the group is equal.</div>
+          <button class="btn reveal-btn">Reveal method</button>
+          <div class="reveal-panel">
+            <div class="method-name accent-comb">Combination</div>
+            <div class="formula">₂₀C₄ = 4,845</div>
+            <p style="margin:0;">Only membership matters, not any ordering within the group — swapping which student is "listed first" doesn't create a new group.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= EXERCISE: FOUR CHECKS ================= -->
+    <section class="block" id="four-checks">
+      <div class="eyebrow">Exercise</div>
+      <h2>Work the four checks</h2>
+      <p>For each scenario, answer the diagnostic questions yourself — click a chip for questions 2 and 3 — then reveal the full reasoning.</p>
+
+      <div class="check-scenario">
+        <div class="scenario-text"><strong>Scenario 1.</strong> A committee of 4 is chosen from 15 employees to review a proposal. All committee members have equal standing.</div>
+
+        <div class="check-row">
+          <div class="check-num">1</div>
+          <div>
+            <div class="check-q">Define one complete outcome.</div>
+            <div class="static-answer q1-placeholder">Think it through, then reveal below.</div>
+            <div class="static-answer static-hidden">One outcome is the <em>set</em> of 4 employees selected for the committee — no distinction between members.</div>
+          </div>
+        </div>
+        <div class="check-row">
+          <div class="check-num">2</div>
+          <div>
+            <div class="check-q">Does order or role matter?</div>
+            <div class="chip-group" data-correct="no">
+              <div class="chip" data-val="yes">Yes</div>
+              <div class="chip" data-val="no">No</div>
+            </div>
+          </div>
+        </div>
+        <div class="check-row">
+          <div class="check-num">3</div>
+          <div>
+            <div class="check-q">Can an employee be chosen more than once?</div>
+            <div class="chip-group" data-correct="no">
+              <div class="chip" data-val="yes">Yes</div>
+              <div class="chip" data-val="no">No</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn reveal-check-btn">Reveal reasoning</button>
+        <div class="final-answer">
+          <div class="method-name accent-comb" style="font-family:'Fraunces',serif; font-weight:650; margin-bottom:0.3rem;">4. Method: Combination</div>
+          <div class="formula">₁₅C₄ = 1,365</div>
+          No roles means no order; each of the 15 employees can serve at most once, so there's no repetition. Unordered, no repeats → combination.
+        </div>
+      </div>
+
+      <div class="check-scenario">
+        <div class="scenario-text"><strong>Scenario 2.</strong> A 4-digit PIN is created using the digits 0–9. Digits may repeat.</div>
+
+        <div class="check-row">
+          <div class="check-num">1</div>
+          <div>
+            <div class="check-q">Define one complete outcome.</div>
+            <div class="static-answer q1-placeholder">Think it through, then reveal below.</div>
+            <div class="static-answer static-hidden">One outcome is an ordered string of 4 digits, e.g. <span class="mono">0483</span> — position 1 through position 4, each filled independently.</div>
+          </div>
+        </div>
+        <div class="check-row">
+          <div class="check-num">2</div>
+          <div>
+            <div class="check-q">Does order or role matter?</div>
+            <div class="chip-group" data-correct="yes">
+              <div class="chip" data-val="yes">Yes</div>
+              <div class="chip" data-val="no">No</div>
+            </div>
+          </div>
+        </div>
+        <div class="check-row">
+          <div class="check-num">3</div>
+          <div>
+            <div class="check-q">Can a digit repeat?</div>
+            <div class="chip-group" data-correct="yes">
+              <div class="chip" data-val="yes">Yes</div>
+              <div class="chip" data-val="no">No</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn reveal-check-btn">Reveal reasoning</button>
+        <div class="final-answer">
+          <div style="font-family:'Fraunces',serif; font-weight:650; margin-bottom:0.3rem;" class="accent-principle">4. Method: Fundamental counting principle</div>
+          <div class="formula">10 × 10 × 10 × 10 = 10,000</div>
+          A PIN is an ordered string of 4 digit-positions, and repetition is explicitly allowed — each of the 4 stages always has 10 choices, regardless of earlier digits.
+        </div>
+      </div>
+
+      <div class="check-scenario">
+        <div class="scenario-text"><strong>Scenario 3.</strong> Gold, silver, and bronze medals are awarded to 3 of the 8 finishers in a marathon.</div>
+
+        <div class="check-row">
+          <div class="check-num">1</div>
+          <div>
+            <div class="check-q">Define one complete outcome.</div>
+            <div class="static-answer q1-placeholder">Think it through, then reveal below.</div>
+            <div class="static-answer static-hidden">One outcome is which specific runner gets gold, which gets silver, and which gets bronze — an assignment of 3 distinguishable roles to 3 of the 8 runners.</div>
+          </div>
+        </div>
+        <div class="check-row">
+          <div class="check-num">2</div>
+          <div>
+            <div class="check-q">Does order or role matter?</div>
+            <div class="chip-group" data-correct="yes">
+              <div class="chip" data-val="yes">Yes</div>
+              <div class="chip" data-val="no">No</div>
+            </div>
+          </div>
+        </div>
+        <div class="check-row">
+          <div class="check-num">3</div>
+          <div>
+            <div class="check-q">Can a runner win more than one medal?</div>
+            <div class="chip-group" data-correct="no">
+              <div class="chip" data-val="yes">Yes</div>
+              <div class="chip" data-val="no">No</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn reveal-check-btn">Reveal reasoning</button>
+        <div class="final-answer">
+          <div style="font-family:'Fraunces',serif; font-weight:650; margin-bottom:0.3rem;" class="accent-perm">4. Method: Permutation of k of n</div>
+          <div class="formula">₈P₃ = 8 × 7 × 6 = 336</div>
+          Gold, silver, and bronze are distinguishable roles, so order matters; once a runner wins a medal they're out of the running for the next one, so there's no repetition.
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= EXERCISE: FIND THE ERROR ================= -->
+    <section class="block" id="find-error">
+      <div class="eyebrow">Exercise</div>
+      <h2>Find the counting error</h2>
+      <p>Each approach below is incorrect. Try to spot the mistake before revealing the explanation and the corrected expression.</p>
+
+      <div class="card-grid">
+        <div class="card wrong-card">
+          <div class="scenario-label">A. Computer configurations</div>
+          <div class="scenario-text">A build needs one choice from each of 4 categories: 3 hard drives, 4 memory options, 2 video cards, 3 monitors.</div>
+          <div class="approach">3 + 4 + 2 + 3</div>
+          <button class="btn reveal-btn">Reveal explanation</button>
+          <div class="reveal-panel">
+            Addition would only make sense if you were choosing from just <em>one</em> category. Since a complete build needs one option from every category at once, the choices combine multiplicatively — the fundamental counting principle, not addition.
+            <div class="correct-line">3 × 4 × 2 × 3 = 72</div>
+          </div>
+        </div>
+
+        <div class="card wrong-card">
+          <div class="scenario-label">B. Medal assignments</div>
+          <div class="scenario-text">5 runners compete; gold, silver, and bronze go to 3 of them.</div>
+          <div class="approach">5 × 5 × 5</div>
+          <button class="btn reveal-btn">Reveal explanation</button>
+          <div class="reveal-panel">
+            This treats every medal position as an independent draw from all 5 runners, which would let one runner win two or three medals. A runner can only fill one position, so after gold is awarded only 4 runners remain for silver, then 3 for bronze.
+            <div class="correct-line">5 × 4 × 3 = 60 (₅P₃)</div>
+          </div>
+        </div>
+
+        <div class="card wrong-card">
+          <div class="scenario-label">C. Identical-prize groups</div>
+          <div class="scenario-text">30 people attend an event; 5 different people receive identical door prizes.</div>
+          <div class="approach">(30 choose 5) × 5!</div>
+          <button class="btn reveal-btn">Reveal explanation</button>
+          <div class="reveal-panel">
+            Multiplying by 5! counts each group of 5 winners once for every order they could be announced in. But the prizes are identical — there's no "1st prize" vs. "5th prize" — so different announcement orders describe the exact same outcome and shouldn't be counted separately.
+            <div class="correct-line">30 choose 5 = 142,506 (no × 5!)</div>
+          </div>
+        </div>
+
+        <div class="card wrong-card">
+          <div class="scenario-label">D. All four bulbs good</div>
+          <div class="scenario-text">A box has 8 good bulbs and 2 burned-out bulbs; 4 bulbs are drawn at random.</div>
+          <div class="approach">P(A) = 8 / 10</div>
+          <button class="btn reveal-btn">Reveal explanation</button>
+          <div class="reveal-panel">
+            8/10 is the fraction of individual bulbs that are good — but the event asks about a <em>group</em> of 4 bulbs drawn together, not one bulb. The numerator and denominator both need to count 4-bulb subsets, using the same convention.
+            <div class="correct-line">(8 choose 4) / (10 choose 4) = 70/210 = 1/3</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SUMMARY ================= -->
+    <section class="block" id="summary">
+      <div class="eyebrow">Recap</div>
+      <h2>One outcome, one method</h2>
+      <p>Whatever the scenario, describe one complete outcome first — the method follows automatically.</p>
+
+      <table class="summary">
+        <thead>
+          <tr><th>One complete outcome describes…</th><th>Method</th><th>Count</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>A sequence of independent stage choices</td><td>Fundamental principle</td><td class="f">n₁ × n₂ × ⋯ × nₖ</td></tr>
+          <tr><td>All n distinct objects, in order</td><td>All-object permutation</td><td class="f">n!</td></tr>
+          <tr><td>k of n distinct objects, in order</td><td>Permutation</td><td class="f">n! / (n − k)!</td></tr>
+          <tr><td>An unordered group of k distinct objects</td><td>Combination</td><td class="f">n! / [k!(n − k)!]</td></tr>
+        </tbody>
+      </table>
+      <p class="panel-note">For probability with equally likely outcomes: <span class="mono">P(A) = favourable count / total count</span> — always count the same kind of outcome on both sides of the fraction.</p>
+    </section>
+
+    <footer class="page-end">
+      Companion tutorial for ENDG 319, Lecture 5 — Counting Methods · Hua Song, Fall 2026, Schulich School of Engineering.
+    </footer>
+  </main>
+</div>
+
+<script>
+/* ============ scrollspy for side nav ============ */
+(function(){
+  const links = document.querySelectorAll('nav.side a.navlink');
+  const sections = Array.from(links).map(l => document.getElementById(l.getAttribute('href').slice(1)));
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 140;
+    sections.forEach((s,i)=>{ if(s && s.offsetTop <= y) idx = i; });
+    links.forEach((l,i)=> l.classList.toggle('active', i===idx));
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+})();
+
+/* ============ hero toggle ============ */
+(function(){
+  const bOrder = document.getElementById('btn-order-matters');
+  const bIgnore = document.getElementById('btn-order-ignored');
+  const explain = document.getElementById('hero-explain');
+  bOrder.addEventListener('click', ()=>{
+    bOrder.classList.add('active'); bIgnore.classList.remove('active');
+    explain.innerHTML = 'They\'re <strong>different</strong> — swapping the letters changes the outcome. That\'s a <span class="accent-perm">permutation</span>: 2 letters, 2 arrangements each.';
+  });
+  bIgnore.addEventListener('click', ()=>{
+    bIgnore.classList.add('active'); bOrder.classList.remove('active');
+    explain.innerHTML = 'They\'re the <strong>same</strong> — only the letters chosen matter, not their order. That\'s a <span class="accent-comb">combination</span>: 2 letters, 1 group.';
+  });
+})();
+
+/* ============ generic tree layout + render ============ */
+function computeLeaves(node){
+  if(!node.children || node.children.length===0){ node._leaves = 1; return 1; }
+  let sum = 0;
+  node.children.forEach(c => sum += computeLeaves(c));
+  node._leaves = sum;
+  return sum;
+}
+function layoutTree(node, x0, x1, depth, positions, maxDepthRef){
+  node._x = (x0+x1)/2;
+  node._y = depth;
+  if(depth > maxDepthRef.v) maxDepthRef.v = depth;
+  positions.push(node);
+  if(node.children && node.children.length){
+    let cursor = x0;
+    node.children.forEach(c=>{
+      const w = (x1-x0) * (c._leaves||1) / node._leaves;
+      layoutTree(c, cursor, cursor+w, depth+1, positions, maxDepthRef);
+      cursor += w;
+    });
+  }
+}
+function renderTree(containerEl, root, opts){
+  opts = Object.assign({width:640, levelGap:74, nodeW:52, nodeH:26}, opts||{});
+  computeLeaves(root);
+  const positions = [];
+  const maxDepthRef = {v:0};
+  layoutTree(root, 24, opts.width-24, 0, positions, maxDepthRef);
+  const height = (maxDepthRef.v+1)*opts.levelGap + 26;
+
+  let svg = '';
+  // links
+  positions.forEach(node=>{
+    if(node.children){
+      node.children.forEach(c=>{
+        const x1=node._x, y1=node._y*opts.levelGap + opts.levelGap/2;
+        const x2=c._x, y2=c._y*opts.levelGap + opts.levelGap/2;
+        const on = c.onPath ? ' on' : '';
+        svg += '<line class="tree-link'+on+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"></line>';
+      });
+    }
+  });
+  // nodes
+  positions.forEach(node=>{
+    const x=node._x, y=node._y*opts.levelGap + opts.levelGap/2;
+    if(node.isRoot){
+      svg += '<g class="tree-node root" transform="translate('+x+','+y+')"><circle r="5"></circle></g>';
+      return;
+    }
+    if(node.leaf){
+      const colored = node.leafColor ? ' colored' : '';
+      const style = node.leafColor ? ' style="--leafcolor:'+node.leafColor+'"' : '';
+      svg += '<g class="tree-node tree-leaf'+colored+'" transform="translate('+x+','+y+')"'+style+'>'+
+             '<circle r="4.5"></circle>'+
+             '<text y="18" text-anchor="middle">'+node.label+'</text>'+
+             '</g>';
+      return;
+    }
+    if(node.isMore){
+      const w = opts.nodeW+14, h=opts.nodeH;
+      svg += '<g class="tree-node more" transform="translate('+(x-w/2)+','+(y-h/2)+')">'+
+             '<rect width="'+w+'" height="'+h+'"></rect>'+
+             '<text x="'+(w/2)+'" y="'+(h/2+4)+'" text-anchor="middle">'+node.label+'</text>'+
+             '</g>';
+      return;
+    }
+    const w = opts.nodeW, h=opts.nodeH;
+    const onCls = node.onPath ? ' on' : '';
+    const clickCls = node.clickable ? ' clickable' : '';
+    const dataAttrs = (node.stage!==undefined) ? ' data-stage="'+node.stage+'" data-option="'+node.option+'"' : '';
+    svg += '<g class="tree-node'+onCls+clickCls+'" transform="translate('+(x-w/2)+','+(y-h/2)+')"'+dataAttrs+'>'+
+           '<rect width="'+w+'" height="'+h+'"></rect>'+
+           '<text x="'+(w/2)+'" y="'+(h/2+4)+'" text-anchor="middle">'+node.label+'</text>'+
+           '</g>';
+  });
+
+  containerEl.innerHTML = '<svg class="tree-svg" viewBox="0 0 '+opts.width+' '+height+'">'+svg+'</svg>';
+}
+
+/* ============ stepped stage tree (Examples 4 & 5) ============ */
+function makeSteppedTreeController(containerId, formulaId, statusId, expandBtnId, resetBtnId, stagesData, opts){
+  const container = document.getElementById(containerId);
+  const formulaEl = document.getElementById(formulaId);
+  const statusEl = document.getElementById(statusId);
+  const expandBtn = document.getElementById(expandBtnId);
+  const resetBtn = document.getElementById(resetBtnId);
+
+  let expandedCount = 0;
+  let selectedPath = stagesData.map(()=>0);
+
+  function buildTree(){
+    const root = {label:'Start', isRoot:true, children: []};
+    let parent = root;
+    for(let s=0; s<expandedCount; s++){
+      const stage = stagesData[s];
+      const opts_ = stage.condensed ? stage.displayCount : stage.options.length;
+      const kids = [];
+      for(let i=0;i<opts_;i++){
+        kids.push({
+          label: stage.options[i],
+          stage: s, option: i,
+          clickable: true,
+          onPath: (i===selectedPath[s]),
+          children: null
+        });
+      }
+      if(stage.condensed){
+        kids.push({label:'⋯ '+ (stage.total - stage.displayCount) +' more', isMore:true});
+      }
+      parent.children = kids;
+      const chosenIdx = Math.min(selectedPath[s], opts_-1);
+      parent = kids[chosenIdx];
+    }
+    return root;
+  }
+
+  function render(){
+    renderTree(container, buildTree(), {width: opts.width||640, levelGap:70, nodeW: opts.nodeW||50});
+    // formula row
+    let html = '';
+    stagesData.forEach((stage,i)=>{
+      const active = i < expandedCount;
+      html += '<span class="factor'+(active?' active':'')+'">'+ (stage.count) +'</span>';
+      if(i < stagesData.length-1) html += '<span class="op">×</span>';
+    });
+    html += '<span class="eq">=</span><span class="total'+(expandedCount===stagesData.length?' active':'')+'">'+opts.total+'</span>';
+    formulaEl.innerHTML = html;
+
+    statusEl.textContent = expandedCount===0
+      ? 'Stage 0 of '+stagesData.length+' expanded — click "Expand next stage" to begin.'
+      : (expandedCount===stagesData.length
+          ? 'All '+stagesData.length+' stages expanded — total = '+opts.total+'. Click a node to try a different path.'
+          : 'Stage '+expandedCount+' of '+stagesData.length+' expanded — click a node to follow a different branch.');
+
+    expandBtn.disabled = expandedCount >= stagesData.length;
+  }
+
+  container.addEventListener('click', (e)=>{
+    const g = e.target.closest('[data-stage]');
+    if(!g) return;
+    const s = parseInt(g.getAttribute('data-stage'),10);
+    const o = parseInt(g.getAttribute('data-option'),10);
+    selectedPath[s] = o;
+    render();
+  });
+  expandBtn.addEventListener('click', ()=>{
+    if(expandedCount < stagesData.length){ expandedCount++; render(); }
+  });
+  resetBtn.addEventListener('click', ()=>{
+    expandedCount = 0;
+    selectedPath = stagesData.map(()=>0);
+    render();
+  });
+
+  render();
+}
+
+/* Example 4: computer configuration */
+makeSteppedTreeController('ex4-tree','ex4-formula','ex4-status','ex4-expand','ex4-reset',
+  [
+    {options:['HD1','HD2','HD3'], count:3},
+    {options:['M1','M2','M3','M4'], count:4},
+    {options:['V1','V2'], count:2},
+    {options:['N1','N2','N3'], count:3}
+  ],
+  {width:620, total:'72'}
+);
+
+/* Example 5: plate letters + digits, condensed */
+makeSteppedTreeController('ex5-tree','ex5-formula','ex5-status','ex5-expand','ex5-reset',
+  [
+    {options:['A','B','C','D'], condensed:true, displayCount:4, total:26, count:'26'},
+    {options:['A','B','C','D'], condensed:true, displayCount:4, total:26, count:'26'},
+    {options:['A','B','C','D'], condensed:true, displayCount:4, total:26, count:'26'},
+    {options:['0','1','2','3'], condensed:true, displayCount:4, total:10, count:'10'},
+    {options:['0','1','2','3'], condensed:true, displayCount:4, total:10, count:'10'},
+    {options:['0','1','2','3'], condensed:true, displayCount:4, total:10, count:'10'}
+  ],
+  {width:660, total:'17,576,000', nodeW:38}
+);
+
+/* ============ permutation trees (Example 6) ============ */
+function buildPermTree(items, k){
+  function rec(remaining, prefix){
+    if(prefix.length === k){
+      return {label: prefix.join(''), leaf:true};
+    }
+    return {
+      label: prefix.length===0 ? '' : prefix.join(''),
+      isRoot: prefix.length===0,
+      children: remaining.map((item,i)=>{
+        const rest = remaining.slice(0,i).concat(remaining.slice(i+1));
+        return rec(rest, prefix.concat([item]));
+      })
+    };
+  }
+  return rec(items, []);
+}
+
+renderTree(document.getElementById('perm-full-tree'), buildPermTree(['X','Y','Z'],3), {width:420, levelGap:64, nodeW:40});
+const partialTree = buildPermTree(['X','Y','Z'],2);
+renderTree(document.getElementById('perm-partial-tree'), partialTree, {width:420, levelGap:64, nodeW:40});
+
+/* ============ combination grouping tree ============ */
+(function(){
+  const tree = buildPermTree(['X','Y','Z'],2);
+  const palette = ['var(--comb)','var(--group2)','var(--group3)'];
+  const seen = new Map();
+  let idx = 0;
+  (function walk(n){
+    if(n.leaf){
+      const key = n.label.split('').sort().join('');
+      if(!seen.has(key)) seen.set(key, palette[idx++ % palette.length]);
+      n.leafColor = seen.get(key);
+    } else if(n.children){
+      n.children.forEach(walk);
+    }
+  })(tree);
+  renderTree(document.getElementById('comb-group-tree'), tree, {width:520, levelGap:64, nodeW:40});
+})();
+
+/* ============ simple reveal buttons (slide 18 + slide 22/23 cards) ============ */
+document.querySelectorAll('.reveal-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const panel = btn.nextElementSibling;
+    const open = panel.classList.toggle('open');
+    btn.textContent = open ? 'Hide answer' : 'Reveal method';
+    if(btn.closest('.wrong-card')) btn.textContent = open ? 'Hide explanation' : 'Reveal explanation';
+  });
+});
+
+/* ============ four-checks scenario reveal ============ */
+document.querySelectorAll('.chip-group .chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    const group = chip.closest('.chip-group');
+    group.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+    chip.classList.add('selected');
+  });
+});
+document.querySelectorAll('.reveal-check-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const card = btn.closest('.check-scenario');
+    card.classList.add('revealed');
+    card.querySelectorAll('.chip-group').forEach(group=>{
+      const correctVal = group.getAttribute('data-correct');
+      group.querySelectorAll('.chip').forEach(chip=>{
+        if(chip.getAttribute('data-val')===correctVal) chip.classList.add('correct');
+        else if(chip.classList.contains('selected')) chip.classList.add('incorrect');
+      });
+    });
+    btn.textContent = 'Reasoning shown ✓';
+    btn.disabled = true;
+  });
+});
+</script>
+</body>
+</html>

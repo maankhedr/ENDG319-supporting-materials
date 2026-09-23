@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundations of Probability — Interactive Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFEEE6;
+    --paper-raised:#F8F7F1;
+    --ink:#1E2A35;
+    --ink-soft:#4B5A68;
+    --ink-faint:#8A93A0;
+    --line:#D8D3C2;
+    --gold:#C68F2E;
+    --gold-soft:#F1E1BE;
+    --teal:#2F7A72;
+    --teal-soft:#DCEAE7;
+    --coral:#B3402F;
+    --coral-soft:#F3DFD9;
+    --radius: 3px;
+    --shadow: 0 1px 0 rgba(30,42,53,0.08);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  h1,h2,h3,h4{
+    font-family:'Spectral', serif;
+    font-weight:600;
+    color:var(--ink);
+    line-height:1.2;
+    margin:0 0 0.5em;
+  }
+  .kicker{
+    font-family:'Spectral SC', serif;
+    font-weight:500;
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    color:var(--teal);
+  }
+  p{margin:0 0 1em;color:var(--ink-soft);}
+  a{color:var(--teal);}
+  code, .mono{font-family:'IBM Plex Mono', monospace;}
+  button{
+    font-family:'IBM Plex Sans', sans-serif;
+    cursor:pointer;
+    border:none;
+    border-radius:var(--radius);
+    font-weight:600;
+    transition:transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  button:active{transform:translateY(1px);}
+  button:focus-visible, a:focus-visible, summary:focus-visible{
+    outline:2px solid var(--teal);
+    outline-offset:2px;
+  }
+
+  /* ---------- layout shell ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns: 240px 1fr;
+    max-width:1240px;
+    margin:0 auto;
+  }
+  nav.toc{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    padding:2.2rem 1.2rem 2rem 1.6rem;
+    border-right:1px solid var(--line);
+  }
+  nav.toc .brand{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size:1.05rem;
+    margin-bottom:0.2rem;
+  }
+  nav.toc .brand-sub{
+    font-size:0.78rem;
+    color:var(--ink-faint);
+    margin-bottom:1.6rem;
+    display:block;
+  }
+  nav.toc ol{
+    list-style:none;
+    margin:0;
+    padding:0;
+    counter-reset:toc;
+  }
+  nav.toc li{counter-increment:toc; margin-bottom:0.15rem;}
+  nav.toc a{
+    display:flex;
+    gap:0.6em;
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:0.86rem;
+    padding:0.4em 0.3em;
+    border-left:2px solid transparent;
+  }
+  nav.toc a::before{
+    content:counter(toc, decimal-leading-zero);
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--ink-faint);
+    font-size:0.78rem;
+  }
+  nav.toc a:hover, nav.toc a.active{
+    color:var(--ink);
+    border-left-color:var(--gold);
+    background:rgba(198,143,46,0.08);
+  }
+
+  main{padding:0 0 6rem;}
+
+  .hero{
+    padding:3.4rem 3.2rem 2.6rem;
+    border-bottom:1px solid var(--line);
+  }
+  .hero h1{font-size:2.3rem; max-width:14ch;}
+  .hero p.lede{
+    max-width:56ch;
+    font-size:1.05rem;
+    color:var(--ink-soft);
+  }
+  .hero .badge-row{display:flex; gap:0.6rem; margin-top:1.4rem; flex-wrap:wrap;}
+  .hero .badge{
+    font-size:0.76rem;
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:0.3em 0.9em;
+    background:var(--paper-raised);
+  }
+
+  section.card{
+    padding:3rem 3.2rem;
+    border-bottom:1px solid var(--line);
+    scroll-margin-top:1rem;
+  }
+  section.card:nth-of-type(even){background:var(--paper-raised);}
+  section.card > .kicker{display:block; margin-bottom:0.5rem;}
+  section.card h2{font-size:1.6rem; max-width:26ch; margin-bottom:0.6rem;}
+  section.card .intro{max-width:66ch; font-size:0.98rem;}
+
+  .grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.6rem;
+    margin-top:1.6rem;
+  }
+  @media (max-width:820px){ .grid2{grid-template-columns:1fr;} }
+
+  .panel{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:1.4rem 1.5rem;
+    box-shadow:var(--shadow);
+  }
+  .panel h3{font-size:1.05rem; margin-bottom:0.4rem;}
+  .panel h3 .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    font-weight:500;
+    color:#fff;
+    padding:0.15em 0.55em;
+    border-radius:2px;
+    margin-right:0.5em;
+    vertical-align:middle;
+  }
+  .tag.discrete{background:var(--teal);}
+  .tag.continuous{background:var(--gold); color:var(--ink);}
+
+  .example-set{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.92rem;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:0.6em 0.8em;
+    margin:0.7em 0;
+    color:var(--ink);
+    word-break:break-word;
+  }
+
+  .dots-row{display:flex; gap:0.35rem; flex-wrap:wrap; margin:0.8rem 0;}
+  .dot{
+    width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;
+    border:1.5px solid var(--teal); color:var(--teal);
+  }
+
+  /* ---------- tree diagrams ---------- */
+  .tree-wrap{margin-top:1.4rem;}
+  svg.tree{width:100%; height:auto; display:block;}
+  .tree-node rect{fill:#fff; stroke:var(--ink-soft); stroke-width:1.2;}
+  .tree-node.stage1 rect{stroke:var(--teal);}
+  .tree-node.stage2 rect{stroke:var(--gold);}
+  .tree-node.leaf rect{fill:var(--paper); stroke:var(--ink-faint); stroke-dasharray:2 2;}
+  .tree-node text{font-family:'IBM Plex Mono', monospace; font-size:12px; fill:var(--ink);}
+  .tree-edge{stroke:var(--line); stroke-width:1.4; fill:none;}
+  .tree-caption{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+    background:var(--gold-soft);
+    display:inline-block;
+    padding:0.4em 0.8em;
+    border-radius:2px;
+    margin-top:0.8rem;
+  }
+
+  /* ---------- die roller ---------- */
+  .die-stage{
+    display:flex;
+    align-items:center;
+    gap:1.6rem;
+    flex-wrap:wrap;
+    margin:1.2rem 0;
+  }
+  .die-face{
+    width:78px;height:78px;
+    background:#fff;
+    border:2px solid var(--ink);
+    border-radius:10px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(3,1fr);
+    padding:10px;
+    flex-shrink:0;
+  }
+  .die-face .pip{width:100%;height:100%; display:flex; align-items:center; justify-content:center;}
+  .die-face .pip.on::after{content:""; width:11px;height:11px;border-radius:50%;background:var(--ink);}
+  .roll-btn{
+    background:var(--ink);
+    color:#fff;
+    padding:0.75em 1.4em;
+    font-size:0.92rem;
+    border-radius:6px;
+  }
+  .roll-btn:hover{background:#0F1720;}
+  .roll-btn.secondary{background:var(--teal);}
+  .roll-btn.secondary:hover{background:#245F58;}
+  .roll-btn.ghost{background:transparent; color:var(--ink-soft); border:1px solid var(--line);}
+  .outcome-readout{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.95rem;
+  }
+  .outcome-readout .value{font-size:1.3rem; font-weight:600; color:var(--ink);}
+
+  table.events{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:1.2rem;
+    font-size:0.92rem;
+  }
+  table.events th, table.events td{
+    text-align:left;
+    padding:0.6em 0.7em;
+    border-bottom:1px solid var(--line);
+  }
+  table.events th{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:500;
+    color:var(--ink-faint);
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .yes{color:var(--teal); font-weight:600;}
+  .no{color:var(--ink-faint);}
+  tr.event-row.active{background:var(--teal-soft);}
+
+  /* ---------- relative frequency ---------- */
+  .rf-stats{
+    display:flex;
+    gap:1.4rem;
+    flex-wrap:wrap;
+    margin:1.1rem 0;
+  }
+  .rf-stat{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:0.7em 1.1em;
+    min-width:130px;
+  }
+  .rf-stat .label{font-size:0.72rem; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace;}
+  .rf-stat .value{font-size:1.35rem; font-family:'IBM Plex Mono',monospace; font-weight:600;}
+  canvas#rfChart{
+    width:100%;
+    max-width:100%;
+    height:260px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:4px;
+    margin-top:0.6rem;
+  }
+
+  /* ---------- venn / addition rule ---------- */
+  .venn-wrap{display:flex; gap:2rem; flex-wrap:wrap; align-items:flex-start; margin-top:1.2rem;}
+  svg.venn{flex-shrink:0;}
+  .venn-circle-val{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    fill:var(--ink);
+    font-weight:600;
+  }
+  .addition-math{
+    flex:1;
+    min-width:260px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.92rem;
+  }
+  .addition-math .line{
+    padding:0.5em 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .addition-math .line:last-child{border-bottom:none;}
+  .addition-math .label{color:var(--ink-faint); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em; display:block; margin-bottom:0.15em; font-family:'IBM Plex Sans',sans-serif;}
+  .addition-math .highlight{color:var(--coral); font-weight:600;}
+  .addition-math .ok{color:var(--teal); font-weight:600;}
+
+  /* ---------- comparison ---------- */
+  .compare-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.4rem;
+    margin-top:1.4rem;
+  }
+  @media (max-width:820px){ .compare-grid{grid-template-columns:1fr;} }
+  .compare-col{
+    border-radius:6px;
+    padding:1.3rem 1.4rem;
+  }
+  .compare-col.disjoint{background:var(--teal-soft); border:1px solid #BBD8D3;}
+  .compare-col.overlap{background:var(--coral-soft); border:1px solid #E3BFB4;}
+  .compare-col h4{font-size:1rem; margin-bottom:0.5rem;}
+  .compare-col .formula{
+    font-family:'IBM Plex Mono',monospace;
+    background:rgba(255,255,255,0.6);
+    border-radius:3px;
+    padding:0.5em 0.7em;
+    margin:0.6em 0;
+    font-size:0.9rem;
+  }
+
+  /* ---------- quiz / concept check ---------- */
+  .quiz-item{
+    border:1px solid var(--line);
+    border-radius:5px;
+    margin-bottom:0.9rem;
+    background:#fff;
+    overflow:hidden;
+  }
+  .quiz-q{
+    display:flex;
+    align-items:center;
+    gap:0.9rem;
+    padding:1rem 1.2rem;
+  }
+  .quiz-num{
+    font-family:'IBM Plex Mono',monospace;
+    background:var(--ink);
+    color:#fff;
+    width:26px;height:26px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.8rem;
+    flex-shrink:0;
+  }
+  .quiz-q p{margin:0; color:var(--ink); font-weight:500;}
+  .reveal-btn{
+    margin:0 1.2rem 1rem auto;
+    display:block;
+    background:transparent;
+    border:1px solid var(--teal);
+    color:var(--teal);
+    padding:0.4em 1em;
+    border-radius:4px;
+    font-size:0.82rem;
+  }
+  .reveal-btn:hover{background:var(--teal); color:#fff;}
+  .quiz-answer{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.25s ease;
+    padding:0 1.2rem;
+    background:var(--paper);
+  }
+  .quiz-answer.open{max-height:220px; padding:0.2rem 1.2rem 1.1rem;}
+  .quiz-answer .ans-value{
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--teal);
+    font-weight:600;
+  }
+
+  footer{
+    padding:2.4rem 3.2rem;
+    color:var(--ink-faint);
+    font-size:0.82rem;
+  }
+
+  .mobile-toc-toggle{display:none;}
+  @media (max-width:900px){
+    .shell{grid-template-columns:1fr;}
+    nav.toc{
+      position:relative;
+      height:auto;
+      border-right:none;
+      border-bottom:1px solid var(--line);
+      padding:1rem 1.2rem;
+    }
+    nav.toc ol{
+      display:flex;
+      overflow-x:auto;
+      gap:0.4rem;
+    }
+    nav.toc li{margin-bottom:0; flex-shrink:0;}
+    nav.toc a{border-left:none; border-bottom:2px solid transparent; white-space:nowrap;}
+    nav.toc a:hover, nav.toc a.active{border-left-color:transparent; border-bottom-color:var(--gold);}
+    .hero, section.card{padding:2.2rem 1.3rem;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <span class="brand">Foundations of Probability</span>
+    <span class="brand-sub">Interactive companion · ENDG 319, L4</span>
+    <ol>
+      <li><a href="#sample-spaces">Discrete vs. continuous</a></li>
+      <li><a href="#trees">Tree diagrams</a></li>
+      <li><a href="#events">Events on a die</a></li>
+      <li><a href="#relative-frequency">Probability vs. frequency</a></li>
+      <li><a href="#addition-rule">Why we subtract the overlap</a></li>
+      <li><a href="#compare">Disjoint vs. overlapping</a></li>
+      <li><a href="#concept-check">Concept check answers</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="hero">
+      <span class="kicker">ENDG 319 — Lecture 4 companion</span>
+      <h1>Foundations of Probability, hands-on</h1>
+      <p class="lede">Seven short, interactive stops that let you roll the dice yourself — literally — instead of just reading the definitions. Each section mirrors a slide from Lecture 4, with a live example to build intuition.</p>
+      <div class="badge-row">
+        <span class="badge">sample spaces</span>
+        <span class="badge">tree diagrams</span>
+        <span class="badge">events</span>
+        <span class="badge">relative frequency</span>
+        <span class="badge">addition rule</span>
+      </div>
+    </div>
+
+    <!-- ============ 1. DISCRETE VS CONTINUOUS ============ -->
+    <section class="card" id="sample-spaces">
+      <span class="kicker">01 · Sample spaces</span>
+      <h2>Discrete vs. continuous sample spaces</h2>
+      <p class="intro">A sample space can either be a list you could (in principle) count on your fingers, or an unbroken interval with infinitely many possible values in between. The type of sample space determines how you'll eventually assign probabilities to it.</p>
+
+      <div class="grid2">
+        <div class="panel">
+          <h3><span class="tag discrete">discrete</span>Coin & die outcomes</h3>
+          <p>Outcomes can be listed one by one — there's a gap between each possible value, and nothing can fall between them.</p>
+          <div class="example-set">S = {1, 2, 3, 4, 5, 6}</div>
+          <p style="margin-top:0.9rem;">Rolling a die gives exactly one of six separated values. You could point to each one individually:</p>
+          <div class="dots-row" id="discreteDots"></div>
+          <p style="margin-top:0.4rem; font-size:0.86rem;">Six dots, six gaps between them — a countable, finite sample space.</p>
+        </div>
+
+        <div class="panel">
+          <h3><span class="tag continuous">continuous</span>Motor shaft temperature</h3>
+          <p>An engineer measures the surface temperature of a running motor shaft. The thermometer can, in theory, report any real value in its calibrated range.</p>
+          <div class="example-set">S = {t : 40 &lt; t &lt; 90 °C}</div>
+          <p style="margin-top:0.9rem;">Slide the reading below — notice there's no "next" temperature after any given one; you can always find another reading in between.</p>
+          <input type="range" id="tempSlider" min="40" max="90" step="0.01" value="65" style="width:100%;">
+          <p class="outcome-readout" style="margin-top:0.5rem;">Reading: <span class="value" id="tempReadout">65.00</span> °C — one of infinitely many values in (40, 90)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 2. TREE DIAGRAMS ============ -->
+    <section class="card" id="trees">
+      <span class="kicker">02 · Enumerating compound outcomes</span>
+      <h2>Tree diagrams, beyond the coin toss</h2>
+      <p class="intro">A tree diagram enumerates every stage of an experiment systematically so nothing is missed and nothing is duplicated. Below are two examples that don't use a coin: one where every stage has the <em>same</em> number of branches (illustrating r<sup>m</sup>), and one where the stages have <em>different</em> branch counts.</p>
+
+      <div class="grid2">
+        <div class="panel">
+          <h3>Spinner, spun twice — equal branching</h3>
+          <p>A three-colour spinner (Red, Green, Blue) is spun twice. Each stage has <span class="mono">r = 3</span> results, over <span class="mono">m = 2</span> stages, so the tree has <span class="mono">r<sup>m</sup> = 9</span> terminal paths.</p>
+          <div class="tree-wrap" id="tree1"></div>
+          <div class="tree-caption">9 outcomes: RR, RG, RB, GR, GG, GB, BR, BG, BB</div>
+        </div>
+
+        <div class="panel">
+          <h3>Supplier &amp; inspection — unequal branching</h3>
+          <p>A part is sourced from one of <span class="mono">3</span> suppliers, then inspected as Pass or Fail (<span class="mono">2</span> results). Stage 1 and Stage 2 don't have the same number of branches — the tree still enumerates all <span class="mono">3 × 2 = 6</span> paths correctly.</p>
+          <div class="tree-wrap" id="tree2"></div>
+          <div class="tree-caption">6 outcomes: A-Pass, A-Fail, B-Pass, B-Fail, C-Pass, C-Fail</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. EVENTS ON A DIE ============ -->
+    <section class="card" id="events">
+      <span class="kicker">03 · Events as subsets</span>
+      <h2>Roll the die — which events occur?</h2>
+      <p class="intro">An event occurs exactly when the observed outcome belongs to that event's set. Roll the die and watch which of four predefined events "light up".</p>
+
+      <div class="panel">
+        <div class="die-stage">
+          <div class="die-face" id="dieFace">
+            <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+            <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+            <span class="pip"></span><span class="pip"></span><span class="pip"></span>
+          </div>
+          <div>
+            <button class="roll-btn" id="rollOnce">Roll the die</button>
+            <p class="outcome-readout" style="margin-top:0.7rem;">Outcome: <span class="value" id="dieValue">—</span></p>
+          </div>
+        </div>
+
+        <table class="events">
+          <thead>
+            <tr><th>Event</th><th>Definition</th><th>Occurred?</th><th>Reason</th></tr>
+          </thead>
+          <tbody id="eventsTable">
+            <!-- filled by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 4. RELATIVE FREQUENCY ============ -->
+    <section class="card" id="relative-frequency">
+      <span class="kicker">04 · Interpreting probability</span>
+      <h2>Probability vs. observed relative frequency</h2>
+      <p class="intro">P(rolling a 6) = 1/6 ≈ 0.167 is a fixed, theoretical number baked into a fair die. The <em>relative frequency</em> you actually observe after rolling wobbles around at first — but should settle in near 1/6 as you roll more. Press the button to roll ten more times and watch the running proportion converge.</p>
+
+      <div class="panel">
+        <div class="rf-stats">
+          <div class="rf-stat"><span class="label">Total rolls</span><div class="value" id="rfTotal">0</div></div>
+          <div class="rf-stat"><span class="label">Number of 6s</span><div class="value" id="rfHits">0</div></div>
+          <div class="rf-stat"><span class="label">Relative frequency</span><div class="value" id="rfFreq">—</div></div>
+          <div class="rf-stat"><span class="label">True P(rolling a 6)</span><div class="value">1/6 ≈ 0.167</div></div>
+        </div>
+        <button class="roll-btn secondary" id="rollTen">Roll 10 more times</button>
+        <button class="roll-btn ghost" id="resetRf" style="margin-left:0.6rem;">Reset</button>
+        <canvas id="rfChart"></canvas>
+        <p style="margin-top:0.7rem; font-size:0.86rem;">Dashed line marks the true probability, 1/6. The solid line is the running relative frequency of rolling a 6, recalculated after every single roll.</p>
+      </div>
+    </section>
+
+    <!-- ============ 5. ADDITION RULE / VENN ============ -->
+    <section class="card" id="addition-rule">
+      <span class="kicker">05 · General addition rule</span>
+      <h2>Why we subtract the intersection</h2>
+      <p class="intro">Sets A and B below are each populated with five outcomes and their individual probabilities. One outcome — the one worth 0.04 — belongs to <em>both</em> sets, so it sits in the overlap. Watch what happens if you simply add P(A) and P(B) without correcting for it.</p>
+
+      <div class="panel">
+        <div class="venn-wrap">
+          <svg class="venn" viewBox="0 0 380 300" width="380" height="300">
+            <ellipse cx="150" cy="150" rx="130" ry="110" fill="#2F7A72" fill-opacity="0.12" stroke="#2F7A72" stroke-width="1.6"/>
+            <ellipse cx="230" cy="150" rx="130" ry="110" fill="#C68F2E" fill-opacity="0.14" stroke="#C68F2E" stroke-width="1.6"/>
+            <text x="55" y="55" class="mono" font-family="IBM Plex Mono" font-size="14" fill="#2F7A72" font-weight="600">A</text>
+            <text x="320" y="55" class="mono" font-family="IBM Plex Mono" font-size="14" fill="#C68F2E" font-weight="600">B</text>
+
+            <!-- A-only circles -->
+            <circle cx="95" cy="95" r="20" fill="#fff" stroke="#2F7A72" stroke-width="1.4"/>
+            <text x="95" y="99" text-anchor="middle" class="venn-circle-val">0.05</text>
+
+            <circle cx="70" cy="150" r="20" fill="#fff" stroke="#2F7A72" stroke-width="1.4"/>
+            <text x="70" y="154" text-anchor="middle" class="venn-circle-val">0.08</text>
+
+            <circle cx="95" cy="205" r="20" fill="#fff" stroke="#2F7A72" stroke-width="1.4"/>
+            <text x="95" y="209" text-anchor="middle" class="venn-circle-val">0.06</text>
+
+            <circle cx="140" cy="230" r="20" fill="#fff" stroke="#2F7A72" stroke-width="1.4"/>
+            <text x="140" y="234" text-anchor="middle" class="venn-circle-val">0.07</text>
+
+            <!-- shared / intersection circle -->
+            <circle cx="190" cy="150" r="22" fill="#F7EFD8" stroke="#B3402F" stroke-width="2"/>
+            <text x="190" y="147" text-anchor="middle" class="venn-circle-val" fill="#B3402F">0.04</text>
+            <text x="190" y="162" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#B3402F">A∩B</text>
+
+            <!-- B-only circles -->
+            <circle cx="240" cy="230" r="20" fill="#fff" stroke="#C68F2E" stroke-width="1.4"/>
+            <text x="240" y="234" text-anchor="middle" class="venn-circle-val">0.09</text>
+
+            <circle cx="285" cy="205" r="20" fill="#fff" stroke="#C68F2E" stroke-width="1.4"/>
+            <text x="285" y="209" text-anchor="middle" class="venn-circle-val">0.05</text>
+
+            <circle cx="310" cy="150" r="20" fill="#fff" stroke="#C68F2E" stroke-width="1.4"/>
+            <text x="310" y="154" text-anchor="middle" class="venn-circle-val">0.07</text>
+
+            <circle cx="285" cy="95" r="20" fill="#fff" stroke="#C68F2E" stroke-width="1.4"/>
+            <text x="285" y="99" text-anchor="middle" class="venn-circle-val">0.10</text>
+          </svg>
+
+          <div class="addition-math">
+            <div class="line">
+              <span class="label">P(A) — sum A's five circles</span>
+              0.05 + 0.08 + 0.06 + 0.07 + 0.04 = <strong>0.30</strong>
+            </div>
+            <div class="line">
+              <span class="label">P(B) — sum B's five circles</span>
+              0.09 + 0.05 + 0.07 + 0.10 + 0.04 = <strong>0.35</strong>
+            </div>
+            <div class="line">
+              <span class="label">Naive direct sum (wrong)</span>
+              0.30 + 0.35 = <span class="highlight">0.65</span> — the 0.04 circle got counted twice, once inside P(A) and once inside P(B).
+            </div>
+            <div class="line">
+              <span class="label">P(A ∩ B) — the shared circle</span>
+              <strong>0.04</strong>
+            </div>
+            <div class="line">
+              <span class="label">General addition rule</span>
+              P(A∪B) = P(A) + P(B) − P(A∩B)<br>
+              = 0.30 + 0.35 − 0.04 = <span class="ok">0.61</span>
+            </div>
+            <div class="line">
+              <span class="label">Check, by counting unique circles directly</span>
+              4 A-only (0.26) + 4 B-only (0.31) + 1 shared (0.04) = <span class="ok">0.61</span> ✓
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 6. COMPARISON ============ -->
+    <section class="card" id="compare">
+      <span class="kicker">06 · Side by side</span>
+      <h2>Mutually exclusive vs. general addition</h2>
+      <p class="intro">Same die, same "or" question — but whether you can add probabilities directly depends entirely on whether the two events overlap.</p>
+
+      <div class="compare-grid">
+        <div class="compare-col disjoint">
+          <h4>Disjoint events — direct addition</h4>
+          <p>A = {1, 2} &nbsp;&nbsp; B = {5, 6}</p>
+          <p>A ∩ B = ∅ &nbsp;→&nbsp; no outcome is shared, so nothing is double-counted.</p>
+          <div class="formula">P(A ∪ B) = P(A) + P(B)<br>= 2/6 + 2/6 = 4/6 ≈ 0.667</div>
+          <p style="font-size:0.86rem;">This is the special case of the addition rule from slide 26 — it only works because A and B don't overlap.</p>
+        </div>
+        <div class="compare-col overlap">
+          <h4>Overlapping events — general rule</h4>
+          <p>A = {2, 4, 6} (even) &nbsp;&nbsp; B = {4, 5, 6} (&gt; 3)</p>
+          <p>A ∩ B = {4, 6} &nbsp;→&nbsp; two outcomes are shared and would be counted twice.</p>
+          <div class="formula">P(A ∪ B) = P(A) + P(B) − P(A∩B)<br>= 3/6 + 3/6 − 2/6 = 4/6 ≈ 0.667</div>
+          <p style="font-size:0.86rem;">This is slide 27's general rule. Skipping the subtraction here would (wrongly) give 6/6 = 1.0.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 7. CONCEPT CHECK ANSWERS ============ -->
+    <section class="card" id="concept-check">
+      <span class="kicker">07 · In-class concept check</span>
+      <h2>Answers to the four warm-up questions</h2>
+      <p class="intro">Try each one yourself first, then reveal the worked answer.</p>
+
+      <div id="quizList"></div>
+    </section>
+
+    <footer>
+      Interactive companion for ENDG 319, Lecture 4 — Foundations of Probability. Built to accompany, not replace, the lecture slides.
+    </footer>
+  </main>
+</div>
+
+<script>
+/* ===================== helpers ===================== */
+function rand(n){ return Math.floor(Math.random()*n)+1; }
+
+/* ===================== scroll-spy for TOC ===================== */
+(function(){
+  const links = document.querySelectorAll('nav.toc a');
+  const sections = [...links].map(l => document.querySelector(l.getAttribute('href')));
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((s,i) => { if(s && s.offsetTop <= y) idx = i; });
+    links.forEach((l,i) => l.classList.toggle('active', i===idx));
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+
+/* ===================== 1. discrete dots + continuous slider ===================== */
+(function(){
+  const wrap = document.getElementById('discreteDots');
+  for(let i=1;i<=6;i++){
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.textContent = i;
+    wrap.appendChild(d);
+  }
+  const slider = document.getElementById('tempSlider');
+  const readout = document.getElementById('tempReadout');
+  slider.addEventListener('input', () => {
+    readout.textContent = parseFloat(slider.value).toFixed(2);
+  });
+})();
+
+/* ===================== 2. tree diagrams ===================== */
+function drawTree(containerId, stage1Labels, stage2Labels, colorStage1, colorStage2){
+  // stage2Labels: array (same set of labels used under every stage-1 branch)
+  const container = document.getElementById(containerId);
+  const nStage1 = stage1Labels.length;
+  const nStage2 = stage2Labels.length;
+  const totalLeaves = nStage1 * nStage2;
+
+  const leafSpacing = 34;
+  const topPad = 20;
+  const height = topPad*2 + (totalLeaves-1)*leafSpacing + 20;
+  const width = 620;
+
+  const xStart = 30, xStage1 = 190, xStage2 = 370, xLeaf = 520;
+
+  let leafY = [];
+  for(let i=0;i<totalLeaves;i++) leafY.push(topPad + i*leafSpacing);
+
+  // compute stage2 node y (same as leaf y, one per leaf)
+  // compute stage1 node y = average of its stage2 children's y
+  let stage1Y = [];
+  for(let i=0;i<nStage1;i++){
+    const startIdx = i*nStage2;
+    let sum=0;
+    for(let j=0;j<nStage2;j++) sum += leafY[startIdx+j];
+    stage1Y.push(sum/nStage2);
+  }
+  const startY = stage1Y.reduce((a,b)=>a+b,0)/stage1Y.length;
+
+  let svg = `<svg class="tree" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // edges: start -> stage1
+  stage1Y.forEach(y => {
+    svg += `<path class="tree-edge" d="M ${xStart+34},${startY} C ${(xStart+xStage1)/2},${startY} ${(xStart+xStage1)/2},${y} ${xStage1-40},${y}" />`;
+  });
+  // edges: stage1 -> stage2 (leaf-aligned)
+  for(let i=0;i<nStage1;i++){
+    for(let j=0;j<nStage2;j++){
+      const y2 = leafY[i*nStage2+j];
+      svg += `<path class="tree-edge" d="M ${xStage1+40},${stage1Y[i]} C ${(xStage1+xStage2)/2},${stage1Y[i]} ${(xStage1+xStage2)/2},${y2} ${xStage2-40},${y2}" />`;
+    }
+  }
+  // edges: stage2 -> leaf
+  for(let i=0;i<totalLeaves;i++){
+    svg += `<path class="tree-edge" d="M ${xStage2+40},${leafY[i]} L ${xLeaf-56},${leafY[i]}" />`;
+  }
+
+  // start node
+  svg += `<g class="tree-node"><rect x="${xStart-2}" y="${startY-14}" width="36" height="28" rx="4"/><text x="${xStart+16}" y="${startY+4}" text-anchor="middle">Start</text></g>`;
+
+  // stage1 nodes
+  stage1Labels.forEach((lab,i) => {
+    const y = stage1Y[i];
+    svg += `<g class="tree-node stage1"><rect x="${xStage1-38}" y="${y-14}" width="76" height="28" rx="4"/><text x="${xStage1}" y="${y+4}" text-anchor="middle">${lab}</text></g>`;
+  });
+
+  // stage2 nodes
+  for(let i=0;i<nStage1;i++){
+    for(let j=0;j<nStage2;j++){
+      const y = leafY[i*nStage2+j];
+      const lab = stage2Labels[j];
+      svg += `<g class="tree-node stage2"><rect x="${xStage2-38}" y="${y-14}" width="76" height="28" rx="4"/><text x="${xStage2}" y="${y+4}" text-anchor="middle">${lab}</text></g>`;
+    }
+  }
+
+  // leaves
+  for(let i=0;i<nStage1;i++){
+    for(let j=0;j<nStage2;j++){
+      const y = leafY[i*nStage2+j];
+      const lab = stage1Labels[i][0] + stage2Labels[j][0];
+      svg += `<g class="tree-node leaf"><rect x="${xLeaf-54}" y="${y-13}" width="72" height="26" rx="4"/><text x="${xLeaf-18}" y="${y+4}" text-anchor="middle">${lab}</text></g>`;
+    }
+  }
+
+  svg += `</svg>`;
+  container.innerHTML = svg;
+}
+
+drawTree('tree1', ['Red','Green','Blue'], ['Red','Green','Blue']);
+drawTree('tree2', ['Supplier A','Supplier B','Supplier C'], ['Pass','Fail']);
+
+/* ===================== 3. die roll + events ===================== */
+const events = [
+  { name:'A', def:'{2, 4, 6} — an even number', set:[2,4,6] },
+  { name:'B', def:'{4, 5, 6} — a number greater than 3', set:[4,5,6] },
+  { name:'C', def:'{3, 5, 6}', set:[3,5,6] },
+  { name:'D', def:'{6}', set:[6] },
+];
+
+function pipPattern(n){
+  // 3x3 grid indices (0-8) that should be "on" for each face
+  const patterns = {
+    1:[4],
+    2:[0,8],
+    3:[0,4,8],
+    4:[0,2,6,8],
+    5:[0,2,4,6,8],
+    6:[0,2,3,5,6,8]
+  };
+  return patterns[n];
+}
+
+function renderDie(value){
+  const face = document.getElementById('dieFace');
+  const pips = face.querySelectorAll('.pip');
+  pips.forEach(p => p.classList.remove('on'));
+  if(value){
+    pipPattern(value).forEach(i => pips[i].classList.add('on'));
+  }
+}
+
+function renderEventsTable(value){
+  const tbody = document.getElementById('eventsTable');
+  tbody.innerHTML = '';
+  events.forEach(ev => {
+    const occurred = value !== null && ev.set.includes(value);
+    const tr = document.createElement('tr');
+    tr.className = 'event-row' + (occurred ? ' active' : '');
+    tr.innerHTML = `
+      <td><strong>${ev.name}</strong></td>
+      <td class="mono">${ev.def}</td>
+      <td class="${value===null ? '' : (occurred?'yes':'no')}">${value===null ? '—' : (occurred ? 'Yes' : 'No')}</td>
+      <td class="mono" style="font-size:0.86rem;">${value===null ? '' : (occurred ? `${value} ∈ ${ev.name}` : `${value} ∉ ${ev.name}`)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+renderDie(null);
+renderEventsTable(null);
+
+document.getElementById('rollOnce').addEventListener('click', () => {
+  const v = rand(6);
+  document.getElementById('dieValue').textContent = v;
+  renderDie(v);
+  renderEventsTable(v);
+});
+
+/* ===================== 4. relative frequency ===================== */
+let rfRolls = [];
+const rfChart = document.getElementById('rfChart');
+const rfCtx = rfChart.getContext('2d');
+
+function resizeCanvas(){
+  const rect = rfChart.getBoundingClientRect();
+  rfChart.width = rect.width * devicePixelRatio;
+  rfChart.height = rect.height * devicePixelRatio;
+  rfCtx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  drawRfChart();
+}
+
+function drawRfChart(){
+  const w = rfChart.getBoundingClientRect().width;
+  const h = rfChart.getBoundingClientRect().height;
+  rfCtx.clearRect(0,0,w,h);
+
+  const padL = 48, padR = 16, padT = 16, padB = 30;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+
+  // axes
+  rfCtx.strokeStyle = '#D8D3C2';
+  rfCtx.lineWidth = 1;
+  rfCtx.beginPath();
+  rfCtx.moveTo(padL, padT);
+  rfCtx.lineTo(padL, padT+plotH);
+  rfCtx.lineTo(padL+plotW, padT+plotH);
+  rfCtx.stroke();
+
+  // y ticks 0, 0.167, 0.5, 1
+  rfCtx.fillStyle = '#8A93A0';
+  rfCtx.font = '11px IBM Plex Mono, monospace';
+  [0, 0.25, 0.5, 0.75, 1].forEach(v => {
+    const y = padT + plotH - v*plotH;
+    rfCtx.fillText(v.toFixed(2), 4, y+4);
+    rfCtx.strokeStyle = '#EFEEE6';
+    rfCtx.beginPath(); rfCtx.moveTo(padL,y); rfCtx.lineTo(padL+plotW,y); rfCtx.stroke();
+  });
+
+  // true probability dashed line at 1/6
+  const trueP = 1/6;
+  const yTrue = padT + plotH - trueP*plotH;
+  rfCtx.setLineDash([5,4]);
+  rfCtx.strokeStyle = '#B3402F';
+  rfCtx.lineWidth = 1.4;
+  rfCtx.beginPath();
+  rfCtx.moveTo(padL, yTrue);
+  rfCtx.lineTo(padL+plotW, yTrue);
+  rfCtx.stroke();
+  rfCtx.setLineDash([]);
+  rfCtx.fillStyle = '#B3402F';
+  rfCtx.font = '11px IBM Plex Mono, monospace';
+  rfCtx.fillText('P = 1/6', padL+plotW-58, yTrue-6);
+
+  if(rfRolls.length === 0){
+    rfCtx.fillStyle = '#8A93A0';
+    rfCtx.font = '13px IBM Plex Sans, sans-serif';
+    rfCtx.fillText('Roll the die to start plotting relative frequency…', padL+12, padT+plotH/2);
+    return;
+  }
+
+  // running proportion line
+  let hits = 0;
+  const pts = rfRolls.map((v,i) => {
+    if(v===6) hits++;
+    const freq = hits/(i+1);
+    const x = padL + (i/(Math.max(rfRolls.length-1,1)))*plotW;
+    const y = padT + plotH - freq*plotH;
+    return [x,y];
+  });
+
+  rfCtx.strokeStyle = '#2F7A72';
+  rfCtx.lineWidth = 2;
+  rfCtx.beginPath();
+  pts.forEach(([x,y],i) => i===0 ? rfCtx.moveTo(x,y) : rfCtx.lineTo(x,y));
+  rfCtx.stroke();
+
+  // last point marker
+  const [lx,ly] = pts[pts.length-1];
+  rfCtx.fillStyle = '#2F7A72';
+  rfCtx.beginPath();
+  rfCtx.arc(lx,ly,4,0,Math.PI*2);
+  rfCtx.fill();
+}
+
+function updateRfStats(){
+  const total = rfRolls.length;
+  const hits = rfRolls.filter(v=>v===6).length;
+  document.getElementById('rfTotal').textContent = total;
+  document.getElementById('rfHits').textContent = hits;
+  document.getElementById('rfFreq').textContent = total===0 ? '—' : (hits/total).toFixed(3);
+  drawRfChart();
+}
+
+document.getElementById('rollTen').addEventListener('click', () => {
+  for(let i=0;i<10;i++) rfRolls.push(rand(6));
+  updateRfStats();
+});
+document.getElementById('resetRf').addEventListener('click', () => {
+  rfRolls = [];
+  updateRfStats();
+});
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+/* ===================== 7. concept check answers ===================== */
+const quizData = [
+  {
+    q: 'For two coin tosses, write the event "exactly one head."',
+    a: 'The sample space is S = {HH, HT, TH, TT}. "Exactly one head" means one toss shows H and the other shows T — that matches HT and TH, but not HH (two heads) or TT (zero heads). So the event is <span class="ans-value">{HT, TH}</span>.'
+  },
+  {
+    q: 'If A = {1,2,3} and B = {3,4}, are A and B mutually exclusive?',
+    a: 'Check the intersection: A ∩ B = {3}, since the outcome 3 belongs to both sets. Because the intersection is not empty, <span class="ans-value">A and B are NOT mutually exclusive</span> — they can both occur if the outcome is 3.'
+  },
+  {
+    q: 'If P(A) = 0.62, find P(Aᶜ).',
+    a: 'By the complement rule, P(A) + P(Aᶜ) = 1, so P(Aᶜ) = 1 − P(A) = 1 − 0.62 = <span class="ans-value">0.38</span>.'
+  },
+  {
+    q: 'If P(A) = 0.40, P(B) = 0.35, and P(A∩B) = 0.10, find P(A∪B).',
+    a: 'Use the general addition rule: P(A∪B) = P(A) + P(B) − P(A∩B) = 0.40 + 0.35 − 0.10 = <span class="ans-value">0.65</span>.'
+  }
+];
+
+const quizList = document.getElementById('quizList');
+quizData.forEach((item, idx) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'quiz-item';
+  wrap.innerHTML = `
+    <div class="quiz-q">
+      <div class="quiz-num">${idx+1}</div>
+      <p>${item.q}</p>
+    </div>
+    <button class="reveal-btn">Show answer</button>
+    <div class="quiz-answer"><p style="margin:0;">${item.a}</p></div>
+  `;
+  const btn = wrap.querySelector('.reveal-btn');
+  const ans = wrap.querySelector('.quiz-answer');
+  btn.addEventListener('click', () => {
+    const open = ans.classList.toggle('open');
+    btn.textContent = open ? 'Hide answer' : 'Show answer';
+  });
+  quizList.appendChild(wrap);
+});
+</script>
+</body>
+</html>
