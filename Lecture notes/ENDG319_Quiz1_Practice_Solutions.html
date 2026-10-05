@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>ENDG 319 Quiz 1 Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: single reading column, one block per problem, each part a question with a reveal underneath */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --ink: #18202e;
+  --muted: #5b6577;
+  --line: #d9dee7;
+  --accent: #2550c4;
+  --accent-soft: #e6ecfb;
+  --rule-bg: #eef2fa;
+  --hl: #d9822b;
+  --hl-soft: rgba(217,130,43,.22);
+  --ok: #2f8a5b;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151d; --surface: #181e29; --ink: #e5e9f1; --muted: #9aa4b6; --line: #2b3342;
+    --accent: #7d9cf5; --accent-soft: #1f2a45; --rule-bg: #1b2335; --hl: #f0a457; --hl-soft: rgba(240,164,87,.25); --ok: #5cc28d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151d; --surface: #181e29; --ink: #e5e9f1; --muted: #9aa4b6; --line: #2b3342;
+  --accent: #7d9cf5; --accent-soft: #1f2a45; --rule-bg: #1b2335; --hl: #f0a457; --hl-soft: rgba(240,164,87,.25); --ok: #5cc28d;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.6; }
+.wrap { max-width: 50rem; margin: 0 auto; padding-inline: 20px; padding-block: 2.5rem 4rem; }
+header { display: grid; gap: .6rem; margin-bottom: 2rem; }
+.eyebrow { font-family: var(--f-mono); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.1; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); margin: 0; max-width: 65ch; }
+.toolbar { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .6rem; }
+button { font-family: var(--f-display); font-weight: 500; font-size: .92rem; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: .45rem .9rem; border-radius: 6px; cursor: pointer; }
+button:hover { border-color: var(--accent); color: var(--accent); }
+button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+nav.toc { display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-family: var(--f-mono); font-size: .82rem; margin: 1.4rem 0 0; padding-top: 1rem; border-top: 1px solid var(--line); }
+nav.toc a { color: var(--muted); text-decoration: none; }
+nav.toc a:hover { color: var(--accent); }
+
+section.problem { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.6rem clamp(1rem, 4vw, 2rem); margin-top: 1.6rem; }
+.pnum { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+h2 { font-family: var(--f-display); font-weight: 700; font-size: 1.45rem; line-height: 1.2; margin: .2rem 0 .8rem; text-wrap: balance; }
+.setup p { margin: .5rem 0; }
+.part { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px dashed var(--line); }
+.q { margin: 0; }
+.q b.lbl { font-family: var(--f-display); color: var(--accent); margin-right: .25rem; }
+details { margin-top: .8rem; }
+summary { list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: .45rem; font-family: var(--f-display); font-weight: 500; font-size: .92rem; color: var(--accent); background: var(--accent-soft); padding: .35rem .8rem; border-radius: 6px; user-select: none; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: "▸"; transition: transform .15s; }
+details[open] summary::before { transform: rotate(90deg); }
+details[open] summary .show { display: none; }
+details:not([open]) summary .hide { display: none; }
+.sol { margin-top: .9rem; display: grid; gap: .75rem; }
+.sol > * { min-width: 0; }
+.step-label { font-family: var(--f-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .2rem; }
+.rule { background: var(--rule-bg); border-left: 3px solid var(--accent); padding: .6rem .9rem; border-radius: 0 6px 6px 0; }
+.sub { padding: .1rem 0; }
+.math { overflow-x: auto; overflow-y: hidden; }
+.note { color: var(--muted); font-size: .95rem; }
+.ans { font-weight: 600; }
+p { margin: 0; }
+table { border-collapse: collapse; font-size: .95rem; font-variant-numeric: tabular-nums; }
+th, td { border-bottom: 1px solid var(--line); padding: .35rem .8rem; text-align: left; }
+th { font-family: var(--f-display); font-weight: 500; color: var(--muted); }
+.tablewrap { overflow-x: auto; }
+figure { margin: 0; }
+.fig { overflow-x: auto; }
+.fig svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.fig-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+figcaption { font-family: var(--f-mono); font-size: .76rem; color: var(--muted); text-align: center; margin-top: .3rem; }
+svg text { font-family: var(--f-mono); font-size: 11px; fill: var(--ink); }
+svg .muted { fill: var(--muted); }
+svg .ax { stroke: var(--muted); stroke-width: 1; fill: none; }
+svg .edge { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+svg .acc { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+svg .hlline { stroke: var(--hl); stroke-width: 4; fill: none; stroke-linecap: round; }
+svg .dash { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; fill: none; }
+svg .supp { fill: var(--accent-soft); stroke: var(--ink); stroke-width: 1.5; }
+svg .shade { fill: var(--hl-soft); stroke: none; }
+svg .bar { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+svg .dot { fill: var(--accent); }
+svg .odot { fill: var(--surface); stroke: var(--accent); stroke-width: 1.5; }
+svg .acctext { fill: var(--accent); font-weight: 600; }
+svg .hltext { fill: var(--hl); font-weight: 600; }
+.warn { border: 1px solid var(--hl); border-radius: 6px; padding: .6rem .9rem; font-size: .95rem; }
+footer { margin-top: 2.5rem; color: var(--muted); font-size: .9rem; }
+mjx-container[display="true"] { margin: .3em 0 !important; }
+@media (prefers-reduced-motion: reduce) { summary::before { transition: none; } }
+</style>
+
+<script>
+window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">ENDG 319 · Fall 2026 · L01–L08</div>
+  <h1>Quiz 1 Preparation: Mixed Practice</h1>
+  <p class="lede">Seven problems, about 60–75 minutes. Attempt each part before revealing its solution. Every solution states the general formula first, then substitutes the numbers. Use exact fractions or four decimal places for probabilities and include units.</p>
+  <p class="lede note">This set practises selected concepts. It does not specify the quiz's question types, order, or weighting, so review all L01–L08 material. All scenarios and numbers are constructed for practice.</p>
+  <div class="toolbar">
+    <button type="button" id="showAll">Show all solutions</button>
+    <button type="button" id="hideAll">Hide all solutions</button>
+  </div>
+  <nav class="toc" aria-label="Problems">
+    <a href="#p1">1 Events</a><a href="#p2">2 Sampling</a><a href="#p3">3 CDF</a><a href="#p4">4 Counting</a><a href="#p5">5 Joint density</a><a href="#p6">6 Bayes</a><a href="#p7">7 Linear combos</a>
+  </nav>
+</header>
+
+<!-- ============ PROBLEM 1 ============ -->
+<section class="problem" id="p1">
+  <div class="pnum">Problem 1</div>
+  <h2>Events, overlap, and reliability</h2>
+  <div class="setup">
+    <p>During a test, let \(A\) be the event that a temperature alarm activates and \(B\) the event that a vibration alarm activates. The model gives \(P(A)=0.30\), \(P(B)=0.40\), and \(P(A\cup B)=0.58\).</p>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(a)</b> Find the probability that both alarms activate and the probability that exactly one alarm activates.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · inclusion–exclusion</div>
+          <div class="math">\[P(A\cup B)=P(A)+P(B)-P(A\cap B)\quad\Longrightarrow\quad P(A\cap B)=P(A)+P(B)-P(A\cup B)\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(A\cap B)=0.30+0.40-0.58=\mathbf{0.12}\]</div></div>
+        <p>Do not assume independence to get the intersection. Independence is not given, and part (b) asks you to check it. The union is given precisely so the intersection can be found without any assumption.</p>
+        <div class="rule"><div class="step-label">Formula · exactly one</div>
+          <div class="math">\[P(\text{exactly one})=P(A\cup B)-P(A\cap B)=P(A)+P(B)-2P(A\cap B)\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(\text{exactly one})=0.58-0.12=\mathbf{0.46}\]</div></div>
+        <figure class="fig">
+          <svg viewBox="0 0 320 170" role="img" aria-label="Venn diagram: A only 0.18, both 0.12, B only 0.28, neither 0.42">
+            <rect x="6" y="6" width="308" height="158" rx="6" class="ax"/>
+            <circle cx="125" cy="88" r="62" style="fill:var(--accent-soft);fill-opacity:.7;stroke:var(--accent);stroke-width:1.5"/>
+            <circle cx="195" cy="88" r="62" style="fill:var(--hl-soft);stroke:var(--hl);stroke-width:1.5"/>
+            <text x="92" y="92" text-anchor="middle">0.18</text>
+            <text x="160" y="92" text-anchor="middle" font-weight="600">0.12</text>
+            <text x="228" y="92" text-anchor="middle">0.28</text>
+            <text x="85" y="30" class="acctext" text-anchor="middle">A</text>
+            <text x="235" y="30" class="hltext" text-anchor="middle">B</text>
+            <text x="290" y="155" text-anchor="end" class="muted">neither 0.42</text>
+          </svg>
+          <figcaption>Exactly one = A only + B only = 0.18 + 0.28 = 0.46</figcaption>
+        </figure>
+        <p class="note">The double count: \(P(A)+P(B)\) includes the overlap twice. Removing it once gives the union; removing it twice leaves only the "exactly one" regions.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(b)</b> Find \(P(A\mid B)\). Are \(A\) and \(B\) independent? Are they mutually exclusive? Justify both conclusions numerically.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · conditional probability</div>
+          <div class="math">\[P(A\mid B)=\frac{P(A\cap B)}{P(B)},\qquad P(B)>0\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(A\mid B)=\frac{0.12}{0.40}=\mathbf{0.30}=P(A)\]</div></div>
+        <div class="rule"><div class="step-label">Definitions</div>
+          <div class="math">\[\text{Independent: }P(A\cap B)=P(A)\,P(B)\qquad \text{Mutually exclusive: }P(A\cap B)=0\]</div></div>
+        <div class="sub"><div class="step-label">Check</div>
+          <div class="math">\[P(A)P(B)=(0.30)(0.40)=0.12=P(A\cap B)\ \Rightarrow\ \text{independent}\]
+          \[P(A\cap B)=0.12>0\ \Rightarrow\ \text{not mutually exclusive}\]</div></div>
+        <p>Knowing that \(B\) occurred does not change the probability of \(A\). Independence and mutual exclusivity are different properties. Two events with positive probability that are mutually exclusive are strongly <em>dependent</em>, because one occurring rules the other out.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(c)</b> In a separate configuration, three alarm modules activate independently, each with probability 0.30. Find the probability that at least one module activates.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · complement + independence</div>
+          <div class="math">\[P(\text{at least one})=1-P(\text{none})=1-\prod_{i=1}^{n}\bigl(1-p_i\bigr)\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(\text{at least one})=1-(1-0.30)^3=1-0.343=\mathbf{0.6570}\]</div></div>
+        <p>The probability is 65.70%. It is not \(3(0.30)=0.90\), because that sum counts outcomes where two or three modules activate more than once. With four modules the sum would reach 1.20, which shows the method is wrong.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ PROBLEM 2 ============ -->
+<section class="problem" id="p2">
+  <div class="pnum">Problem 2</div>
+  <h2>Sampling choices and interpreting summaries</h2>
+  <div class="setup">
+    <p>A shipment contains 1,200 sensors. To study response times, an engineer tests the 40 sensors in the most easily reached tray rather than selecting sensors throughout the shipment. The density histogram of the 40 recorded response times has the following bar heights. All times are less than 10 seconds.</p>
+    <div class="tablewrap" style="margin-top:.6rem">
+      <table>
+        <thead><tr><th>Response time, \(t\) (s)</th><th>Class width (s)</th><th>Density height (s⁻¹)</th></tr></thead>
+        <tbody>
+          <tr><td>\(0\le t&lt;2\)</td><td>2</td><td>0.150</td></tr>
+          <tr><td>\(2\le t&lt;5\)</td><td>3</td><td>0.100</td></tr>
+          <tr><td>\(5\le t&lt;10\)</td><td>5</td><td>0.080</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(a)</b> Identify the sampling method. Would testing 400 sensors chosen in the same convenient way necessarily eliminate selection bias? Briefly describe a better sampling procedure.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <p>This is a <b>convenience sample</b>, not a simple random sample. The accessible sensors may differ systematically from the rest of the shipment, for example if that tray came from one production batch.</p>
+        <p>A larger sample collected the same way does <b>not</b> necessarily remove the bias. Bias comes from how units are selected, not from how many. Increasing \(n\) only makes the estimate more precise around the wrong value.</p>
+        <p>Better: number all 1,200 sensors and randomly select 40 distinct identifiers, so every 40-sensor subset has the same chance of selection (a simple random sample).</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(b)</b> Use the histogram areas to verify that the total relative frequency is 1. Find the proportion of recorded times below 5 s and the number of recorded times that are at least 5 s.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · density histogram</div>
+          <div class="math">\[\text{relative frequency of a class}=\text{width}\times\text{density height},\qquad \sum_{\text{classes}}\text{width}\times\text{height}=1\]
+          \[\text{frequency (count)}=n\times\text{relative frequency}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[2(0.150)+3(0.100)+5(0.080)=0.30+0.30+0.40=1\]
+          \[P(t&lt;5)=0.30+0.30=\mathbf{0.60}\qquad \#(t\ge 5)=40(0.40)=\mathbf{16}\text{ sensors}\]</div></div>
+        <figure class="fig">
+          <svg viewBox="0 0 320 240" role="img" aria-label="Density histogram with areas 0.30, 0.30 and 0.40">
+            <line x1="50" y1="200" x2="300" y2="200" class="ax"/>
+            <line x1="50" y1="200" x2="50" y2="30" class="ax"/>
+            <rect x="50" y="50" width="48" height="150" class="bar"/>
+            <rect x="98" y="100" width="72" height="100" class="bar"/>
+            <rect x="170" y="120" width="120" height="80" class="bar"/>
+            <text x="74" y="130" text-anchor="middle" font-weight="600">0.30</text>
+            <text x="134" y="155" text-anchor="middle" font-weight="600">0.30</text>
+            <text x="230" y="165" text-anchor="middle" font-weight="600">0.40</text>
+            <text x="74" y="145" text-anchor="middle" class="muted">12 sensors</text>
+            <text x="134" y="170" text-anchor="middle" class="muted">12</text>
+            <text x="230" y="180" text-anchor="middle" class="muted">16 sensors</text>
+            <g class="muted"><text x="50" y="215" text-anchor="middle" class="muted">0</text><text x="98" y="215" text-anchor="middle" class="muted">2</text><text x="170" y="215" text-anchor="middle" class="muted">5</text><text x="290" y="215" text-anchor="middle" class="muted">10</text></g>
+            <text x="175" y="232" text-anchor="middle" class="muted">response time t (s)</text>
+            <text x="44" y="54" text-anchor="end" class="muted">0.15</text>
+            <text x="44" y="104" text-anchor="end" class="muted">0.10</text>
+            <text x="44" y="124" text-anchor="end" class="muted">0.08</text>
+            <text x="44" y="204" text-anchor="end" class="muted">0</text>
+          </svg>
+          <figcaption>Bold numbers are bar areas (relative frequencies)</figcaption>
+        </figure>
+        <p class="note">These summaries describe the recorded sample. Because of part (a), they do not establish the same proportions for the whole shipment.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(c)</b> A technician says, "The first bar is tallest, so the first class contains the most sensors." Is this correct? Explain without redrawing the histogram.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Principle</div>
+          <div class="math">\[\text{count in class}=n\times(\text{width}\times\text{height})\quad\text{(area, not height)}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[40(2\times0.150)=12,\qquad 40(3\times0.100)=12,\qquad 40(5\times0.080)=16\]</div></div>
+        <p><b>No.</b> With unequal class widths, compare areas, not heights. The first class has the highest <em>density</em> (sensors per second of width), but the third class has the largest <em>frequency</em>.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(d)</b> For an error-sensitivity check, replace the largest recorded value, 9.0 s, by 90.0 s while leaving the other 39 values unchanged. By how much does the sample mean change? Does the sample median change?</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · effect of changing one value on the mean</div>
+          <div class="math">\[\bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_i\quad\Longrightarrow\quad \Delta\bar{x}=\frac{x_{\text{new}}-x_{\text{old}}}{n}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[\Delta\bar{x}=\frac{90.0-9.0}{40}=\mathbf{2.025\ s}\]</div></div>
+        <div class="rule"><div class="step-label">Formula · median for even n</div>
+          <div class="math">\[\tilde{x}=\tfrac12\bigl(x_{(n/2)}+x_{(n/2+1)}\bigr)=\tfrac12\bigl(x_{(20)}+x_{(21)}\bigr)\]</div></div>
+        <p>The median is <b>unchanged</b>. The altered observation was the largest and remains the largest, so the 20th and 21st ordered values do not move.</p>
+        <p class="note">This shows the mean is sensitive to extreme values and the median is resistant. It does not justify automatically removing a genuine extreme observation.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ PROBLEM 3 ============ -->
+<section class="problem" id="p3">
+  <div class="pnum">Problem 3</div>
+  <h2>Recovering a distribution from its CDF</h2>
+  <div class="setup">
+    <p>Let \(X\) be a discrete delay, in minutes, in a data-transfer process. Its cumulative distribution function \(F(x)=P(X\le x)\) is specified for every real threshold \(x\):</p>
+    <div class="tablewrap" style="margin-top:.6rem">
+      <table>
+        <thead><tr><th>Threshold interval</th><th>\(F(x)\)</th></tr></thead>
+        <tbody>
+          <tr><td>\(x&lt;0\)</td><td>0</td></tr>
+          <tr><td>\(0\le x&lt;2\)</td><td>0.20</td></tr>
+          <tr><td>\(2\le x&lt;5\)</td><td>0.70</td></tr>
+          <tr><td>\(x\ge5\)</td><td>1.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(a)</b> Identify the possible values of \(X\) and recover its probability mass function. Explain how each probability is obtained from the CDF.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · PMF from CDF (jump size)</div>
+          <div class="math">\[p(x)=P(X=x)=F(x)-F(x^-)\qquad\text{where }F(x^-)=\lim_{t\uparrow x}F(t)\]</div></div>
+        <p>Each jump in \(F\) marks a possible value, and the jump height is that value's probability. The jumps are at 0, 2 and 5 minutes.</p>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[p(0)=0.20-0=\mathbf{0.20},\quad p(2)=0.70-0.20=\mathbf{0.50},\quad p(5)=1.00-0.70=\mathbf{0.30}\]
+          \[p(x)=0\text{ otherwise};\qquad 0.20+0.50+0.30=1\]</div></div>
+        <figure class="fig">
+          <svg viewBox="0 0 320 240" role="img" aria-label="Staircase CDF with jumps of 0.20 at 0, 0.50 at 2, 0.30 at 5">
+            <line x1="20" y1="200" x2="300" y2="200" class="ax"/>
+            <line x1="50" y1="210" x2="50" y2="30" class="ax"/>
+            <line x1="44" y1="40" x2="300" y2="40" class="dash"/>
+            <text x="40" y="44" text-anchor="end" class="muted">1.0</text>
+            <text x="40" y="92" text-anchor="end" class="muted">0.7</text>
+            <text x="40" y="172" text-anchor="end" class="muted">0.2</text>
+            <line x1="20" y1="200" x2="50" y2="200" class="acc"/>
+            <line x1="50" y1="168" x2="130" y2="168" class="acc"/>
+            <line x1="130" y1="88" x2="250" y2="88" class="acc"/>
+            <line x1="250" y1="40" x2="295" y2="40" class="acc"/>
+            <line x1="50" y1="200" x2="50" y2="168" class="hlline" style="stroke-width:2"/>
+            <line x1="130" y1="168" x2="130" y2="88" class="hlline" style="stroke-width:2"/>
+            <line x1="250" y1="88" x2="250" y2="40" class="hlline" style="stroke-width:2"/>
+            <circle cx="50" cy="200" r="4" class="odot"/><circle cx="50" cy="168" r="4" class="dot"/>
+            <circle cx="130" cy="168" r="4" class="odot"/><circle cx="130" cy="88" r="4" class="dot"/>
+            <circle cx="250" cy="88" r="4" class="odot"/><circle cx="250" cy="40" r="4" class="dot"/>
+            <text x="58" y="190" class="hltext">+0.20</text>
+            <text x="138" y="132" class="hltext">+0.50</text>
+            <text x="258" y="68" class="hltext">+0.30</text>
+            <text x="50" y="222" text-anchor="middle" class="muted">0</text>
+            <text x="130" y="222" text-anchor="middle" class="muted">2</text>
+            <text x="250" y="222" text-anchor="middle" class="muted">5</text>
+            <text x="300" y="222" text-anchor="end" class="muted">x (min)</text>
+          </svg>
+          <figcaption>Filled dot = value F takes at the jump; jump heights are the PMF</figcaption>
+        </figure>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(b)</b> Find \(P(2\le X&lt;5)\) and \(P(2&lt;X\le5)\). Explain why changing which endpoint is included changes the answer.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · interval probabilities for a discrete variable</div>
+          <div class="math">\[P(a&lt;X\le b)=F(b)-F(a),\qquad P(a\le X&lt;b)=F(b^-)-F(a^-)\]
+          \[\text{equivalently, add }p(x)\text{ over the possible values inside the interval}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(2\le X&lt;5)=F(5^-)-F(2^-)=0.70-0.20=P(X=2)=\mathbf{0.50}\]
+          \[P(2&lt;X\le5)=F(5)-F(2)=1.00-0.70=P(X=5)=\mathbf{0.30}\]</div></div>
+        <p>Both endpoints carry positive probability mass. The first interval contains only the value 2; the second contains only 5. For a continuous variable the two answers would match, because single points have probability zero. For a discrete variable, the endpoint convention matters.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(c)</b> Calculate \(E[X]\), \(\mathrm{Var}(X)\), and the standard deviation of \(X\).</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formulas</div>
+          <div class="math">\[E[X]=\sum_x x\,p(x),\qquad E[X^2]=\sum_x x^2\,p(x)\]
+          \[\mathrm{Var}(X)=E[X^2]-\bigl(E[X]\bigr)^2,\qquad \sigma=\sqrt{\mathrm{Var}(X)}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[E[X]=0(0.20)+2(0.50)+5(0.30)=\mathbf{2.50\ min}\]
+          \[E[X^2]=0^2(0.20)+2^2(0.50)+5^2(0.30)=9.50\ \text{min}^2\]
+          \[\mathrm{Var}(X)=9.50-2.50^2=\mathbf{3.25\ min^2},\qquad \sigma=\sqrt{3.25}\approx\mathbf{1.8028\ min}\]</div></div>
+        <p class="note">The model probabilities are the weights. This is a population (model) variance, so there is no sample-variance \(n-1\) divisor.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(d)</b> Must the expected delay be one of the possible observed delays? Explain using this distribution.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <p><b>No.</b> The expected value is a probability-weighted long-run average, not a likely outcome. Here \(E[X]=2.50\) min, but an individual delay can only be 0, 2 or 5 min.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ PROBLEM 4 ============ -->
+<section class="problem" id="p4">
+  <div class="pnum">Problem 4</div>
+  <h2>Planning a set of engineering tests</h2>
+  <div class="setup">
+    <p>A laboratory has nine distinct test protocols: four thermal protocols and five vibration protocols. An engineer will use three different protocols, each at most once.</p>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(a)</b> How many ordered schedules of three protocols are possible? Explain why \(9^3\) is not the correct count.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · permutations (ordered, no repetition)</div>
+          <div class="math">\[P(n,r)=n(n-1)\cdots(n-r+1)=\frac{n!}{(n-r)!}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(9,3)=9\times8\times7=\frac{9!}{6!}=\mathbf{504}\]</div></div>
+        <p>The three positions are distinguishable and a protocol cannot repeat. The count \(9^3=729\) would allow the same protocol in more than one position, such as protocol 4 three times.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(b)</b> An acceptable test plan is an unordered group of three protocols containing at least one thermal protocol. How many acceptable plans are there?</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · combinations and the complement</div>
+          <div class="math">\[C(n,r)=\binom{n}{r}=\frac{n!}{r!\,(n-r)!}\]
+          \[\#(\text{at least one thermal})=\#(\text{all groups})-\#(\text{no thermal})\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[C(9,3)-C(5,3)=84-10=\mathbf{74}\]</div></div>
+        <div class="sub"><div class="step-label">Check · disjoint cases</div>
+          <div class="math">\[C(4,1)C(5,2)+C(4,2)C(5,1)+C(4,3)=40+30+4=74\]</div></div>
+        <div class="warn"><b>Common error:</b> \(C(4,1)\,C(8,2)=112\). Choosing a "guaranteed" thermal protocol first and then any two others counts each plan with 2 thermal protocols twice and each plan with 3 thermal protocols three times: \(40+2(30)+3(4)=112\).</div>
+        <p class="note">Changing the order of a plan does not create a new plan, which is why combinations are used here.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(c)</b> One plan is selected uniformly from the acceptable plans in part (b). What is the probability that the selected plan contains exactly two thermal protocols? State the reference set used in your denominator.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · equally likely outcomes</div>
+          <div class="math">\[P(E)=\frac{\#\text{ outcomes in }E}{\#\text{ outcomes in the reference set}}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[\#(\text{exactly two thermal})=C(4,2)\,C(5,1)=6\times5=30\]
+          \[P(\text{exactly two thermal}\mid\text{acceptable})=\frac{30}{74}=\frac{15}{37}\approx\mathbf{0.4054}\]</div></div>
+        <p>The reference set is the 74 acceptable plans, not all 84 three-protocol groups and not the 504 ordered schedules. Those denominators describe different random experiments.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ PROBLEM 5 ============ -->
+<section class="problem" id="p5">
+  <div class="pnum">Problem 5</div>
+  <h2>A joint density on a triangular region</h2>
+  <div class="setup">
+    <p>Let \(X\) and \(Y\) be two dimensionless process measurements with joint probability density</p>
+    <div class="math">\[f(x,y)=\begin{cases}2, & 0&lt;y&lt;x&lt;1\\ 0, & \text{otherwise}\end{cases}\]</div>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(a)</b> Sketch the support and shade the event \(Y&gt;X/2\) within that support. Set up and evaluate the corresponding probability integral.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <figure class="fig">
+          <svg viewBox="0 0 300 270" role="img" aria-label="Triangle support with the region above y equals x over 2 shaded">
+            <line x1="50" y1="230" x2="275" y2="230" class="ax"/>
+            <line x1="50" y1="240" x2="50" y2="15" class="ax"/>
+            <polygon points="50,230 250,230 250,30" class="supp"/>
+            <polygon points="50,230 250,30 250,130" class="shade"/>
+            <line x1="50" y1="230" x2="250" y2="130" class="hlline" style="stroke-width:2"/>
+            <text x="135" y="112" class="muted" transform="rotate(-45 135 112)">y = x</text>
+            <text x="200" y="168" class="hltext">y = x/2</text>
+            <text x="222" y="110" class="hltext" text-anchor="middle">Y &gt; X/2</text>
+            <text x="50" y="252" text-anchor="middle" class="muted">0</text>
+            <text x="150" y="252" text-anchor="middle" class="muted">0.5</text>
+            <text x="250" y="252" text-anchor="middle" class="muted">1</text>
+            <text x="270" y="252" class="muted">x</text>
+            <text x="42" y="134" text-anchor="end" class="muted">0.5</text>
+            <text x="42" y="34" text-anchor="end" class="muted">1</text>
+            <text x="42" y="20" text-anchor="end" class="muted">y</text>
+          </svg>
+          <figcaption>Support: below y = x, above y = 0, for 0 &lt; x &lt; 1 (area ½)</figcaption>
+        </figure>
+        <div class="rule"><div class="step-label">Formula · probability of a region</div>
+          <div class="math">\[P\bigl((X,Y)\in R\bigr)=\iint_R f(x,y)\,dy\,dx\]</div></div>
+        <p>For a fixed \(x\in(0,1)\), the event requires \(x/2&lt;y&lt;x\).</p>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(Y&gt;X/2)=\int_0^1\!\int_{x/2}^{x}2\,dy\,dx=\int_0^1 2\Bigl(x-\frac{x}{2}\Bigr)dx=\int_0^1 x\,dx=\mathbf{\tfrac12}\]</div></div>
+        <p class="note">Geometric check: with a constant density, probability = density × area. The shaded triangle has base 0.5 (along x = 1) and height 1, so its area is ¼, and 2 × ¼ = ½.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(b)</b> Find the two marginal densities \(f_X(x)\) and \(f_Y(y)\), including their support and zero values elsewhere.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · marginal densities</div>
+          <div class="math">\[f_X(x)=\int_{-\infty}^{\infty}f(x,y)\,dy,\qquad f_Y(y)=\int_{-\infty}^{\infty}f(x,y)\,dx\]</div></div>
+        <p>The limits come from the support, not from 0 to 1. Fix one variable and read off the range of the other along the slice shown below.</p>
+        <div class="fig-row">
+          <figure class="fig">
+            <svg viewBox="0 0 300 270" role="img" aria-label="Vertical slice at fixed x from y equals 0 to y equals x">
+              <line x1="50" y1="230" x2="275" y2="230" class="ax"/>
+              <line x1="50" y1="240" x2="50" y2="15" class="ax"/>
+              <polygon points="50,230 250,230 250,30" class="supp"/>
+              <line x1="170" y1="230" x2="170" y2="110" class="hlline"/>
+              <circle cx="170" cy="230" r="4" class="dot"/>
+              <circle cx="170" cy="110" r="4" class="dot"/>
+              <text x="178" y="226" class="hltext">y = 0</text>
+              <text x="140" y="104" class="hltext" text-anchor="end">y = x</text>
+              <line x1="170" y1="110" x2="146" y2="104" class="dash"/>
+              <text x="170" y="252" text-anchor="middle" class="acctext">fixed x</text>
+              <text x="50" y="252" text-anchor="middle" class="muted">0</text>
+              <text x="250" y="252" text-anchor="middle" class="muted">1</text>
+              <text x="42" y="34" text-anchor="end" class="muted">1</text>
+            </svg>
+            <figcaption>Fix x: y runs from 0 up to x</figcaption>
+          </figure>
+          <figure class="fig">
+            <svg viewBox="0 0 300 270" role="img" aria-label="Horizontal slice at fixed y from x equals y to x equals 1">
+              <line x1="50" y1="230" x2="275" y2="230" class="ax"/>
+              <line x1="50" y1="240" x2="50" y2="15" class="ax"/>
+              <polygon points="50,230 250,230 250,30" class="supp"/>
+              <line x1="110" y1="170" x2="250" y2="170" class="hlline"/>
+              <circle cx="110" cy="170" r="4" class="dot"/>
+              <circle cx="250" cy="170" r="4" class="dot"/>
+              <text x="104" y="160" class="hltext" text-anchor="end">x = y</text>
+              <text x="256" y="174" class="hltext">x = 1</text>
+              <line x1="50" y1="170" x2="110" y2="170" class="dash"/>
+              <text x="42" y="174" text-anchor="end" class="acctext">fixed y</text>
+              <text x="50" y="252" text-anchor="middle" class="muted">0</text>
+              <text x="250" y="252" text-anchor="middle" class="muted">1</text>
+              <text x="42" y="34" text-anchor="end" class="muted">1</text>
+            </svg>
+            <figcaption>Fix y: x runs from y across to 1</figcaption>
+          </figure>
+        </div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[f_X(x)=\int_0^{x}2\,dy=\mathbf{2x},\quad 0&lt;x&lt;1;\quad 0\text{ otherwise}\]
+          \[f_Y(y)=\int_y^{1}2\,dx=\mathbf{2(1-y)},\quad 0&lt;y&lt;1;\quad 0\text{ otherwise}\]</div></div>
+        <div class="sub"><div class="step-label">Check</div>
+          <div class="math">\[\int_0^1 2x\,dx=1,\qquad \int_0^1 2(1-y)\,dy=1\]</div></div>
+        <p class="note">Values assigned at boundary points do not affect probabilities.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(c)</b> Find \(P(Y&lt;0.20\mid X=0.60)\). Compare it with the unconditional probability \(P(Y&lt;0.20)\), and use the comparison to assess independence.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · conditional density</div>
+          <div class="math">\[f_{Y\mid X}(y\mid x)=\frac{f(x,y)}{f_X(x)},\quad f_X(x)&gt;0;\qquad P(Y&lt;c\mid X=x)=\int_{-\infty}^{c}f_{Y\mid X}(y\mid x)\,dy\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[f_{Y\mid X}(y\mid 0.60)=\frac{2}{2(0.60)}=\frac{5}{3},\quad 0&lt;y&lt;0.60\]
+          \[P(Y&lt;0.20\mid X=0.60)=\int_0^{0.20}\frac53\,dy=\frac13\approx\mathbf{0.3333}\]</div></div>
+        <div class="rule"><div class="step-label">Formula · unconditional probability from the marginal</div>
+          <div class="math">\[P(Y&lt;c)=\int_{-\infty}^{c}f_Y(y)\,dy\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(Y&lt;0.20)=\int_0^{0.20}2(1-y)\,dy=\Bigl[2y-y^2\Bigr]_0^{0.20}=0.40-0.04=\mathbf{0.36}\]</div></div>
+        <div class="fig-row">
+          <figure class="fig">
+            <svg viewBox="0 0 300 270" role="img" aria-label="Slice at x equals 0.6 with the part below y equals 0.2 highlighted">
+              <line x1="50" y1="230" x2="275" y2="230" class="ax"/>
+              <line x1="50" y1="240" x2="50" y2="15" class="ax"/>
+              <polygon points="50,230 250,230 250,30" class="supp"/>
+              <line x1="170" y1="230" x2="170" y2="110" class="acc"/>
+              <line x1="170" y1="230" x2="170" y2="190" class="hlline"/>
+              <line x1="44" y1="190" x2="250" y2="190" class="dash"/>
+              <text x="42" y="194" text-anchor="end" class="muted">0.2</text>
+              <text x="42" y="114" text-anchor="end" class="muted">0.6</text>
+              <line x1="44" y1="110" x2="170" y2="110" class="dash"/>
+              <text x="178" y="214" class="hltext">⅓ of slice</text>
+              <text x="170" y="252" text-anchor="middle" class="acctext">x = 0.6</text>
+              <text x="50" y="252" text-anchor="middle" class="muted">0</text>
+              <text x="250" y="252" text-anchor="middle" class="muted">1</text>
+            </svg>
+            <figcaption>Given X = 0.6, Y is uniform on (0, 0.6)</figcaption>
+          </figure>
+          <figure class="fig">
+            <svg viewBox="0 0 300 270" role="img" aria-label="Strip of the triangle below y equals 0.2 shaded">
+              <line x1="50" y1="230" x2="275" y2="230" class="ax"/>
+              <line x1="50" y1="240" x2="50" y2="15" class="ax"/>
+              <polygon points="50,230 250,230 250,30" class="supp"/>
+              <polygon points="50,230 250,230 250,190 90,190" class="shade"/>
+              <line x1="44" y1="190" x2="250" y2="190" class="dash"/>
+              <text x="42" y="194" text-anchor="end" class="muted">0.2</text>
+              <text x="170" y="216" text-anchor="middle" class="hltext">P = 0.36</text>
+              <text x="50" y="252" text-anchor="middle" class="muted">0</text>
+              <text x="250" y="252" text-anchor="middle" class="muted">1</text>
+            </svg>
+            <figcaption>Unconditional: whole strip y &lt; 0.2, area 0.18 × density 2</figcaption>
+          </figure>
+        </div>
+        <p>Since \(\tfrac13\ne0.36\), <b>X and Y are dependent</b>. More generally, \(P(Y&lt;0.20\mid X=x)=0.20/x\) for \(0.20&lt;x&lt;1\), which changes with \(x\). The support also shows this: it is not a rectangle, so knowing \(X\) changes the possible range of \(Y\).</p>
+        <p class="note">Conditioning on \(X=0.60\) uses a density ratio. You cannot divide by \(P(X=0.60)\), which is zero for a continuous variable.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ PROBLEM 6 ============ -->
+<section class="problem" id="p6">
+  <div class="pnum">Problem 6</div>
+  <h2>What can an alarm rate tell us?</h2>
+  <div class="setup">
+    <p>Let \(F\) be the event that a machine has a fault, and \(A\) the event that its monitoring system raises an alarm. Treat the following as exact model probabilities, not sample estimates:</p>
+    <div class="tablewrap" style="margin-top:.6rem">
+      <table>
+        <thead><tr><th>Quantity</th><th>Probability</th></tr></thead>
+        <tbody>
+          <tr><td>Alarm given a fault: \(P(A\mid F)\)</td><td>0.80</td></tr>
+          <tr><td>Alarm given no fault: \(P(A\mid F^c)\)</td><td>0.10</td></tr>
+          <tr><td>Alarm overall: \(P(A)\)</td><td>0.24</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(a)</b> The fault probability \(r=P(F)\) is not given. Write a total-probability equation and use it to determine \(r\).</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · law of total probability</div>
+          <div class="math">\[P(A)=P(A\mid F)\,P(F)+P(A\mid F^c)\,P(F^c)\]</div></div>
+        <p>\(F\) and \(F^c\) form a partition: exactly one of them happens. The overall alarm rate is a weighted average of the two conditional alarm rates, with weights \(r\) and \(1-r\). Here the equation is solved for the unknown weight.</p>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[0.24=0.80r+0.10(1-r)=0.10+0.70r\quad\Longrightarrow\quad r=\frac{0.24-0.10}{0.70}=\mathbf{0.20}\]</div></div>
+        <figure class="fig">
+          <svg viewBox="0 0 340 200" role="img" aria-label="Probability tree: fault 0.2 then alarm 0.8 giving 0.16; no fault 0.8 then alarm 0.1 giving 0.08">
+            <circle cx="30" cy="100" r="4" class="dot"/>
+            <line x1="30" y1="100" x2="130" y2="50" class="edge"/>
+            <line x1="30" y1="100" x2="130" y2="150" class="edge"/>
+            <text x="70" y="64" class="muted">0.20</text>
+            <text x="70" y="146" class="muted">0.80</text>
+            <text x="138" y="54" font-weight="600">F</text>
+            <text x="138" y="154" font-weight="600">Fᶜ</text>
+            <line x1="160" y1="50" x2="240" y2="25" class="acc"/>
+            <line x1="160" y1="50" x2="240" y2="75" class="edge"/>
+            <line x1="160" y1="150" x2="240" y2="125" class="acc"/>
+            <line x1="160" y1="150" x2="240" y2="175" class="edge"/>
+            <text x="192" y="28" class="muted">0.80</text>
+            <text x="192" y="78" class="muted">0.20</text>
+            <text x="192" y="128" class="muted">0.10</text>
+            <text x="192" y="178" class="muted">0.90</text>
+            <text x="248" y="29" class="acctext">A  0.16</text>
+            <text x="248" y="79" class="muted">Aᶜ 0.04</text>
+            <text x="248" y="129" class="acctext">A  0.08</text>
+            <text x="248" y="179" class="muted">Aᶜ 0.72</text>
+          </svg>
+          <figcaption>Alarm branches: 0.16 + 0.08 = 0.24 = P(A)</figcaption>
+        </figure>
+        <p class="note">This is algebra with stated model probabilities, not an estimate from a sample.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(b)</b> If an alarm occurs, find the probability that the machine has a fault. Explain why this is not simply 0.80.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · Bayes' theorem</div>
+          <div class="math">\[P(F\mid A)=\frac{P(A\mid F)\,P(F)}{P(A)}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(F\mid A)=\frac{(0.80)(0.20)}{0.24}=\frac{0.16}{0.24}=\frac23\approx\mathbf{0.6667}\]</div></div>
+        <p>\(P(A\mid F)=0.80\) is the fraction of <em>faulty machines</em> that alarm. \(P(F\mid A)\) is the fraction of <em>alarms</em> that come from faulty machines. The reference groups differ. In 100 machines: 20 are faulty and 16 of them alarm; 80 are healthy and 8 of them alarm. Of 24 alarms, 16 are real, so 16/24 = 2/3.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(c)</b> An improved system reduces \(P(A\mid F^c)\) to 0.05 while leaving \(P(A\mid F)\) and the fault probability unchanged. Recalculate the probability of a fault given an alarm. Explain the direction of the change.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formulas · total probability, then Bayes</div>
+          <div class="math">\[P(A)=P(A\mid F)P(F)+P(A\mid F^c)P(F^c),\qquad P(F\mid A)=\frac{P(A\mid F)P(F)}{P(A)}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[P(A)_{\text{new}}=(0.80)(0.20)+(0.05)(0.80)=0.16+0.04=0.20\]
+          \[P(F\mid A)_{\text{new}}=\frac{0.16}{0.20}=\mathbf{0.80}\]</div></div>
+        <p>The conditional fault probability rises from about 66.67% to 80%. True-fault alarms stay at 0.16, while false alarms fall from 0.08 to 0.04. A larger share of alarms now corresponds to genuine faults.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ PROBLEM 7 ============ -->
+<section class="problem" id="p7">
+  <div class="pnum">Problem 7</div>
+  <h2>A corrected signal and repeated measurements</h2>
+  <div class="setup">
+    <p>An instrument reports a raw reading \(R\) and a baseline reading \(B\), both in volts. Within one measurement pair:</p>
+    <div class="tablewrap" style="margin-top:.6rem">
+      <table>
+        <thead><tr><th>Quantity</th><th>Mean (V)</th><th>Standard deviation (V)</th></tr></thead>
+        <tbody>
+          <tr><td>Raw reading \(R\)</td><td>12.0</td><td>0.60</td></tr>
+          <tr><td>Baseline reading \(B\)</td><td>5.0</td><td>0.80</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:.6rem">The correlation between \(R\) and \(B\) within a pair is \(-0.25\). The baseline-corrected signal is \(Z=R-B\). Different measurement pairs are independent and identically distributed; \(R\) and \(B\) within the same pair are not assumed independent.</p>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(a)</b> Calculate \(\mathrm{Cov}(R,B)\), including its units.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · covariance from correlation</div>
+          <div class="math">\[\rho_{R,B}=\frac{\mathrm{Cov}(R,B)}{\sigma_R\,\sigma_B}\quad\Longrightarrow\quad \mathrm{Cov}(R,B)=\rho_{R,B}\,\sigma_R\,\sigma_B\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[\mathrm{Cov}(R,B)=(-0.25)(0.60)(0.80)=\mathbf{-0.12\ V^2}\]</div></div>
+        <p class="note">Correlation is dimensionless; covariance carries the product of the variables' units, V × V = V².</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(b)</b> Find the mean, variance, and standard deviation of \(Z\). Explain why subtracting the baseline does not mean subtracting the two variances.</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formulas · linear combinations</div>
+          <div class="math">\[E[aR+bB]=a\,E[R]+b\,E[B]\]
+          \[\mathrm{Var}(aR+bB)=a^2\,\mathrm{Var}(R)+b^2\,\mathrm{Var}(B)+2ab\,\mathrm{Cov}(R,B)\]
+          \[\text{For }Z=R-B\ (a=1,\ b=-1):\quad \mathrm{Var}(Z)=\mathrm{Var}(R)+\mathrm{Var}(B)-2\,\mathrm{Cov}(R,B)\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[E[Z]=12.0-5.0=\mathbf{7.0\ V}\]
+          \[\mathrm{Var}(Z)=0.60^2+0.80^2-2(-0.12)=0.36+0.64+0.24=\mathbf{1.24\ V^2}\]
+          \[\sigma_Z=\sqrt{1.24}\approx\mathbf{1.1136\ V}\]</div></div>
+        <p>Variance uses squared coefficients, so the \(-1\) on \(B\) contributes \((-1)^2\mathrm{Var}(B)=+\mathrm{Var}(B)\). The covariance term keeps its sign through \(2ab=-2\). Here the covariance is negative, so it <em>increases</em> the variance of the difference: when \(R\) and \(B\) tend to move in opposite directions, subtracting \(B\) makes their deviations reinforce.</p>
+      </div>
+    </details>
+  </div>
+
+  <div class="part">
+    <p class="q"><b class="lbl">(c)</b> The instrument averages the corrected signals from 16 independent measurement pairs. Find the mean and standard deviation of this average. Does the within-pair correlation invalidate the averaging rule?</p>
+    <details><summary><span class="show">Show solution</span><span class="hide">Hide solution</span></summary>
+      <div class="sol">
+        <div class="rule"><div class="step-label">Formula · mean of n i.i.d. variables</div>
+          <div class="math">\[\bar{Z}=\frac1n\sum_{i=1}^{n}Z_i:\qquad E[\bar{Z}]=E[Z],\qquad \mathrm{Var}(\bar{Z})=\frac{\mathrm{Var}(Z)}{n},\qquad \sigma_{\bar{Z}}=\frac{\sigma_Z}{\sqrt{n}}\]</div></div>
+        <div class="sub"><div class="step-label">Substitute</div>
+          <div class="math">\[E[\bar{Z}]=\mathbf{7.0\ V},\qquad \mathrm{Var}(\bar{Z})=\frac{1.24}{16}=0.0775\ \text{V}^2\]
+          \[\sigma_{\bar{Z}}=\frac{\sqrt{1.24}}{\sqrt{16}}\approx\mathbf{0.2784\ V}\]</div></div>
+        <p>The rule is valid. It requires the 16 corrected signals \(Z_1,\dots,Z_{16}\) to be independent and identically distributed <em>across pairs</em>, which is given. The within-pair correlation of \(R\) and \(B\) is already included in \(\mathrm{Var}(Z)=1.24\); it does not create dependence between different pairs.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<footer>ENDG 319 · Fall 2026 · Ungraded self-study. Attempt each problem before reading its solution.</footer>
+</div>
+
+<script>
+(function () {
+  var all = function () { return Array.prototype.slice.call(document.querySelectorAll('details')); };
+  document.getElementById('showAll').addEventListener('click', function () { all().forEach(function (d) { d.open = true; }); });
+  document.getElementById('hideAll').addEventListener('click', function () { all().forEach(function (d) { d.open = false; }); });
+})();
+</script>
+
+</body>
+</html>
