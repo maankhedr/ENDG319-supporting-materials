@@ -1,0 +1,1062 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ENDG 319 Review Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: the ENDG 319 lab-manual series — one long column of six timed review blocks, each pairing the traps with a live instrument and reveal-able exercises. */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --sunk:#e3e8ee; --ink:#15202b; --muted:#566373; --line:#cfd7e0;
+  --bar:#3a64ad; --hi:#c8283e; --hi-soft:#f6dde1; --ok:#1f7a55; --warn:#a4620d;
+  --c2:#c58a14; --shade:rgba(58,100,173,.18); --shade-hi:rgba(200,40,62,.26); --shade-c2:rgba(197,138,20,.26);
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c2:#e2b14b; --shade:rgba(111,155,227,.22); --shade-hi:rgba(241,106,125,.3); --shade-c2:rgba(226,177,75,.28); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c2:#e2b14b; --shade:rgba(111,155,227,.22); --shade-hi:rgba(241,106,125,.3); --shade-c2:rgba(226,177,75,.28); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1060px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0;max-width:66ch}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hi);font-weight:600}
+.muted{color:var(--muted)}
+code,.m{font-family:var(--mono);font-size:.9em}
+:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+
+header.top{padding-block:40px 20px;display:grid;gap:14px}
+header.top p{font-size:1.08rem}
+nav.stations{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;align-items:center}
+nav.stations a{flex:none;text-decoration:none;color:var(--ink);font-family:var(--mono);font-size:.8rem;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+nav.stations a:hover{border-color:var(--bar)}
+nav.stations a .min{color:var(--muted)}
+nav.stations button{flex:none;margin-left:auto}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+
+section.station{padding-block:48px 8px;display:grid;gap:22px;scroll-margin-top:60px}
+.head{display:grid;gap:8px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:22px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.stack{display:grid;gap:22px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:14px;min-width:0}
+.concept{display:grid;gap:12px;min-width:0}
+.concept ul,.concept ol{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.formula{font-family:"Times New Roman",Georgia,serif;font-size:1.18rem;background:var(--sunk);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:nowrap}
+.formula.live{font-size:1.04rem;line-height:1.9;white-space:normal}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;margin:0 2px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.ov{text-decoration:overline}
+.warn{border-left:3px solid var(--hi);background:var(--hi-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.95rem}
+.note{border-left:3px solid var(--bar);background:var(--sunk);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.93rem}
+.added{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--warn);border:1px solid var(--warn);border-radius:999px;padding:1px 8px;justify-self:start}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 18px}
+.ctl{display:grid;gap:2px;min-width:0}
+.ctl label,.ctl .lbl{font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.ctl label output{font-family:var(--mono);color:var(--ink);font-weight:600}
+.ctl textarea{font:inherit;font-family:var(--mono);font-size:.92rem;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);width:100%;resize:vertical;min-height:52px}
+input[type=range]{width:100%;accent-color:var(--hi)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);color:var(--ink);font:inherit;font-size:.85rem;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.btn{font:inherit;font-size:.88rem;padding:7px 14px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:var(--surface);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--bar)}
+.btn.small{font-size:.8rem;padding:5px 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.ro{background:var(--sunk);border-radius:8px;padding:8px 10px;min-width:0}
+.ro .k{font-size:.78rem;color:var(--muted)}
+.ro .v{font-family:var(--mono);font-size:1.12rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ro.key .v{color:var(--hi)}
+.ro.bad .v{color:var(--muted);text-decoration:line-through}
+.ro.good .v{color:var(--ok)}
+
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:420px;height:auto}
+svg .curve{fill:none;stroke:var(--bar);stroke-width:2.2}
+svg .curve.hi{stroke:var(--hi)}
+svg .curve.c2{stroke:var(--c2)}
+svg .curve.ghost{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1.4}
+svg .shade{fill:var(--shade)}
+svg .shade.hi{fill:var(--shade-hi)}
+svg .shade.c2{fill:var(--shade-c2)}
+svg .bar{fill:var(--sunk);stroke:var(--muted);stroke-width:.6}
+svg .bar.on{fill:var(--shade-hi);stroke:var(--hi);stroke-width:1}
+svg .ax{stroke:var(--muted);stroke-width:1}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+svg text.lab{fill:var(--ink);font-family:var(--body);font-size:12px}
+svg text.lab.hi{fill:var(--hi);font-weight:600}
+svg text.lab.c2{fill:var(--c2);font-weight:600}
+svg text.lab.bar{fill:var(--bar);font-weight:600}
+svg .vl{stroke:var(--ink);stroke-dasharray:4 3;stroke-width:1.2}
+svg .vl.hi{stroke:var(--hi)}
+svg .vl.c2{stroke:var(--c2)}
+svg .vl.soft{stroke:var(--muted);stroke-width:1}
+svg .dot{fill:var(--bar)}
+svg .box{fill:var(--shade);stroke:var(--bar);stroke-width:1.4}
+svg .wh{stroke:var(--bar);stroke-width:1.4}
+svg .med{stroke:var(--hi);stroke-width:2.4}
+svg .meanmk{fill:var(--c2)}
+svg .outl{fill:var(--surface);stroke:var(--hi);stroke-width:2}
+svg .cell{stroke:var(--surface);stroke-width:1}
+svg .cell.tp{fill:var(--hi)}
+svg .cell.fp{fill:var(--c2)}
+svg .cell.fn{fill:var(--hi-soft)}
+svg .cell.tn{fill:var(--sunk)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.sw{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.sw.ln{height:3px;vertical-align:3px}
+
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.8rem;color:var(--muted);font-weight:600}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.steps{display:grid;gap:6px;font-family:var(--mono);font-size:.86rem}
+.steps div{overflow-wrap:anywhere}
+.chip{font-family:var(--mono);font-size:.78rem;font-weight:600;border-radius:999px;padding:2px 10px;border:1px solid currentColor;justify-self:start}
+.chip.pass{color:var(--ok)}
+.chip.fail{color:var(--hi)}
+.chip.info{color:var(--bar)}
+
+.exercises{display:grid;gap:14px}
+.ex{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;min-width:0}
+.ex .tag{font-family:var(--mono);font-weight:600;color:var(--hi);font-size:.82rem}
+.ex ol{margin:0;padding-left:1.3em;display:grid;gap:4px}
+.ans{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px;font-size:.95rem}
+.ans ol,.ans ul{margin:0;padding-left:1.3em;display:grid;gap:4px}
+.ans b.ok{color:var(--ok)}
+.ans .ln{display:block;font-family:var(--mono);font-size:.88rem;padding-left:10px;line-height:1.7}
+.ans li+li{margin-top:8px}
+.ans .one{display:grid}
+.ans .rule{display:block;font-family:var(--mono);font-size:.82rem;color:var(--bar);background:var(--sunk);border-radius:6px;padding:4px 8px;margin-block:2px 4px}
+.ans b.no{color:var(--hi)}
+
+.quiz{display:grid;gap:10px}
+.qrow{display:grid;gap:8px;background:var(--sunk);border-radius:8px;padding:12px}
+.qrow .opts{display:flex;flex-wrap:wrap;gap:6px}
+.qrow .opts button{font:inherit;font-size:.82rem;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.qrow .opts button.right{border-color:var(--ok);color:var(--ok);font-weight:600}
+.qrow .opts button.wrong{border-color:var(--hi);color:var(--hi);text-decoration:line-through}
+.qrow .why{font-size:.9rem}
+.vsgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:820px){.vsgrid{grid-template-columns:minmax(0,1fr)}}
+.side{display:grid;gap:8px;align-content:start;min-width:0;background:var(--sunk);border-radius:10px;padding:14px}
+.side.wrong{background:var(--hi-soft)}
+.checklist{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.checklist label{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer}
+.checklist input{margin-top:4px;accent-color:var(--ok)}
+.subex{border-top:1px dashed var(--line);padding-top:16px;display:grid;gap:12px;min-width:0}
+table.ztab{min-width:860px}
+table.ztab td.span{vertical-align:middle;background:var(--sunk);border-right:1px solid var(--surface)}
+table.ztab th{white-space:nowrap}
+table.ztab td{font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.ztab tr.ext td{color:var(--hi);font-weight:600}
+table.ztab tr.avg td{border-top:2px solid var(--ink);font-weight:600}
+svg .dot.c2{fill:var(--c2)}
+svg .dot.hi{fill:var(--hi)}
+svg rect.zband{fill:var(--shade-hi)}
+.grouphead{display:grid;gap:4px;padding-top:6px}
+.grouphead h3{font-size:1.2rem}
+.dists{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px}
+.dist{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;align-content:start;min-width:0}
+.dist .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.dist h3{font-size:1.15rem}
+.dist .kind{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dist .fx{font-family:"Times New Roman",Georgia,serif;font-size:1.02rem;background:var(--sunk);border-radius:6px;padding:8px 10px;overflow-x:auto;line-height:1.7}
+.dist .k{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.dist .blk{display:grid;gap:4px;font-size:.93rem}
+.dist ul{margin:0;padding-left:1.2em;display:grid;gap:3px}
+.cues{display:flex;flex-wrap:wrap;gap:5px}
+.cues span{font-size:.8rem;background:var(--sunk);border-radius:999px;padding:2px 9px}
+table.gloss td:first-child{font-weight:600}
+table.gloss td:last-child{font-family:var(--mono);font-size:.86rem}
+table.gloss tr.grp th{background:var(--sunk);color:var(--ink);font-family:var(--display);font-size:.98rem;padding:8px 10px}
+.filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.filter input{font:inherit;font-size:.95rem;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:min(100%,340px)}
+.ss{display:inline-flex;flex-direction:column;vertical-align:middle;font-size:.68em;line-height:1;margin-left:1px;text-align:left}
+.ss sup,.ss sub{vertical-align:baseline;font-size:1em;line-height:1.1}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}
+html{scroll-behavior:smooth}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">ENDG 319 · Lectures 3–13 · 60-minute review</span>
+  <h1>ENDG 319 Review Lab</h1>
+  <p>Six timed blocks on the places students lose the most marks. Each block lists the traps, gives one instrument to show the trap live, and ends with exercises whose answers stay hidden until you reveal them. All exercise numbers are new, not taken from the slides, and every answer was checked numerically.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Block</th><th>Minutes</th><th>Lectures</th><th>Core trap</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Descriptive stats</td><td class="n">5</td><td>L3–L4</td><td>(n+1) quartile convention; mean vs median under skew</td></tr>
+      <tr><td>2 · Counting + conditional probability</td><td class="n">12</td><td>L5–L6</td><td>Base-rate neglect; independent ≠ mutually exclusive</td></tr>
+      <tr><td>3 · Linear combinations</td><td class="n">10</td><td>L7–L8</td><td>Var(X − Y) adds; Var(2X) ≠ Var(X₁ + X₂)</td></tr>
+      <tr><td>4 · Discrete distributions</td><td class="n">10</td><td>L9–L10</td><td>"At least / more than" wording; picking the model</td></tr>
+      <tr><td>5 · Continuous models</td><td class="n">10</td><td>L11, L12</td><td>Lognormal log scale; memorylessness</td></tr>
+      <tr><td>6 · CLT + confidence intervals</td><td class="n">10</td><td>L12, L13</td><td>σ vs σ/√n; continuity correction; what 95% means</td></tr>
+    </tbody>
+  </table></div>
+</header>
+
+<nav class="stations" aria-label="Blocks">
+  <a href="#b1">1 · Summaries <span class="min">5′</span></a><a href="#b2">2 · Bayes <span class="min">12′</span></a><a href="#b3">3 · Variance <span class="min">10′</span></a><a href="#b4">4 · Discrete <span class="min">10′</span></a><a href="#b5">5 · Continuous <span class="min">10′</span></a><a href="#b6">6 · CLT &amp; CI <span class="min">10′</span></a><a href="#b7">Checklist</a><a href="#b8">Distributions</a><a href="#b9">Key words</a>
+  <button type="button" class="btn ghost small" id="revealAll" aria-pressed="false">Show all answers</button>
+</nav>
+
+<!-- ============ BLOCK 1 ============ -->
+<section class="station" id="b1">
+  <div class="head">
+    <span class="eyebrow">Block 1 · L3–L4 · 5 minutes</span>
+    <h2>Quartiles by the course convention, and what an outlier moves</h2>
+    <p>Edit the data or swap the 40 for a 400. The steps show the (n+1) position rule; the readouts show which summaries react to the extreme value and which ignore it.</p>
+  </div>
+  <div class="stack b1stack">
+    <div class="concept">
+      <div class="formula">Position: &nbsp;<i>L<sub>p</sub></i> = <span class="frac"><span><i>p</i></span><span>100</span></span>(<i>n</i> + 1)</div>
+      <div class="formula">Fences: &nbsp;<i>Q</i><sub>1</sub> − 1.5 × IQR &nbsp;and&nbsp; <i>Q</i><sub>3</sub> + 1.5 × IQR</div>
+      <ul>
+        <li>Whole-number position: use that sorted value. Otherwise average the two neighbours. Excel and NumPy use other rules, so their answers differ.</li>
+        <li>Median and IQR resist outliers. Mean, SD and range do not.</li>
+        <li>Whiskers do not stop at the fences. Each whisker ends at the most extreme data value still inside its fence; any value beyond a fence is plotted as a separate outlier point.</li>
+        <li>A long right tail pulls the mean above the median.</li>
+        <li><i>s</i>² divides by <i>n</i> − 1: deviations are measured from x̄, which sits closer to the data than μ does, so dividing by <i>n</i> underestimates σ².</li>
+        <li>x̄, <i>s</i>, p̂ are statistics (computed). μ, σ, <i>p</i> are parameters (unknown).</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="ctl"><label for="d1">Data (any order, commas or spaces)</label><textarea id="d1" rows="2">2, 4, 5, 7, 8, 9, 11, 12, 15, 40</textarea></div>
+      <div class="row"><button type="button" class="btn ghost" id="d1orig">Original data</button><button type="button" class="btn" id="d1big">Make the 40 a 400</button></div>
+      <div class="chart"><svg id="s1" role="img" aria-label="Dot plot and box plot of the data with mean and median marked"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade);border:1px solid var(--bar)"></span>Q1 to Q3 box</span><span><span class="sw ln" style="background:var(--hi)"></span>median</span><span><span class="sw" style="background:var(--c2)"></span>mean</span><span>whiskers end at the last value inside the fences</span><span><span class="sw" style="background:var(--surface);border:2px solid var(--hi);border-radius:50%"></span>outlier</span><span><span class="sw ln" style="background:var(--muted)"></span>fence</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">n</div><div class="v" id="r1n"></div></div>
+        <div class="ro key"><div class="k">Median</div><div class="v" id="r1med"></div></div>
+        <div class="ro"><div class="k">Mean</div><div class="v" id="r1mean"></div></div>
+        <div class="ro key"><div class="k">IQR</div><div class="v" id="r1iqr"></div></div>
+        <div class="ro"><div class="k">Range</div><div class="v" id="r1rng"></div></div>
+        <div class="ro"><div class="k">s (n − 1)</div><div class="v" id="r1s"></div></div>
+        <div class="ro"><div class="k">Fences</div><div class="v" id="r1fen"></div></div>
+        <div class="ro"><div class="k">Whiskers</div><div class="v" id="r1wh"></div></div>
+        <div class="ro key"><div class="k">Outliers</div><div class="v" id="r1out"></div></div>
+      </div>
+      <div class="steps" id="r1steps"></div>
+    </div>
+  </div>
+  <div class="exercises">
+    <div class="ex">
+      <span class="tag">Exercise 1</span>
+      <p>Sorted data, n = 10: 2, 4, 5, 7, 8, 9, 11, 12, 15, 40.</p>
+      <ol><li>Find Q1, the median, Q3 and the IQR with the course convention.</li><li>Find the mean. What does mean vs median say about shape?</li><li>Compute the boxplot fences and where each whisker ends. Is any value an outlier?</li><li>Replace 40 with 400. Which of mean, median, IQR, range and the whiskers change?</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a1">Show answer</button>
+      <div class="ans" id="a1" hidden><ol><li><span class="rule">Rule · position L<sub>p</sub> = (p/100)(n + 1); whole number → use that sorted value, otherwise average the two neighbours. IQR = Q3 − Q1.</span><span class="ln">Q1: L = 0.25(11) = 2.75 → (x₂ + x₃)/2 = (4 + 5)/2 = 4.5</span><span class="ln">Median: L = 0.5(11) = 5.5 → (x₅ + x₆)/2 = (8 + 9)/2 = 8.5</span><span class="ln">Q3: L = 0.75(11) = 8.25 → (x₈ + x₉)/2 = (12 + 15)/2 = 13.5</span><span class="ln">IQR = 13.5 − 4.5 = 9</span></li><li><span class="rule">Rule · x̄ = Σx/n. Mean &gt; median → right skew; mean &lt; median → left skew.</span><span class="ln">x̄ = 113/10 = 11.3</span><span class="ln">11.3 &gt; 8.5, so the data are right-skewed, pulled by the 40.</span></li><li><span class="rule">Rule · fences Q1 − 1.5·IQR and Q3 + 1.5·IQR; each whisker ends at the most extreme data value inside its fence; values beyond a fence are outliers.</span><span class="ln">Lower fence = 4.5 − 1.5(9) = −9</span><span class="ln">Upper fence = 13.5 + 1.5(9) = 27</span><span class="ln">Lower whisker → smallest value ≥ −9 = 2</span><span class="ln">Upper whisker → largest value ≤ 27 = 15</span><span class="ln">Outlier: 40, since 40 &gt; 27</span></li><li><span class="rule">Rule · position-based summaries (median, quartiles, IQR, fences) depend only on the order of the middle values; the mean and range use every value.</span><span class="ln">Mean = (113 − 40 + 400)/10 = 47.3</span><span class="ln">Range = 400 − 2 = 398</span><span class="ln">Median, IQR, fences and whiskers are unchanged; 400 is still one outlier point.</span></li></ol></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOCK 2 ============ -->
+<section class="station" id="b2">
+  <div class="head">
+    <span class="eyebrow">Block 2 · L5–L6 · 12 minutes</span>
+    <h2>A good test can still be wrong most of the time it fires</h2>
+    <p>Each square is one of 1000 parts. Red squares are defective parts the inspection flags; gold squares are good parts it flags by mistake. Lower the defect rate and watch the gold outnumber the red, even though the test itself has not changed.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula"><i>P</i>(<i>D</i> | <i>F</i>) = <span class="frac"><span><i>P</i>(<i>F</i> | <i>D</i>) <i>P</i>(<i>D</i>)</span><span><i>P</i>(<i>F</i> | <i>D</i>) <i>P</i>(<i>D</i>) + <i>P</i>(<i>F</i> | <i>D</i>′) <i>P</i>(<i>D</i>′)</span></span></div>
+      <ul>
+        <li>P(A | B) makes B the new reference group. P(A | B) and P(B | A) are different numbers; mixing them is the most common error in the course.</li>
+        <li>Build the denominator first with total probability: every way the evidence can happen.</li>
+        <li>Counting: ask whether order changes the outcome. Distinct roles = permutation; an unlabeled group = combination (divide by <i>k</i>!).</li>
+        <li>Drawing without replacement makes successive draws dependent.</li>
+      </ul>
+      <div class="warn">Independent and mutually exclusive are near opposites. If P(A), P(B) &gt; 0 and A, B cannot both happen, then P(A ∩ B) = 0 ≠ P(A)P(B), so they are dependent.</div>
+      <div class="note">Pairwise independence does not give mutual independence. The product rule must hold for every subset of the events.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="b2p">Defect rate P(D) <output id="b2po"></output></label><input type="range" id="b2p" min="0.5" max="30" step="0.5" value="2"></div>
+        <div class="ctl"><label for="b2s">Flags defective P(F | D) <output id="b2so"></output></label><input type="range" id="b2s" min="50" max="100" step="1" value="95"></div>
+        <div class="ctl"><label for="b2f">Flags good P(F | D′) <output id="b2fo"></output></label><input type="range" id="b2f" min="0" max="20" step="0.5" value="4"></div>
+      </div>
+      <div class="chart"><svg id="s2" role="img" aria-label="Grid of 1000 parts coloured by defect status and inspection result"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--hi)"></span>defective, flagged</span><span><span class="sw" style="background:var(--c2)"></span>good, flagged</span><span><span class="sw" style="background:var(--hi-soft);border:1px solid var(--hi)"></span>defective, passed</span><span><span class="sw" style="background:var(--sunk);border:1px solid var(--line)"></span>good, passed</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">P(flagged)</div><div class="v" id="r2f"></div></div>
+        <div class="ro key"><div class="k">P(D | flagged)</div><div class="v" id="r2pos"></div></div>
+        <div class="ro"><div class="k">P(D | passed)</div><div class="v" id="r2neg"></div></div>
+      </div>
+      <p class="muted" id="r2txt" style="font-size:.93rem"></p>
+    </div>
+  </div>
+  <div class="exercises">
+    <div class="ex">
+      <span class="tag">Exercise 2a · counting · 1 min</span>
+      <p>From 10 engineers, how many ways can you form (i) a 3-person review committee, (ii) a president, VP and treasurer?</p>
+      <button type="button" class="btn ghost small" data-rev="a2a">Show answer</button>
+      <div class="ans" id="a2a" hidden><div class="one"><span class="rule">Rule · order does not matter → <i>C</i><span class="ss"><sup>n</sup><sub>k</sub></span> = n!/(k!(n − k)!); order matters → <i>P</i><span class="ss"><sup>n</sup><sub>k</sub></span> = n!/(n − k)! = k! · <i>C</i><span class="ss"><sup>n</sup><sub>k</sub></span>.</span><span class="ln">(i) A committee has no roles: <i>C</i><span class="ss"><sup>10</sup><sub>3</sub></span> = 10!/(3! 7!) = 120</span><span class="ln">(ii) Roles are distinct, so order matters: <i>P</i><span class="ss"><sup>10</sup><sub>3</sub></span> = 10!/7! = 10 × 9 × 8 = 720</span><span class="ln">Check: 720 = 3! × 120, each committee counted 6 times.</span></div></div>
+    </div>
+    <div class="ex">
+      <span class="tag">Exercise 2b · Bayes</span>
+      <p>2% of parts are defective. The inspection flags 95% of defective parts and wrongly flags 4% of good parts. (These are the instrument's starting values.)</p>
+      <ol><li>What fraction of all parts are flagged?</li><li>Given a part is flagged, what is the probability it is defective?</li><li>Given a part passes, what is the probability it is defective?</li><li>Why is (2) so far below 95%?</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a2b">Show answer</button>
+      <div class="ans" id="a2b" hidden><ol><li><span class="rule">Rule · total probability: P(F) = P(F | D)P(D) + P(F | D′)P(D′).</span><span class="ln">P(F) = 0.95(0.02) + 0.04(0.98)</span><span class="ln">= 0.019 + 0.0392</span><span class="ln">= 0.0582</span></li><li><span class="rule">Rule · Bayes: P(D | F) = P(F | D)P(D) / P(F).</span><span class="ln">P(D | F) = 0.019 / 0.0582</span><span class="ln">= 0.326</span></li><li><span class="rule">Rule · Bayes on the complement: P(D | F′) = P(F′ | D)P(D) / P(F′), with P(F′ | D) = 1 − P(F | D) and P(F′) = 1 − P(F).</span><span class="ln">P(F′ | D) = 1 − 0.95 = 0.05</span><span class="ln">P(F′) = 1 − 0.0582 = 0.9418</span><span class="ln">P(D | F′) = (0.05)(0.02) / 0.9418 = 0.001 / 0.9418</span><span class="ln">= 0.00106</span></li><li><span class="rule">Rule · P(D | F) is the share of flagged parts that are defective: P(D ∩ F) out of P(F) = P(D ∩ F) + P(D′ ∩ F).</span><span class="ln">True flags: P(D ∩ F) = 0.019</span><span class="ln">False flags: P(D′ ∩ F) = 0.0392</span><span class="ln">Good parts outnumber defective ones 49 to 1, so false flags are about twice the true ones even with a 4% error rate.</span></li></ol></div>
+    </div>
+    <div class="ex">
+      <span class="tag">Exercise 2c · concept · 30 s</span>
+      <p>A and B are mutually exclusive with P(A) = 0.3 and P(B) = 0.4. Are they independent?</p>
+      <button type="button" class="btn ghost small" data-rev="a2c">Show answer</button>
+      <div class="ans" id="a2c" hidden><div class="one"><span class="rule">Rule · independent ⇔ P(A ∩ B) = P(A)P(B); mutually exclusive ⇔ P(A ∩ B) = 0.</span><span class="ln">Exclusive: P(A ∩ B) = 0</span><span class="ln">Product: P(A)P(B) = 0.3 × 0.4 = 0.12</span><span class="ln">0 ≠ 0.12, so <b class="no">not independent</b>.</span><span class="ln">Learning that A happened tells you B did not.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOCK 3 ============ -->
+<section class="station" id="b3">
+  <div class="head">
+    <span class="eyebrow">Block 3 · L7–L8 · 10 minutes</span>
+    <h2>Variances add, even when the variables subtract</h2>
+    <p>Shaft diameter X and bore diameter Y are independent normals; clearance C = Y − X. The red area is the fraction of assemblies that interfere. The dashed grey curve is what you get if you subtract the SDs, which hides almost all of the risk.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">Var(<i>aX</i> + <i>bY</i>) = <i>a</i>²σ<sub><i>X</i></sub>² + <i>b</i>²σ<sub><i>Y</i></sub>² + 2<i>ab</i> Cov(<i>X</i>, <i>Y</i>)</div>
+      <ul>
+        <li>Means are always linear, with no independence needed. Variances need independence, or the covariance term.</li>
+        <li>With <i>b</i> = −1, <i>b</i>² = 1: Var(X − Y) = Var(X) + Var(Y).</li>
+        <li>Add variances, never SDs. SDs combine as root-sum-of-squares.</li>
+        <li>Var(2X) = 4σ², but Var(X₁ + X₂) = 2σ² for iid copies. Doubling one part is not adding two parts.</li>
+        <li>A PDF value is not a probability and can exceed 1. E[X²] ≠ (E[X])².</li>
+      </ul>
+      <div class="warn">Cov = 0 does not mean independent. X uniform on {−1, 0, 1} and Y = X² have zero covariance, but Y is completely determined by X.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="b3g">Mean clearance μ<sub>Y</sub> − μ<sub>X</sub> (mm) <output id="b3go"></output></label><input type="range" id="b3g" min="0" max="0.2" step="0.005" value="0.1"></div>
+        <div class="ctl"><label for="b3x">σ<sub>X</sub> shaft (mm) <output id="b3xo"></output></label><input type="range" id="b3x" min="0.005" max="0.08" step="0.005" value="0.03"></div>
+        <div class="ctl"><label for="b3y">σ<sub>Y</sub> bore (mm) <output id="b3yo"></output></label><input type="range" id="b3y" min="0.005" max="0.08" step="0.005" value="0.04"></div>
+      </div>
+      <div class="chart"><svg id="s3" role="img" aria-label="Distribution of clearance with the interference region shaded"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>C with σ = √(σ<sub>X</sub>² + σ<sub>Y</sub>²)</span><span><span class="sw" style="background:var(--shade-hi)"></span>C &lt; 0: interference</span><span><span class="sw ln" style="background:var(--muted)"></span>wrong: σ = |σ<sub>Y</sub> − σ<sub>X</sub>|</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Mean of C</div><div class="v" id="r3m"></div></div>
+        <div class="ro good"><div class="k">SD of C</div><div class="v" id="r3s"></div></div>
+        <div class="ro bad"><div class="k">Subtracted SDs</div><div class="v" id="r3w"></div></div>
+        <div class="ro key"><div class="k">P(C &lt; 0)</div><div class="v" id="r3p"></div></div>
+        <div class="ro"><div class="k">Wrong P(C &lt; 0)</div><div class="v" id="r3pw"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="head" style="gap:4px"><span class="eyebrow">Numerical example · subtracting does not cancel spread</span>
+      <p>Give each variable two equally likely values, one SD below and one SD above its mean. Then X₁ (mean 10) has SD exactly σ₁ and X₂ (mean 6) has SD exactly σ₂. Z = X₁ − X₂ has four equally likely combinations, listed below.</p></div>
+    <div class="controls">
+      <div class="ctl"><label for="z1s">σ₁ for X₁ <output id="z1so"></output></label><input type="range" id="z1s" min="0.5" max="6" step="0.5" value="3"></div>
+      <div class="ctl"><label for="z2s">σ₂ for X₂ <output id="z2so"></output></label><input type="range" id="z2s" min="0.5" max="6" step="0.5" value="4"></div>
+    </div>
+    <div class="tbl"><table id="zt" class="ztab"><thead><tr><th>X₁</th><th>X₁ + σ₁</th><th>X₁ − σ₁</th><th>X₂</th><th>X₂ + σ₂</th><th>X₂ − σ₂</th><th>Z = X₁ − X₂ (4 combinations)</th><th>Max range of Z</th></tr></thead><tbody></tbody></table></div>
+    <div class="warn"><b>For illustration only.</b> The max range μ<sub>Z</sub> ± (σ₁ + σ₂) only shows the most extreme combinations; it is not the SD of Z. Summing the standard deviations (3 + 4 = 7) is the wrong way to combine them, and subtracting them (4 − 3 = 1) is wrong too. The correct rule is to sum the variances and take the square root: SD(Z) = √(σ₁² + σ₂²) = √(3² + 4²) = 5 at the default values.</div>
+    <div class="chart"><svg id="s3z" role="img" aria-label="Values of X1, X2 and Z on one axis, with the true and the wrong SD bands for Z"></svg></div>
+    <div class="legend"><span><span class="sw" style="background:var(--bar)"></span>X₁ values</span><span><span class="sw" style="background:var(--c2)"></span>X₂ values</span><span><span class="sw" style="background:var(--hi)"></span>Z values</span><span><span class="sw" style="background:var(--shade-hi)"></span>μ<sub>Z</sub> ± true SD</span><span><span class="sw ln" style="background:var(--muted)"></span>μ<sub>Z</sub> ± |σ₁ − σ₂| (wrong)</span></div>
+    <div class="formula live" id="zf"></div>
+    <div class="readouts">
+      <div class="ro"><div class="k">μ<sub>Z</sub> = μ₁ − μ₂</div><div class="v" id="zmu"></div></div>
+      <div class="ro good"><div class="k">SD(Z) = √(σ₁² + σ₂²)</div><div class="v" id="zsd"></div></div>
+      <div class="ro bad"><div class="k">|σ₁ − σ₂|</div><div class="v" id="zw"></div></div>
+      <div class="ro key"><div class="k">Range of Z</div><div class="v" id="zr"></div></div>
+    </div>
+    <div class="note">The red combinations pair a high X₁ with a low X₂, or the reverse, and set the max range μ<sub>Z</sub> ± (σ₁ + σ₂). Subtracting a high value from a low one pushes Z further out, so the spread grows. The cross terms ±2σ₁σ₂ cancel on average only because the four pairs are equally likely, which is what independence gives.</div>
+  </div>
+  <div class="exercises">
+    <div class="ex">
+      <span class="tag">Exercise 3</span>
+      <p>Shaft X: mean 10.00 mm, SD 0.03 mm. Bore Y, independent: mean 10.10 mm, SD 0.04 mm. Both normal. C = Y − X.</p>
+      <ol><li>Find the mean and SD of C.</li><li>What fraction of assemblies interfere (C &lt; 0)?</li><li>A student writes SD(C) = 0.04 − 0.03 = 0.01. Name both mistakes.</li><li>Ten rods are stacked end to end, each length mean 50 mm, SD 0.2 mm, independent. Is the stack's SD 10 × 0.2 or √10 × 0.2?</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a3">Show answer</button>
+      <div class="ans" id="a3" hidden><ol><li><span class="rule">Rule · E[aX + bY] = aμ<sub>X</sub> + bμ<sub>Y</sub> (always); Var(aX + bY) = a²σ<sub>X</sub>² + b²σ<sub>Y</sub>² when X, Y are independent. Here C = (1)Y + (−1)X.</span><span class="ln">E[C] = 10.10 − 10.00 = 0.10 mm</span><span class="ln">Var(C) = (1)²(0.04)² + (−1)²(0.03)²</span><span class="ln">= 0.0016 + 0.0009 = 0.0025</span><span class="ln">SD(C) = √0.0025 = 0.05 mm</span></li><li><span class="rule">Rule · a linear combination of independent normals is normal; standardize with z = (c − μ)/σ and read Φ(z).</span><span class="ln">z = (0 − 0.10)/0.05 = −2</span><span class="ln">P(C &lt; 0) = Φ(−2) = 0.0228, about 2.3%</span></li><li><span class="rule">Rule · SDs never add or subtract; variances add, and the coefficient is squared so a minus sign becomes +.</span><span class="ln">Mistake 1: combined SDs instead of variances.</span><span class="ln">Mistake 2: subtracted instead of adding.</span></li><li><span class="rule">Rule · sum of n independent copies: Var(X₁ + … + X<sub>n</sub>) = nσ², so SD = σ√n. One variable scaled: Var(aX) = a²σ², so SD = |a|σ.</span><span class="ln">Ten independent rods: Var = 10(0.2)² = 0.4</span><span class="ln">SD = √0.4 = 0.2√10 = 0.632 mm</span><span class="ln">10 × 0.2 = 2 mm would be SD(10X), one rod scaled up, not ten rods.</span></li></ol></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOCK 4 ============ -->
+<section class="station" id="b4">
+  <div class="head">
+    <span class="eyebrow">Block 4 · L9–L10 · 10 minutes</span>
+    <h2>Translate the words before you touch the table</h2>
+    <p>Cumulative tables only give P(X ≤ x). Pick a phrase and a value; the highlighted bars are the outcomes the phrase includes, and the formula shows which table entries to use.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="tbl"><table>
+        <thead><tr><th>Phrase</th><th>Event</th><th>From the table</th></tr></thead>
+        <tbody>
+          <tr><td>at most 3</td><td>X ≤ 3</td><td>P(X ≤ 3)</td></tr>
+          <tr><td>fewer than 3</td><td>X ≤ 2</td><td>P(X ≤ 2)</td></tr>
+          <tr><td>at least 3</td><td>X ≥ 3</td><td>1 − P(X ≤ 2)</td></tr>
+          <tr><td>more than 3</td><td>X ≥ 4</td><td>1 − P(X ≤ 3)</td></tr>
+          <tr><td>3 to 5 inclusive</td><td>3 ≤ X ≤ 5</td><td>P(X ≤ 5) − P(X ≤ 2)</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note">A Poisson rate must match the window: 4 per hour becomes λ = 2 for 30 minutes.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="b4n">n trials <output id="b4no"></output></label><input type="range" id="b4n" min="5" max="25" step="1" value="10"></div>
+        <div class="ctl"><label for="b4p">p <output id="b4po"></output></label><input type="range" id="b4p" min="0.05" max="0.95" step="0.05" value="0.3"></div>
+      </div>
+      <div class="ctl"><span class="lbl">Phrase</span><div class="seg" id="b4ph"><button type="button" data-v="atmost" aria-pressed="false">at most k</button><button type="button" data-v="fewer" aria-pressed="false">fewer than k</button><button type="button" data-v="atleast" aria-pressed="true">at least k</button><button type="button" data-v="more" aria-pressed="false">more than k</button><button type="button" data-v="exactly" aria-pressed="false">exactly k</button><button type="button" data-v="between" aria-pressed="false">k to m inclusive</button></div></div>
+      <div class="controls">
+        <div class="ctl"><label for="b4k">k <output id="b4ko"></output></label><input type="range" id="b4k" min="0" max="10" step="1" value="3"></div>
+        <div class="ctl" id="b4mwrap" hidden><label for="b4m">m <output id="b4mo"></output></label><input type="range" id="b4m" min="0" max="10" step="1" value="5"></div>
+      </div>
+      <div class="chart"><svg id="s4" role="img" aria-label="Binomial PMF with the outcomes in the chosen event highlighted"></svg></div>
+      <div class="formula live" id="r4f"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="head"><span class="eyebrow">Model choice · click a model for each scenario</span><h3>What is fixed, and what is counted?</h3></div>
+    <div class="quiz" id="quiz"></div>
+  </div>
+  <div class="exercises">
+    <div class="ex">
+      <span class="tag">Exercise 4a · wording</span>
+      <p>X ~ Binomial(10, 0.3). Write each as cumulative-table entries, then evaluate: P(X &lt; 3), P(X ≥ 3), P(3 ≤ X ≤ 5).</p>
+      <button type="button" class="btn ghost small" data-rev="a4a">Show answer</button>
+      <div class="ans" id="a4a" hidden><div class="one"><span class="rule">Rule · tables give P(X ≤ x). P(X &lt; k) = P(X ≤ k − 1); P(X ≥ k) = 1 − P(X ≤ k − 1); P(a ≤ X ≤ b) = P(X ≤ b) − P(X ≤ a − 1).</span><span class="ln">P(X &lt; 3) = P(X ≤ 2) = 0.3828</span><span class="ln">P(X ≥ 3) = 1 − P(X ≤ 2) = 1 − 0.3828 = 0.6172</span><span class="ln">P(3 ≤ X ≤ 5) = P(X ≤ 5) − P(X ≤ 2) = 0.9527 − 0.3828 = 0.5699</span></div></div>
+    </div>
+    <div class="ex">
+      <span class="tag">Exercise 4b · hypergeometric or binomial?</span>
+      <p>A box holds 12 sensors, 4 of them faulty. You draw 3 without replacement.</p>
+      <ol><li>Find P(exactly 1 faulty) and P(at least 1 faulty).</li><li>A student uses Binomial(3, 1/3) for (1). What do they get, and why is it wrong here?</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a4b">Show answer</button>
+      <div class="ans" id="a4b" hidden><ol><li><span class="rule">Rule · hypergeometric P(X = x) = <i>C</i><span class="ss"><sup>M</sup><sub>x</sub></span> <i>C</i><span class="ss"><sup>N−M</sup><sub>n−x</sub></span> / <i>C</i><span class="ss"><sup>N</sup><sub>n</sub></span>, with N = 12, M = 4, n = 3. Complement: P(X ≥ 1) = 1 − P(X = 0).</span><span class="ln">P(X = 1) = <i>C</i><span class="ss"><sup>4</sup><sub>1</sub></span> <i>C</i><span class="ss"><sup>8</sup><sub>2</sub></span> / <i>C</i><span class="ss"><sup>12</sup><sub>3</sub></span></span><span class="ln">= (4 × 28)/220 = 0.509</span><span class="ln">P(X = 0) = <i>C</i><span class="ss"><sup>4</sup><sub>0</sub></span> <i>C</i><span class="ss"><sup>8</sup><sub>3</sub></span> / <i>C</i><span class="ss"><sup>12</sup><sub>3</sub></span> = 56/220 = 0.255</span><span class="ln">P(X ≥ 1) = 1 − 0.255 = 0.745</span></li><li><span class="rule">Rule · binomial P(X = x) = <i>C</i><span class="ss"><sup>n</sup><sub>x</sub></span> p<sup>x</sup>(1 − p)<sup>n−x</sup> needs independent trials with constant p; it approximates the hypergeometric only when n/N &lt; 0.05.</span><span class="ln">Binomial: <i>C</i><span class="ss"><sup>3</sup><sub>1</sub></span>(1/3)(2/3)² = 3 × 4/27 = 0.444</span><span class="ln">Wrong here: without replacement p changes after each draw.</span><span class="ln">n/N = 3/12 = 25%, far above 5%.</span></li></ol></div>
+    </div>
+    <div class="ex">
+      <span class="tag">Exercise 4c · Poisson</span>
+      <p>Packet errors arrive at 4 per hour. Find the probability of at least 2 errors in a 30-minute window.</p>
+      <button type="button" class="btn ghost small" data-rev="a4c">Show answer</button>
+      <div class="ans" id="a4c" hidden><div class="one"><span class="rule">Rule · λ for the window = rate × window length; Poisson P(X = x) = e<sup>−λ</sup>λ<sup>x</sup>/x!; complement rule P(A) = 1 − P(A′), with {X ≥ 2}′ = {X ≤ 1}.</span><span class="ln">λ = 4 × 0.5 = 2</span><span class="ln">P(0) = e<sup>−2</sup> = 0.135</span><span class="ln">P(1) = 2e<sup>−2</sup> = 0.271</span><span class="ln">Direct route: P(X ≥ 2) = P(2) + P(3) + P(4) + … never ends, since a Poisson count has no upper limit.</span><span class="ln">Complement: the opposite of "at least 2" is "at most 1" = {X = 0 or X = 1}</span><span class="ln">P(X ≥ 2) = 1 − P(X ≤ 1) = 1 − [P(0) + P(1)]</span><span class="ln">= 1 − (0.135 + 0.271) = 1 − 3e<sup>−2</sup></span><span class="ln">= 1 − 0.406 = 0.594</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOCK 5 ============ -->
+<section class="station" id="b5">
+  <div class="head">
+    <span class="eyebrow">Block 5 · L11–L12 · 10 minutes</span>
+    <h2>Memorylessness: only the additional wait matters</h2>
+    <p>You have already waited s minutes. The gold area is P(T &gt; s); the red area is P(T &gt; s + t). Their ratio is the conditional probability, and it always equals P(T &gt; t). The dashed red curve is the conditional density: the original curve, shifted to start at s.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula"><i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i> | <i>T</i> &gt; <i>s</i>) = <span class="frac"><span><i>e</i><sup>−λ(<i>s</i>+<i>t</i>)</sup></span><span><i>e</i><sup>−λ<i>s</i></sup></span></span> = <i>e</i><sup>−λ<i>t</i></sup></div>
+      <ul>
+        <li>λ is a rate (per minute); the mean wait is 1/λ. Larger rate, shorter wait.</li>
+        <li>"Wait longer than t" uses the tail e<sup>−λt</sup>, not the CDF 1 − e<sup>−λt</sup>.</li>
+        <li>The median ln 2/λ is below the mean; about 63% of waits are shorter than the mean wait.</li>
+        <li>N(μ, σ²) lists the variance: N(25, 0.04) means σ = 0.2.</li>
+        <li>Areas go x → z → Φ(z). Percentiles run backwards: area → z → x = μ + zσ.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="b5l">Rate λ (per min) <output id="b5lo"></output></label><input type="range" id="b5l" min="0.1" max="1.5" step="0.05" value="0.5"></div>
+        <div class="ctl"><label for="b5s">Already waited s (min) <output id="b5so"></output></label><input type="range" id="b5s" min="0" max="6" step="0.25" value="2"></div>
+        <div class="ctl"><label for="b5t">Additional t (min) <output id="b5to"></output></label><input type="range" id="b5t" min="0.25" max="6" step="0.25" value="3"></div>
+      </div>
+      <div class="chart"><svg id="s5" role="img" aria-label="Exponential density with the regions T greater than s and T greater than s plus t shaded"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade-c2)"></span>T &gt; s</span><span><span class="sw" style="background:var(--shade-hi)"></span>T &gt; s + t</span><span><span class="sw ln" style="background:var(--hi)"></span>density given T &gt; s</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">P(T &gt; s)</div><div class="v" id="r5a"></div></div>
+        <div class="ro"><div class="k">P(T &gt; s + t)</div><div class="v" id="r5b"></div></div>
+        <div class="ro key"><div class="k">Ratio</div><div class="v" id="r5r"></div></div>
+        <div class="ro good"><div class="k">P(T &gt; t)</div><div class="v" id="r5c"></div></div>
+        <div class="ro"><div class="k">Mean / median</div><div class="v" id="r5m"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="head"><span class="eyebrow">Lognormal · the parameters live on the log scale</span><h3>ln X ~ N(2, 0.5²). Find P(X &gt; 10).</h3></div>
+    <div class="vsgrid">
+      <div class="side wrong">
+        <span class="chip fail">Wrong path</span>
+        <div class="formula" style="font-size:1.02rem;background:transparent;padding:0"><i>z</i> = (10 − 2)/0.5 = 16 &nbsp;⇒&nbsp; <i>P</i> ≈ 0</div>
+        <p style="font-size:.93rem">Treats 2 and 0.5 as the mean and SD of X. They describe ln X.</p>
+      </div>
+      <div class="side">
+        <span class="chip pass">Right path</span>
+        <div class="formula" style="font-size:1.02rem;background:transparent;padding:0"><i>z</i> = (ln 10 − 2)/0.5 = 0.605 &nbsp;⇒&nbsp; <i>P</i> = 0.273</div>
+        <p style="font-size:.93rem">Move the cut-off to the log scale, then standardize. Median = e<sup>μ</sup> = 7.39; mean = e<sup>μ + σ²/2</sup> = 8.37.</p>
+      </div>
+    </div>
+  </div>
+  <div class="exercises">
+    <div class="ex">
+      <span class="tag">Exercise 5a · normal, both directions</span>
+      <p>Rod length X ~ N(25.00, 0.02²) mm.</p>
+      <ol><li>Find P(24.97 &lt; X &lt; 25.03).</li><li>Find the length exceeded by only 5% of rods.</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a5a">Show answer</button>
+      <div class="ans" id="a5a" hidden><ol><li><span class="rule">Rule · z = (x − μ)/σ; P(a &lt; X &lt; b) = Φ(z<sub>b</sub>) − Φ(z<sub>a</sub>).</span><span class="ln">z<sub>a</sub> = (24.97 − 25)/0.02 = −1.5</span><span class="ln">z<sub>b</sub> = (25.03 − 25)/0.02 = 1.5</span><span class="ln">P = Φ(1.5) − Φ(−1.5) = 0.9332 − 0.0668 = 0.866</span></li><li><span class="rule">Rule · percentile: find z with Φ(z) = area below, then x = μ + zσ.</span><span class="ln">Top 5% → 95% below → Φ(z) = 0.95 → z = 1.645</span><span class="ln">x = 25.00 + 1.645(0.02) = 25.033 mm</span></li></ol></div>
+    </div>
+    <div class="ex">
+      <span class="tag">Exercise 5b · lognormal</span>
+      <p>Particle size X (µm) has ln X ~ N(2, 0.5²).</p>
+      <ol><li>Find P(X &gt; 10).</li><li>Find the median and mean of X. Which is larger, and why?</li><li>A student computes z = (10 − 2)/0.5 = 16. What went wrong?</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a5b">Show answer</button>
+      <div class="ans" id="a5b" hidden><ol><li><span class="rule">Rule · P(X &gt; x) = P(ln X &gt; ln x) = 1 − Φ((ln x − μ)/σ), with μ, σ the mean and SD of ln X.</span><span class="ln">ln 10 = 2.3026</span><span class="ln">z = (2.3026 − 2)/0.5 = 0.605</span><span class="ln">P(X &gt; 10) = 1 − Φ(0.605) = 1 − 0.7275 = 0.273</span></li><li><span class="rule">Rule · lognormal median = e<sup>μ</sup>; mean = e<sup>μ + σ²/2</sup>.</span><span class="ln">Median = e² = 7.39 µm</span><span class="ln">Mean = e<sup>2 + 0.125</sup> = e<sup>2.125</sup> = 8.37 µm</span><span class="ln">Mean &gt; median because of the long right tail.</span></li><li><span class="rule">Rule · standardize on the scale the parameters belong to: ln X ~ N(μ, σ²), so use ln x.</span><span class="ln">They standardized 10 on the raw scale.</span><span class="ln">μ = 2 and σ = 0.5 describe ln X, so the cut-off must be ln 10.</span></li></ol></div>
+    </div>
+    <div class="ex">
+      <span class="tag">Exercise 5c · exponential</span>
+      <p>Calls arrive at 0.5 per minute; T is the wait for the next call. (The instrument's starting values.)</p>
+      <ol><li>Find P(T &gt; 3 min) and the median wait.</li><li>You have already waited 2 minutes. Find the probability you wait more than 5 minutes in total.</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a5c">Show answer</button>
+      <div class="ans" id="a5c" hidden><ol><li><span class="rule">Rule · tail P(T &gt; t) = e<sup>−λt</sup>; median m solves 1 − e<sup>−λm</sup> = 0.5, so m = ln 2/λ; mean = 1/λ.</span><span class="ln">P(T &gt; 3) = e<sup>−0.5 × 3</sup> = e<sup>−1.5</sup> = 0.223</span><span class="ln">Median = 0.693/0.5 = 1.39 min</span><span class="ln">Mean = 1/0.5 = 2 min, above the median</span></li><li><span class="rule">Rule · conditional probability P(A | B) = P(A ∩ B)/P(B); for the exponential this gives memorylessness, P(T &gt; s + t | T &gt; s) = P(T &gt; t).</span><span class="ln">P(T &gt; 5 | T &gt; 2) = P(T &gt; 5)/P(T &gt; 2)</span><span class="ln">= e<sup>−2.5</sup>/e<sup>−1</sup> = e<sup>−1.5</sup></span><span class="ln">= 0.223 = P(T &gt; 3)</span><span class="ln">Only the 3 additional minutes matter.</span></li></ol></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BLOCK 6 ============ -->
+<section class="station" id="b6">
+  <div class="head">
+    <span class="eyebrow">Block 6 · L12–L13 · 10 minutes</span>
+    <h2>One item or a mean of n? Decide before you standardize</h2>
+    <p>Fill volume has mean 500 mL and SD 10 mL. The blue curve is single bottles; the red curve is the mean of n bottles, which narrows as σ/√n. The same cut-off gives very different tail areas.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">One item: <i>z</i> = <span class="frac"><span><i>x</i> − μ</span><span>σ</span></span> &nbsp;&nbsp; Mean: <i>z</i> = <span class="frac"><span><span class="ov">x</span> − μ</span><span>σ/√<i>n</i></span></span></div>
+      <ul>
+        <li>The CLT makes x̄ approximately normal even when X is not. If X is normal, x̄ is exactly normal for any n.</li>
+        <li>SD describes individual measurements; SE = σ/√n describes sample means. If a problem gives the SE, do not divide by √n again.</li>
+        <li>A 95% CI does not mean "95% chance μ is in this interval." μ is fixed; 95% of intervals built this way capture it.</li>
+        <li>Sample size n = (zσ/E)², always rounded up. One-sided 95% bounds use 1.645, not 1.96.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="b6n">Bottles averaged n <output id="b6no"></output></label><input type="range" id="b6n" min="1" max="100" step="1" value="25"></div>
+        <div class="ctl"><label for="b6c">Cut-off c (mL) <output id="b6co"></output></label><input type="range" id="b6c" min="490" max="515" step="0.5" value="502"></div>
+      </div>
+      <div class="chart"><svg id="s6" role="img" aria-label="Distribution of single bottles and of the sample mean with the area above the cut-off shaded"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>one bottle, σ = 10</span><span><span class="sw ln" style="background:var(--hi)"></span>mean of n, σ/√n</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">P(X &gt; c)</div><div class="v" id="r6a"></div></div>
+        <div class="ro"><div class="k">SE = σ/√n</div><div class="v" id="r6se"></div></div>
+        <div class="ro key"><div class="k">P(x̄ &gt; c)</div><div class="v" id="r6b"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="head" style="margin-top:12px">
+    <h2>Continuity correction: cover the whole bar</h2>
+    <p>Each integer outcome is a bar from k − 0.5 to k + 0.5. The corrected normal area (shaded) covers exactly the bars the event includes. The dashed line is the uncorrected cut-off, which shaves off or adds half a bar.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="tbl"><table>
+        <thead><tr><th>Binomial event</th><th>Normal Y</th></tr></thead>
+        <tbody>
+          <tr><td>X ≤ 15</td><td>Y &lt; 15.5</td></tr>
+          <tr><td>X &lt; 15 (= X ≤ 14)</td><td>Y &lt; 14.5</td></tr>
+          <tr><td>X ≥ 25</td><td>Y &gt; 24.5</td></tr>
+          <tr><td>X &gt; 24 (= X ≥ 25)</td><td>Y &gt; 24.5</td></tr>
+          <tr><td>X = 20</td><td>19.5 &lt; Y &lt; 20.5</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note">Valid when np ≥ 5 and n(1 − p) ≥ 5. Mean np, SD √(np(1 − p)).</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="b6bn">n <output id="b6bno"></output></label><input type="range" id="b6bn" min="10" max="200" step="1" value="100"></div>
+        <div class="ctl"><label for="b6bp">p <output id="b6bpo"></output></label><input type="range" id="b6bp" min="0.05" max="0.95" step="0.01" value="0.2"></div>
+        <div class="ctl"><label for="b6bk">k <output id="b6bko"></output></label><input type="range" id="b6bk" min="0" max="100" step="1" value="15"></div>
+      </div>
+      <div class="ctl"><span class="lbl">Event</span><div class="seg" id="b6ev"><button type="button" data-v="le" aria-pressed="true">X ≤ k</button><button type="button" data-v="lt" aria-pressed="false">X &lt; k</button><button type="button" data-v="ge" aria-pressed="false">X ≥ k</button><button type="button" data-v="gt" aria-pressed="false">X &gt; k</button><button type="button" data-v="eq" aria-pressed="false">X = k</button></div></div>
+      <div class="chart"><svg id="s6b" role="img" aria-label="Binomial bars with the normal curve and the continuity-corrected area shaded"></svg></div>
+      <div class="formula live" id="r6f"></div>
+      <div class="readouts">
+        <div class="ro good"><div class="k">Exact binomial</div><div class="v" id="r6ex"></div></div>
+        <div class="ro key"><div class="k">With correction</div><div class="v" id="r6cc"></div></div>
+        <div class="ro bad"><div class="k">No correction</div><div class="v" id="r6nc"></div></div>
+        <div class="ro"><div class="k">np, n(1 − p)</div><div class="v" id="r6chk"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="exercises">
+    <div class="ex">
+      <span class="tag">Exercise 6a · one item vs a mean</span>
+      <p>Fill volume X has mean 500 mL, SD 10 mL.</p>
+      <ol><li>Find P(one bottle &gt; 502 mL), assuming X is normal.</li><li>Find P(mean of 25 bottles &gt; 502 mL).</li><li>Which answer needs X to be normal, and which does not (approximately)?</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a6a">Show answer</button>
+      <div class="ans" id="a6a" hidden><ol><li><span class="rule">Rule · one item: z = (x − μ)/σ.</span><span class="ln">z = (502 − 500)/10 = 0.2</span><span class="ln">P = 1 − Φ(0.2) = 1 − 0.5793 = 0.421</span></li><li><span class="rule">Rule · mean of n: E[X̄] = μ and SD(X̄) = σ/√n, so z = (x̄ − μ)/(σ/√n).</span><span class="ln">SE = 10/√25 = 2</span><span class="ln">z = (502 − 500)/2 = 1</span><span class="ln">P = 1 − Φ(1) = 1 − 0.8413 = 0.159</span></li><li><span class="rule">Rule · X normal ⇒ X̄ exactly normal for any n; CLT ⇒ X̄ approximately normal for large n whatever the shape of X.</span><span class="ln">(1) needs X normal.</span><span class="ln">(2) is approximately right by the CLT even if X is not normal.</span></li></ol></div>
+    </div>
+    <div class="ex">
+      <span class="tag">Exercise 6b · continuity correction</span>
+      <p>X ~ Binomial(100, 0.2). (The instrument's starting values.)</p>
+      <ol><li>Check the normal approximation is valid and give its mean and SD.</li><li>Approximate P(X ≤ 15) and P(X = 20).</li><li>Write the corrected event for P(X &gt; 24).</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a6b">Show answer</button>
+      <div class="ans" id="a6b" hidden><ol><li><span class="rule">Rule · normal approximation is valid when np ≥ 5 and n(1 − p) ≥ 5; then μ = np and σ = √(np(1 − p)).</span><span class="ln">np = 100(0.2) = 20 ≥ 5</span><span class="ln">n(1 − p) = 100(0.8) = 80 ≥ 5</span><span class="ln">μ = 20</span><span class="ln">σ = √(100 × 0.2 × 0.8) = √16 = 4</span></li><li><span class="rule">Rule · continuity correction: P(X ≤ k) ≈ P(Y &lt; k + 0.5); P(X = k) ≈ P(k − 0.5 &lt; Y &lt; k + 0.5).</span><span class="ln">P(X ≤ 15) ≈ Φ((15.5 − 20)/4) = Φ(−1.125) = 0.130 (exact 0.1285)</span><span class="ln">P(X = 20) ≈ Φ((20.5 − 20)/4) − Φ((19.5 − 20)/4)</span><span class="ln">= Φ(0.125) − Φ(−0.125) = 0.5497 − 0.4503</span><span class="ln">= 0.0995 (exact 0.0993)</span></li><li><span class="rule">Rule · rewrite a strict inequality as an integer event first, then correct: P(X ≥ k) ≈ P(Y &gt; k − 0.5).</span><span class="ln">X &gt; 24 ⇔ X ≥ 25</span><span class="ln">P(X ≥ 25) ≈ P(Y &gt; 24.5)</span></li></ol></div>
+    </div>
+    <div class="ex">
+      <span class="tag">Exercise 6c · confidence interval</span>
+      <p>n = 25 resistors give x̄ = 50.2 Ω; σ = 1.0 Ω is known.</p>
+      <ol><li>Find the 95% two-sided CI for μ.</li><li>Find the 95% lower confidence bound.</li><li>How many resistors give a margin of error of 0.25 Ω at 95%?</li><li>Critique: "There is a 95% probability that μ lies in this interval."</li></ol>
+      <button type="button" class="btn ghost small" data-rev="a6c">Show answer</button>
+      <div class="ans" id="a6c" hidden><ol><li><span class="rule">Rule · two-sided CI: x̄ ± z<sub>α/2</sub> σ/√n, with z<sub>0.025</sub> = 1.96 for 95%.</span><span class="ln">SE = 1.0/√25 = 0.2</span><span class="ln">Margin = 1.96 × 0.2 = 0.392</span><span class="ln">CI = 50.2 ± 0.392 = (49.81, 50.59) Ω</span></li><li><span class="rule">Rule · one-sided lower bound: x̄ − z<sub>α</sub> σ/√n, with z<sub>0.05</sub> = 1.645 (all of α in one tail).</span><span class="ln">Bound = 50.2 − 1.645 × 0.2</span><span class="ln">= 50.2 − 0.329 = 49.87 Ω</span></li><li><span class="rule">Rule · margin E = z<sub>α/2</sub> σ/√n, so n = (z<sub>α/2</sub> σ/E)², always rounded up.</span><span class="ln">n = (1.96 × 1.0/0.25)²</span><span class="ln">= 7.84² = 61.47</span><span class="ln">→ 62 resistors</span></li><li><span class="rule">Rule · confidence describes the procedure: in repeated sampling, 95% of intervals built this way contain μ.</span><span class="ln">After sampling, μ is either in (49.81, 50.59) or not.</span><span class="ln">The 95% belongs to the method, not to this one interval.</span></li></ol></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHECKLIST ============ -->
+<section class="station" id="b7">
+  <div class="head">
+    <span class="eyebrow">Close · 1 minute</span>
+    <h2>Last-minute checklist</h2>
+  </div>
+  <div class="checklist">
+    <label><input type="checkbox" id="c1"><span>Define the random variable in words before writing a formula.</span></label>
+    <label><input type="checkbox" id="c2"><span>Check the assumptions: independence, fixed n, constant p or rate, replacement.</span></label>
+    <label><input type="checkbox" id="c3"><span>Translate wording ("at least", "more than") into ≤ or ≥ before using a table.</span></label>
+    <label><input type="checkbox" id="c4"><span>Match units: λ for the right window, variance vs SD in N(μ, σ²).</span></label>
+    <label><input type="checkbox" id="c5"><span>One item or a mean? Use σ or σ/√n accordingly.</span></label>
+    <label><input type="checkbox" id="c6"><span>Add variances, not SDs, and never subtract them.</span></label>
+    <label><input type="checkbox" id="c7"><span>State a CI with its parameter, level, units and assumptions.</span></label>
+  </div>
+</section>
+
+<!-- ============ DISTRIBUTIONS ============ -->
+<section class="station" id="b8">
+  <div class="head">
+    <span class="eyebrow">Reference · L7–L13</span>
+    <h2>Distributions covered: use, formulas and assumptions</h2>
+    <p>Each card lists what the model is for, its mean and variance, every assumption you must check before using it, and the words in a question that usually point to it. A model only applies if all its assumptions hold.</p>
+  </div>
+
+  <div class="grouphead"><span class="eyebrow">Discrete · counts</span><h3>Counting successes or events</h3></div>
+  <div class="dists">
+    <div class="dist">
+      <div class="top"><h3>Bernoulli(<i>p</i>)</h3><span class="kind">one trial</span></div>
+      <div class="blk"><span class="k">Good for</span><span>A single yes/no outcome: one part is defective or not. It is the building block of the binomial.</span></div>
+      <div class="fx"><i>P</i>(<i>X</i> = 1) = <i>p</i>, <i>P</i>(<i>X</i> = 0) = 1 − <i>p</i><br>Mean <i>p</i> · Var <i>p</i>(1 − <i>p</i>)</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Exactly two outcomes, coded 1 = success, 0 = failure.</li><li>Success is defined before computing; swapping it changes the mean, not the variance.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>a single item</span><span>pass or fail</span><span>indicator</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Binomial(<i>n</i>, <i>p</i>)</h3><span class="kind">successes in n trials</span></div>
+      <div class="blk"><span class="k">Good for</span><span>The number of successes in a fixed number of independent trials, such as passes out of 15 pressure tests.</span></div>
+      <div class="fx"><i>P</i>(<i>X</i> = <i>x</i>) = <i>C</i><span class="ss"><sup><i>n</i></sup><sub><i>x</i></sub></span> <i>p</i><sup><i>x</i></sup>(1 − <i>p</i>)<sup><i>n</i>−<i>x</i></sup>, &nbsp;<i>x</i> = 0,…,<i>n</i><br>Mean <i>np</i> · Var <i>np</i>(1 − <i>p</i>)</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Fixed number of trials <i>n</i>, set in advance.</li><li>Each trial has two outcomes.</li><li>Same <i>p</i> on every trial.</li><li>Trials are independent: sampling with replacement, or the sample is under 5% of the population.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>out of n</span><span>of the 20 tested, how many</span><span>with replacement</span><span>independent trials</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Hypergeometric(<i>N</i>, <i>M</i>, <i>n</i>)</h3><span class="kind">without replacement</span></div>
+      <div class="blk"><span class="k">Good for</span><span>Successes in <i>n</i> draws from a small, finite lot of <i>N</i> items that holds <i>M</i> successes.</span></div>
+      <div class="fx"><i>P</i>(<i>X</i> = <i>x</i>) = <span class="frac"><span><i>C</i><span class="ss"><sup><i>M</i></sup><sub><i>x</i></sub></span> · <i>C</i><span class="ss"><sup><i>N</i>−<i>M</i></sup><sub><i>n</i>−<i>x</i></sub></span></span><span><i>C</i><span class="ss"><sup><i>N</i></sup><sub><i>n</i></sub></span></span></span><br>Mean <i>n</i><span class="frac"><span><i>M</i></span><span><i>N</i></span></span> · Var <i>n</i><span class="frac"><span><i>M</i></span><span><i>N</i></span></span>(1 − <span class="frac"><span><i>M</i></span><span><i>N</i></span></span>)<span class="frac"><span><i>N</i> − <i>n</i></span><span><i>N</i> − 1</span></span></div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Finite population of known size <i>N</i> containing exactly <i>M</i> successes.</li><li>Draws without replacement, so trials are dependent.</li><li>Every subset of size <i>n</i> is equally likely (a random sample).</li><li>When <i>n</i>/<i>N</i> &lt; 0.05 it is close to Binomial(<i>n</i>, <i>M</i>/<i>N</i>).</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>from a box of N</span><span>without replacement</span><span>a lot of 20 containing 6</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Poisson(λ)</h3><span class="kind">events in an interval</span></div>
+      <div class="blk"><span class="k">Good for</span><span>The number of events in a fixed window of time, length, area or volume: calls per hour, flaws per metre. It also approximates Binomial(<i>n</i>, <i>p</i>) when <i>n</i> is large and <i>p</i> small, with λ = <i>np</i>.</span></div>
+      <div class="fx"><i>P</i>(<i>X</i> = <i>x</i>) = <span class="frac"><span><i>e</i><sup>−λ</sup>λ<sup><i>x</i></sup></span><span><i>x</i>!</span></span>, &nbsp;<i>x</i> = 0, 1, 2, …<br>Mean λ · Var λ</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Events occur one at a time and independently of each other.</li><li>The rate is constant over the window.</li><li>Counts in non-overlapping windows are independent.</li><li>λ is the mean for this window: rescale the rate to the window's length.</li><li>No upper limit on the count; there is no fixed <i>n</i>.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>per hour</span><span>per metre</span><span>on average 3 per</span><span>rate</span><span>rare events</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Geometric(<i>p</i>)</h3><span class="kind">trials to 1st success</span></div>
+      <div class="blk"><span class="k">Good for</span><span>How many trials it takes to get the first success, such as inspecting welds until the first crack.</span></div>
+      <div class="fx"><i>P</i>(<i>X</i> = <i>x</i>) = (1 − <i>p</i>)<sup><i>x</i>−1</sup><i>p</i>, &nbsp;<i>x</i> = 1, 2, …<br>Mean <span class="frac"><span>1</span><span><i>p</i></span></span> · Var <span class="frac"><span>1 − <i>p</i></span><span><i>p</i>²</span></span></div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Independent trials with two outcomes.</li><li>Same <i>p</i> on every trial.</li><li>Stops at the first success, so the number of trials is random, not fixed.</li><li>X counts trials including the success. If X counts failures before it, subtract 1.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>until the first</span><span>first defect on the 5th</span><span>how many tries</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Negative binomial(<i>r</i>, <i>p</i>)</h3><span class="kind">trials to r-th success</span></div>
+      <div class="blk"><span class="k">Good for</span><span>How many trials it takes to reach the <i>r</i>-th success, such as testing units until the 3rd failure.</span></div>
+      <div class="fx"><i>P</i>(<i>X</i> = <i>x</i>) = <i>C</i><span class="ss"><sup><i>x</i>−1</sup><sub><i>r</i>−1</sub></span> <i>p</i><sup><i>r</i></sup>(1 − <i>p</i>)<sup><i>x</i>−<i>r</i></sup>, &nbsp;<i>x</i> = <i>r</i>, <i>r</i> + 1, …<br>Mean <span class="frac"><span><i>r</i></span><span><i>p</i></span></span> · Var <span class="frac"><span><i>r</i>(1 − <i>p</i>)</span><span><i>p</i>²</span></span></div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Independent trials with two outcomes and the same <i>p</i>.</li><li>The number of successes <i>r</i> is fixed; the number of trials is random.</li><li>The last trial is a success, which is why the coefficient is <i>C</i><span class="ss"><sup><i>x</i>−1</sup><sub><i>r</i>−1</sub></span>.</li><li>X counts trials. If it counts failures, use X − r.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>until the 3rd</span><span>r-th success</span><span>how many tested to find 2</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Multinomial(<i>n</i>; <i>p</i>₁,…,<i>p<sub>k</sub></i>)</h3><span class="kind">k categories</span></div>
+      <div class="blk"><span class="k">Good for</span><span>Counts in each of <i>k</i> categories over <i>n</i> trials, such as good, minor defect and major defect.</span></div>
+      <div class="fx"><i>P</i> = <span class="frac"><span><i>n</i>!</span><span><i>x</i>₁!⋯<i>x<sub>k</sub></i>!</span></span> <i>p</i>₁<sup><i>x</i>₁</sup>⋯<i>p<sub>k</sub></i><sup><i>x<sub>k</sub></i></sup><br>Each <i>X<sub>i</sub></i> ~ Bin(<i>n</i>, <i>p<sub>i</sub></i>): mean <i>np<sub>i</sub></i>, Var <i>np<sub>i</sub></i>(1 − <i>p<sub>i</sub></i>)</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Fixed number of trials <i>n</i>.</li><li>Independent trials.</li><li>Every trial falls in exactly one of <i>k</i> categories with fixed probabilities that sum to 1.</li><li>The counts sum to <i>n</i>.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>three or more categories</span><span>how many of each type</span></div></div>
+    </div>
+  </div>
+
+  <div class="grouphead"><span class="eyebrow">Continuous · measurements and times</span><h3>Areas under a density</h3></div>
+  <div class="dists">
+    <div class="dist">
+      <div class="top"><h3>Normal N(μ, σ²)</h3><span class="kind">symmetric bell</span></div>
+      <div class="blk"><span class="k">Good for</span><span>Measurement error, dimensions, fill volumes; any sum or mean of many small independent effects.</span></div>
+      <div class="fx"><i>z</i> = <span class="frac"><span><i>x</i> − μ</span><span>σ</span></span>, &nbsp; <i>P</i>(<i>X</i> ≤ <i>x</i>) = Φ(<i>z</i>), &nbsp; <i>x</i> = μ + <i>z</i>σ<br>Mean μ · Var σ²</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Data are unimodal and roughly symmetric (check a Q-Q plot: points near a straight line).</li><li>The second parameter is the variance: N(25, 0.04) has σ = 0.2.</li><li>aX + b is normal; sums and differences of independent normals are normal, with variances adding.</li><li>P(X = c) = 0, so &lt; and ≤ give the same answer.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>normally distributed</span><span>bell-shaped</span><span>percentile</span><span>exceeded by only 5%</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Lognormal</h3><span class="kind">ln X is normal</span></div>
+      <div class="blk"><span class="k">Good for</span><span>Positive, right-skewed quantities: particle sizes, concentrations, some lifetimes.</span></div>
+      <div class="fx">ln <i>X</i> ~ N(μ, σ²), &nbsp; <i>P</i>(<i>X</i> ≤ <i>x</i>) = Φ(<span class="frac"><span>ln <i>x</i> − μ</span><span>σ</span></span>)<br>Median <i>e</i><sup>μ</sup> · Mean <i>e</i><sup>μ+σ²/2</sup> · Var <i>e</i><sup>2μ+σ²</sup>(<i>e</i><sup>σ²</sup> − 1)</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>X &gt; 0.</li><li>ln X, not X, is normal.</li><li>μ and σ are the mean and SD of ln X, not of X. Take ln of the cut-off before standardizing.</li><li>Mean &gt; median because of the long right tail.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>the logarithm of X is normal</span><span>right-skewed, positive</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Exponential(λ)</h3><span class="kind">waiting time</span></div>
+      <div class="blk"><span class="k">Good for</span><span>Time until the next event in a Poisson process; lifetime of a part with a constant failure rate.</span></div>
+      <div class="fx"><i>f</i>(<i>t</i>) = λ<i>e</i><sup>−λ<i>t</i></sup>, &nbsp; <i>P</i>(<i>T</i> ≤ <i>t</i>) = 1 − <i>e</i><sup>−λ<i>t</i></sup>, &nbsp; <i>P</i>(<i>T</i> &gt; <i>t</i>) = <i>e</i><sup>−λ<i>t</i></sup><br>Mean <span class="frac"><span>1</span><span>λ</span></span> · Var <span class="frac"><span>1</span><span>λ²</span></span> · Median <span class="frac"><span>ln 2</span><span>λ</span></span></div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Events follow a Poisson process: constant rate, independent occurrences.</li><li>Memoryless: no wear-out, so time already waited does not change the remaining wait.</li><li>λ is a rate in 1/time. A mean wait of 4 h means λ = 1/4 per hour.</li><li>t ≥ 0.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>time until</span><span>waiting time</span><span>lifetime</span><span>mean time between failures</span><span>already waited</span></div></div>
+    </div>
+  </div>
+
+  <div class="grouphead"><span class="eyebrow">Sampling and approximations</span><h3>Distributions of statistics</h3></div>
+  <div class="dists">
+    <div class="dist">
+      <div class="top"><h3>Sample mean X̄ (CLT)</h3><span class="kind">mean of n</span></div>
+      <div class="blk"><span class="k">Good for</span><span>Probabilities about an average or total of <i>n</i> items, and the basis for confidence intervals.</span></div>
+      <div class="fx"><span class="ov">X</span> ≈ N(μ, σ²/<i>n</i>), &nbsp; SE = σ/√<i>n</i><br>Total Σ<i>X<sub>i</sub></i> ≈ N(<i>n</i>μ, <i>n</i>σ²)</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>A random sample of independent, identically distributed (iid) observations.</li><li>Exactly normal if X is normal; otherwise approximately normal for large <i>n</i>. More skew needs a larger <i>n</i>.</li><li>Independence is what gives σ²/<i>n</i>. Dependent data make this SE wrong, and a larger <i>n</i> does not fix that.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>average of 25</span><span>sample mean</span><span>total of n</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Normal approx. to binomial</h3><span class="kind">large n</span></div>
+      <div class="blk"><span class="k">Good for</span><span>Binomial probabilities when <i>n</i> is too large to sum the PMF by hand.</span></div>
+      <div class="fx"><i>X</i> ≈ <i>Y</i> ~ N(<i>np</i>, <i>np</i>(1 − <i>p</i>))<br><i>P</i>(<i>X</i> ≤ <i>k</i>) ≈ Φ(<span class="frac"><span><i>k</i> + 0.5 − <i>np</i></span><span>√(<i>np</i>(1 − <i>p</i>))</span></span>)</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>All binomial assumptions hold.</li><li><i>np</i> ≥ 5 and <i>n</i>(1 − <i>p</i>) ≥ 5.</li><li>Apply the ±0.5 continuity correction so each included integer's full bar is covered.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>approximately</span><span>use the normal approximation</span><span>n = 100 or more</span></div></div>
+    </div>
+    <div class="dist">
+      <div class="top"><h3>Confidence interval for μ</h3><span class="kind">z interval</span></div>
+      <div class="blk"><span class="k">Good for</span><span>A range of plausible values for the population mean, with a stated confidence level.</span></div>
+      <div class="fx"><span class="ov">x</span> ± <i>z</i><sub>α/2</sub> σ/√<i>n</i> &nbsp;(two-sided) · <span class="ov">x</span> − <i>z</i><sub>α</sub> σ/√<i>n</i> &nbsp;(lower bound)<br><i>n</i> = (<i>z</i>σ/<i>E</i>)², rounded up</div>
+      <div class="blk"><span class="k">Assumptions</span><ul><li>Random, representative sample of independent observations.</li><li>σ known, or <i>n</i> large enough to use <i>s</i> in its place.</li><li>X̄ is normal: X normal, or <i>n</i> large (CLT).</li><li>The confidence level describes the method, not one interval.</li></ul></div>
+      <div class="blk"><span class="k">Cue words</span><div class="cues"><span>95% confident</span><span>margin of error</span><span>upper bound</span><span>how many samples</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KEY WORDS ============ -->
+<section class="station" id="b9">
+  <div class="head">
+    <span class="eyebrow">Reference · reading the question</span>
+    <h2>Key words and what they mean</h2>
+    <p>Most lost marks start with a misread phrase. Translate each phrase into an event or formula before calculating. The inequalities assume a whole-number count; for a continuous variable, &lt; and ≤ give the same probability.</p>
+  </div>
+  <div class="filter"><label for="gq" class="muted" style="font-size:.88rem">Filter</label><input type="search" id="gq" placeholder="Try: least, given, mean, rate"><span class="muted" id="gcount" style="font-size:.85rem"></span></div>
+  <div class="tbl"><table class="gloss" id="gloss">
+    <thead><tr><th>Words in the question</th><th>What it means</th><th>Write it as</th></tr></thead>
+    <tbody>
+      <tr class="grp"><th colspan="3">Counting inequalities</th></tr>
+      <tr><td>at least k</td><td>k or more</td><td>P(X ≥ k) = 1 − P(X ≤ k−1)</td></tr>
+      <tr><td>at most k · no more than k · not more than k</td><td>k or fewer</td><td>P(X ≤ k)</td></tr>
+      <tr><td>more than k · exceeds k · greater than k</td><td>strictly above k</td><td>P(X ≥ k+1) = 1 − P(X ≤ k)</td></tr>
+      <tr><td>fewer than k · less than k</td><td>strictly below k</td><td>P(X ≤ k−1)</td></tr>
+      <tr><td>no fewer than k · not less than k</td><td>same as at least k</td><td>1 − P(X ≤ k−1)</td></tr>
+      <tr><td>between a and b</td><td>inclusive unless the question says strictly</td><td>P(X ≤ b) − P(X ≤ a−1)</td></tr>
+      <tr><td>exactly k</td><td>one value; 0 for a continuous variable</td><td>P(X ≤ k) − P(X ≤ k−1)</td></tr>
+      <tr><td>none</td><td>zero successes</td><td>P(X = 0)</td></tr>
+      <tr><td>at least one</td><td>the complement of none</td><td>1 − P(X = 0)</td></tr>
+      <tr><td>all</td><td>every trial a success</td><td>P(X = n)</td></tr>
+
+      <tr class="grp"><th colspan="3">Combining events</th></tr>
+      <tr><td>and · both</td><td>intersection</td><td>P(A ∩ B)</td></tr>
+      <tr><td>or · either</td><td>union; includes both</td><td>P(A) + P(B) − P(A ∩ B)</td></tr>
+      <tr><td>exactly one of</td><td>one but not the other</td><td>P(A ∪ B) − P(A ∩ B)</td></tr>
+      <tr><td>neither</td><td>not A and not B</td><td>1 − P(A ∪ B)</td></tr>
+      <tr><td>not · fails to</td><td>complement</td><td>1 − P(A)</td></tr>
+      <tr><td>given that · if · among those that · of the parts that</td><td>conditional: the condition goes after the bar and becomes the new reference group</td><td>P(A | B) = P(A ∩ B)/P(B)</td></tr>
+      <tr><td>what fraction of flagged parts are defective</td><td>condition on flagged, not on defective</td><td>P(D | F), not P(F | D)</td></tr>
+      <tr><td>independent</td><td>one event gives no information about the other</td><td>P(A ∩ B) = P(A)P(B)</td></tr>
+      <tr><td>mutually exclusive · disjoint · cannot both</td><td>never happen together; dependent if both have positive probability</td><td>P(A ∩ B) = 0</td></tr>
+      <tr><td>comes from line 1, 2 or 3 · produced by supplier</td><td>a partition: use total probability, then Bayes</td><td>P(F) = Σ P(F | Lᵢ)P(Lᵢ)</td></tr>
+
+      <tr class="grp"><th colspan="3">Sampling and counting</th></tr>
+      <tr><td>arrange · order · assign roles · president and VP</td><td>order matters</td><td><i>P</i><span class="ss"><sup>n</sup><sub>k</sub></span> = n!/(n−k)!</td></tr>
+      <tr><td>select · choose · committee · group · sample of</td><td>order does not matter</td><td><i>C</i><span class="ss"><sup>n</sup><sub>k</sub></span> = n!/(k!(n−k)!)</td></tr>
+      <tr><td>with replacement</td><td>draws independent, p constant</td><td>binomial</td></tr>
+      <tr><td>without replacement</td><td>draws dependent, p changes</td><td>hypergeometric (binomial if n/N &lt; 0.05)</td></tr>
+      <tr><td>at random · randomly selected</td><td>every item equally likely to be chosen</td><td>equally likely outcomes</td></tr>
+
+      <tr class="grp"><th colspan="3">Rates, waiting and models</th></tr>
+      <tr><td>on average 4 per hour · rate</td><td>Poisson mean for that window; rescale to the window asked</td><td>λ = rate × window length</td></tr>
+      <tr><td>mean time between failures is 4 h</td><td>exponential mean, so the rate is its reciprocal</td><td>λ = 1/4 per hour</td></tr>
+      <tr><td>until the first</td><td>geometric</td><td>(1 − p)^(x−1) p</td></tr>
+      <tr><td>until the r-th</td><td>negative binomial</td><td><i>C</i><span class="ss"><sup>x−1</sup><sub>r−1</sub></span> p<sup>r</sup> (1−p)<sup>x−r</sup></td></tr>
+      <tr><td>lasts longer than t · survives past t · reliability</td><td>upper tail</td><td>P(T &gt; t) = e^(−λt)</td></tr>
+      <tr><td>fails within t · by time t</td><td>CDF</td><td>P(T ≤ t) = 1 − e^(−λt)</td></tr>
+      <tr><td>has already run s · given it has lasted s</td><td>memorylessness: only the additional time counts</td><td>P(T &gt; s+t | T &gt; s) = P(T &gt; t)</td></tr>
+
+      <tr class="grp"><th colspan="3">Normal and lognormal</th></tr>
+      <tr><td>N(μ, σ²)</td><td>the second number is the variance</td><td>σ = √(second number)</td></tr>
+      <tr><td>proportion of items · percent of rods</td><td>probability for one item</td><td>P(a &lt; X &lt; b)</td></tr>
+      <tr><td>percentile · value exceeded by only 5% · cut-off below which 90% fall</td><td>inverse problem: area first, then x</td><td>x = μ + zσ</td></tr>
+      <tr><td>the logarithm of X is normal · lognormal</td><td>parameters describe ln X</td><td>z = (ln x − μ)/σ</td></tr>
+
+      <tr class="grp"><th colspan="3">Combining variables</th></tr>
+      <tr><td>difference · clearance · gap</td><td>Y − X; variances still add</td><td>Var = σ_X² + σ_Y²</td></tr>
+      <tr><td>total · sum · stacked end to end</td><td>sum of independent variables</td><td>mean Σμᵢ, Var Σσᵢ²</td></tr>
+      <tr><td>twice the length of one part</td><td>one variable scaled</td><td>Var(2X) = 4σ²</td></tr>
+      <tr><td>two parts</td><td>two independent copies</td><td>Var(X₁ + X₂) = 2σ²</td></tr>
+      <tr><td>uncorrelated · covariance zero</td><td>no linear relationship; does not prove independence</td><td>Cov(X, Y) = 0</td></tr>
+
+      <tr class="grp"><th colspan="3">Sample means and inference</th></tr>
+      <tr><td>a single item · one randomly chosen bottle</td><td>spread of individuals</td><td>z = (x − μ)/σ</td></tr>
+      <tr><td>the mean of n · average of a sample</td><td>spread of sample means</td><td>z = (x̄ − μ)/(σ/√n)</td></tr>
+      <tr><td>standard error is given</td><td>already divided by √n; do not divide again</td><td>use SE as is</td></tr>
+      <tr><td>sample standard deviation s</td><td>describes individuals</td><td>SE = s/√n</td></tr>
+      <tr><td>approximately (for a count)</td><td>normal approximation with continuity correction</td><td>N(np, np(1−p)), ±0.5</td></tr>
+      <tr><td>95% confidence interval · two-sided</td><td>split α between both tails</td><td>z = 1.96</td></tr>
+      <tr><td>upper bound · lower bound · at least / at most with 95% confidence</td><td>one-sided: all of α in one tail</td><td>z = 1.645</td></tr>
+      <tr><td>margin of error E · within E of the true mean</td><td>half-width of the interval</td><td>E = zσ/√n</td></tr>
+      <tr><td>width of the interval</td><td>the full width, twice the margin</td><td>W = 2E</td></tr>
+      <tr><td>how many samples are needed</td><td>solve for n and round up</td><td>n = (zσ/E)²</td></tr>
+      <tr><td>95% confident</td><td>95% of intervals built this way contain μ; not a probability about this one interval</td><td>report: parameter, interval, level, units</td></tr>
+      <tr><td>statistic vs parameter</td><td>computed from the sample vs a fixed population value</td><td>x̄, s, p̂ vs μ, σ, p</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const NS='http://www.w3.org/2000/svg';
+function mk(tag,a,p){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function txt(p,x,y,s,cls,anchor){const t=mk('text',{x:x,y:y,class:cls||'','text-anchor':anchor||'middle'},p);t.textContent=s;return t}
+function frame(svg,W,H){svg.setAttribute('viewBox','0 0 '+W+' '+H);while(svg.firstChild)svg.removeChild(svg.firstChild);return svg}
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+const npdf=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+const LF=[0];for(let i=1;i<=400;i++)LF[i]=LF[i-1]+Math.log(i);
+function bpmf(n,p,k){if(k<0||k>n)return 0;return Math.exp(LF[n]-LF[k]-LF[n-k]+k*Math.log(p)+(n-k)*Math.log(1-p))}
+function bcdf(n,p,k){if(k<0)return 0;if(k>=n)return 1;let s=0;for(let i=0;i<=k;i++)s+=bpmf(n,p,i);return Math.min(1,s)}
+const f4=v=>v.toFixed(4);
+function nice(lo,hi,n){const span=hi-lo;const s0=span/n;const mag=Math.pow(10,Math.floor(Math.log10(s0)));const e=s0/mag;const step=(e>=7.5?10:e>=3.5?5:e>=1.5?2:1)*mag;const out=[];for(let v=Math.ceil(lo/step-1e-9)*step;v<=hi+1e-9;v+=step)out.push(+v.toFixed(10));return {out:out,step:step}}
+function tlab(v,step){const d=Math.max(0,-Math.floor(Math.log10(step)+1e-9));return v.toFixed(d)}
+function axis(g,lo,hi,X,y,n){mk('line',{x1:X(lo),x2:X(hi),y1:y,y2:y,class:'ax'},g);const t=nice(lo,hi,n||6);t.out.forEach(v=>{mk('line',{x1:X(v),x2:X(v),y1:y,y2:y+4,class:'ax'},g);txt(g,X(v),y+16,tlab(v,t.step))})}
+function curve(f,lo,hi,X,Y,N){let d='';for(let i=0;i<=N;i++){const v=lo+(hi-lo)*i/N;d+=(i?'L':'M')+X(v).toFixed(1)+','+Y(f(v)).toFixed(1)}return d}
+function area(f,a,b,X,Y,N,base){if(b<=a)return '';let d='M'+X(a).toFixed(1)+','+base;for(let i=0;i<=N;i++){const v=a+(b-a)*i/N;d+='L'+X(v).toFixed(1)+','+Y(f(v)).toFixed(1)}return d+'L'+X(b).toFixed(1)+','+base+'Z'}
+function lin(lo,hi,a,b){return v=>a+(v-lo)/(hi-lo)*(b-a)}
+function segVal(id){return $(id).querySelector('[aria-pressed=true]').dataset.v}
+function seg(id,cb){$(id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$(id).querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));cb()})}
+function out(id,v){$(id).textContent=v}
+
+/* ---------- reveals ---------- */
+document.querySelectorAll('[data-rev]').forEach(b=>{b.setAttribute('aria-expanded','false');b.addEventListener('click',()=>{const t=$(b.dataset.rev);t.hidden=!t.hidden;b.setAttribute('aria-expanded',String(!t.hidden));b.textContent=t.hidden?'Show answer':'Hide answer'})});
+$('revealAll').addEventListener('click',()=>{const on=$('revealAll').getAttribute('aria-pressed')!=='true';$('revealAll').setAttribute('aria-pressed',String(on));$('revealAll').textContent=on?'Hide all answers':'Show all answers';document.querySelectorAll('[data-rev]').forEach(b=>{$(b.dataset.rev).hidden=!on;b.setAttribute('aria-expanded',String(on));b.textContent=on?'Hide answer':'Show answer'})});
+
+/* ---------- Block 1 ---------- */
+const D1='2, 4, 5, 7, 8, 9, 11, 12, 15, 40';
+function posVal(x,L){const n=x.length;if(L<=1)return x[0];if(L>=n)return x[n-1];const f=Math.floor(L+1e-9);if(Math.abs(L-f)<1e-9)return x[f-1];return (x[f-1]+x[f])/2}
+function fmtN(v){return Number.isInteger(v)?String(v):(+v.toFixed(3)).toString()}
+function posStep(x,p,name){const n=x.length,L=p*(n+1);const f=Math.floor(L+1e-9);let s=name+': L = '+p+'('+n+' + 1) = '+(+L.toFixed(3));if(L<=1)s+=' → below 1, use x(1) = '+fmtN(x[0]);else if(L>=n)s+=' → beyond n, use x('+n+') = '+fmtN(x[n-1]);else if(Math.abs(L-f)<1e-9)s+=' → x('+f+') = '+fmtN(x[f-1]);else s+=' → average x('+f+') and x('+(f+1)+') = ('+fmtN(x[f-1])+' + '+fmtN(x[f])+')/2 = '+fmtN((x[f-1]+x[f])/2);return s}
+function w1(){
+  const x=$('d1').value.split(/[\s,;]+/).filter(s=>s.trim()!=='').map(Number).filter(Number.isFinite).sort((a,b)=>a-b);
+  const svg=frame($('s1'),900,170);
+  if(x.length<3){out('r1steps','');$('r1steps').textContent='Enter at least three numbers.';['r1n','r1med','r1mean','r1iqr','r1rng','r1s','r1fen','r1wh','r1out'].forEach(i=>out(i,'–'));return}
+  const n=x.length,mean=x.reduce((a,b)=>a+b,0)/n,s=Math.sqrt(x.reduce((a,b)=>a+(b-mean)**2,0)/(n-1));
+  const med=posVal(x,.5*(n+1)),q1=posVal(x,.25*(n+1)),q3=posVal(x,.75*(n+1));
+  const iqr=q3-q1,lf=q1-1.5*iqr,uf=q3+1.5*iqr,inside=x.filter(v=>v>=lf&&v<=uf),wlo=inside[0],whi=inside[inside.length-1],outs=x.filter(v=>v<lf||v>uf);
+  out('r1n',n);out('r1med',fmtN(med));out('r1mean',fmtN(mean));out('r1iqr',fmtN(iqr));out('r1rng',fmtN(x[n-1]-x[0]));out('r1s',s.toFixed(3));
+  out('r1fen',fmtN(lf)+' , '+fmtN(uf));out('r1wh',fmtN(wlo)+' to '+fmtN(whi));out('r1out',outs.length?outs.map(fmtN).join(', '):'none');
+  const st=$('r1steps');st.innerHTML='';[posStep(x,.25,'Q1'),posStep(x,.5,'Median'),posStep(x,.75,'Q3'),
+    'IQR = Q3 − Q1 = '+fmtN(q3)+' − '+fmtN(q1)+' = '+fmtN(iqr),
+    'Lower fence = Q1 − 1.5 × IQR = '+fmtN(q1)+' − 1.5 × '+fmtN(iqr)+' = '+fmtN(lf),
+    'Upper fence = Q3 + 1.5 × IQR = '+fmtN(q3)+' + 1.5 × '+fmtN(iqr)+' = '+fmtN(uf),
+    'Lower whisker → smallest value ≥ '+fmtN(lf)+' = '+fmtN(wlo),
+    'Upper whisker → largest value ≤ '+fmtN(uf)+' = '+fmtN(whi),
+    'Outliers (outside the fences): '+(outs.length?outs.map(fmtN).join(', '):'none')].forEach(t=>{const d=document.createElement('div');d.textContent=t;st.appendChild(d)});
+  const sk=document.createElement('div');const diff=mean-med;sk.textContent=Math.abs(diff)<0.05*(x[n-1]-x[0]||1)?'Mean ≈ median: roughly symmetric.':(diff>0?'Mean > median: a right tail is pulling the mean up.':'Mean < median: a left tail is pulling the mean down.');sk.style.color='var(--hi)';st.appendChild(sk);
+  const lo=Math.min(x[0],lf),hi=Math.max(x[n-1],uf),pad=(hi-lo||1)*0.04;const X=lin(lo-pad,hi+pad,30,870);
+  const cnt={};x.forEach(v=>{cnt[v]=(cnt[v]||0)+1;mk('circle',{cx:X(v),cy:56-(cnt[v]-1)*9,r:4,class:'dot'},svg)});
+  [[lf,'fence '],[uf,'fence ']].forEach(([v,l])=>{if(v>=lo-pad&&v<=hi+pad){mk('line',{x1:X(v),x2:X(v),y1:84,y2:122,class:'vl soft'},svg);txt(svg,X(v),132,l+fmtN(v))}});
+  mk('line',{x1:X(wlo),x2:X(q1),y1:102,y2:102,class:'wh'},svg);mk('line',{x1:X(q3),x2:X(whi),y1:102,y2:102,class:'wh'},svg);
+  mk('line',{x1:X(wlo),x2:X(wlo),y1:94,y2:110,class:'wh'},svg);mk('line',{x1:X(whi),x2:X(whi),y1:94,y2:110,class:'wh'},svg);
+  outs.forEach(v=>mk('circle',{cx:X(v),cy:102,r:4.5,class:'outl'},svg));
+  mk('rect',{x:X(q1),y:88,width:Math.max(1,X(q3)-X(q1)),height:28,class:'box'},svg);
+  mk('line',{x1:X(med),x2:X(med),y1:86,y2:118,class:'med'},svg);
+  const mx=X(mean);mk('path',{d:'M'+mx+',74 l-6,-10 h12 Z',class:'meanmk'},svg);
+  txt(svg,X(med),82,'median','lab hi');txt(svg,mx,60,'mean','lab c2');
+  axis(svg,lo-pad,hi+pad,X,138,10);
+}
+$('d1').addEventListener('input',w1);
+$('d1orig').addEventListener('click',()=>{$('d1').value=D1;w1()});
+$('d1big').addEventListener('click',()=>{$('d1').value='2, 4, 5, 7, 8, 9, 11, 12, 15, 400';w1()});
+
+/* ---------- Block 2 ---------- */
+function w2(){
+  const pD=+$('b2p').value/100,se=+$('b2s').value/100,fp=+$('b2f').value/100;
+  out('b2po',(+$('b2p').value)+'%');out('b2so',$('b2s').value+'%');out('b2fo',(+$('b2f').value)+'%');
+  const pF=pD*se+(1-pD)*fp;const pos=pF>0?pD*se/pF:0;const neg=(1-pF)>0?pD*(1-se)/(1-pF):0;
+  out('r2f',f4(pF));out('r2pos',f4(pos));out('r2neg',pos>0?neg.toFixed(5):f4(neg));
+  const D=Math.round(1000*pD),TP=Math.round(D*se),FN=D-TP,G=1000-D,FP=Math.round(G*fp),TN=G-FP;
+  $('r2txt').textContent='Of 1000 parts, about '+(TP+FP)+' are flagged, and only '+TP+' of those are actually defective.';
+  const svg=frame($('s2'),600,375);const cells=[].concat(Array(TP).fill('tp'),Array(FP).fill('fp'),Array(FN).fill('fn'),Array(TN).fill('tn'));
+  cells.forEach((c,i)=>{const col=i%40,row=Math.floor(i/40);mk('rect',{x:col*15,y:row*15,width:15,height:15,class:'cell '+c},svg)});
+}
+['b2p','b2s','b2f'].forEach(i=>$(i).addEventListener('input',w2));
+
+/* ---------- Block 3 ---------- */
+function w3(){
+  const g=+$('b3g').value,sx=+$('b3x').value,sy=+$('b3y').value;out('b3go',g.toFixed(3));out('b3xo',sx.toFixed(3));out('b3yo',sy.toFixed(3));
+  const sc=Math.sqrt(sx*sx+sy*sy),sw=Math.max(Math.abs(sy-sx),0.001);
+  out('r3m',g.toFixed(3)+' mm');out('r3s',sc.toFixed(4)+' mm');out('r3w',Math.abs(sy-sx).toFixed(4)+' mm');
+  out('r3p',f4(Phi(-g/sc)));out('r3pw',f4(Phi(-g/sw)));
+  const svg=frame($('s3'),640,250);const lo=-0.25,hi=0.45;const X=lin(lo,hi,30,610);const top=npdf(g,g,sc);const Y=v=>Math.max(14,220-v/top*190);
+  mk('path',{d:area(v=>npdf(v,g,sc),lo,0,X,Y,120,220),class:'shade hi'},svg);
+  mk('path',{d:curve(v=>npdf(v,g,sw),lo,hi,X,Y,400),class:'curve ghost'},svg);
+  mk('path',{d:curve(v=>npdf(v,g,sc),lo,hi,X,Y,300),class:'curve'},svg);
+  mk('line',{x1:X(0),x2:X(0),y1:20,y2:220,class:'vl hi'},svg);txt(svg,X(0)-6,32,'C = 0','lab hi','end');
+  txt(svg,X(g)+6,Y(npdf(g,g,sc))+14,'mean '+g.toFixed(2),'lab bar','start');
+  axis(svg,lo,hi,X,220,7);txt(svg,610,246,'clearance C (mm)','', 'end');
+}
+['b3g','b3x','b3y'].forEach(i=>$(i).addEventListener('input',w3));
+
+/* ---------- Block 3 numerical example ---------- */
+function w3z(){
+  const a=+$('z1s').value,b=+$('z2s').value;out('z1so',fmtN(a));out('z2so',fmtN(b));
+  const m1=10,m2=6,mz=m1-m2,rows=[];[m1-a,m1+a].forEach(x=>[m2-b,m2+b].forEach(y=>rows.push([x,y,x-y])));
+  const tb=$('zt').tBodies[0];tb.innerHTML='';
+  const combos=[[1,1],[1,-1],[-1,1],[-1,-1]].map(([u,v])=>{const x=m1+u*a,y=m2+v*b;return {u:u,v:v,z:x-y,txt:'('+fmtN(m1)+(u>0?' + ':' − ')+fmtN(a)+') − ('+fmtN(m2)+(v>0?' + ':' − ')+fmtN(b)+') = '+fmtN(x-y)}});
+  const zmin=mz-(a+b),zmax=mz+(a+b);
+  combos.forEach((c,k)=>{const tr=document.createElement('tr');if(c.u!==c.v)tr.className='ext';
+    const cell=(t,span,cls)=>{const td=document.createElement('td');td.innerHTML=t;if(span){td.rowSpan=span;td.className='span'}if(cls)td.classList.add(cls);tr.appendChild(td)};
+    if(k===0){cell(fmtN(m1),4);cell(fmtN(m1)+' + '+fmtN(a),4);cell(fmtN(m1)+' − '+fmtN(a),4);cell(fmtN(m2),4);cell(fmtN(m2)+' + '+fmtN(b),4);cell(fmtN(m2)+' − '+fmtN(b),4)}
+    cell(c.txt);
+    if(k===0)cell(fmtN(zmin)+' to '+fmtN(zmax)+'<br><span class="muted">'+fmtN(mz)+' ± ('+fmtN(a)+' + '+fmtN(b)+'), width '+fmtN(zmax-zmin)+'</span>',4);
+    tb.appendChild(tr)});
+  let ss=0;const devs=[],sq=[];combos.forEach(c=>{const d=c.z-mz;ss+=d*d;devs.push('('+fmtN(c.z)+' − '+fmtN(mz)+')²');sq.push(fmtN(d*d))});
+  const sd=Math.sqrt(ss/4);
+  $('zf').innerHTML='Var(<i>Z</i>) = ['+devs.join(' + ')+']/4 = ('+sq.join(' + ')+')/4 = '+fmtN(ss/4)+' = '+fmtN(a)+'² + '+fmtN(b)+'² &nbsp;⇒&nbsp; SD(<i>Z</i>) = √'+fmtN(ss/4)+' = '+fmtN(+sd.toFixed(3));
+  out('zmu',fmtN(mz));out('zsd',fmtN(+sd.toFixed(3)));out('zw',fmtN(Math.abs(a-b)));
+  const zs=rows.map(r=>r[2]);out('zr',fmtN(Math.min(...zs))+' to '+fmtN(Math.max(...zs)));
+  const all=rows.flat();const lo=Math.min(...all)-1,hi=Math.max(...all)+1;
+  const svg=frame($('s3z'),900,175);const X=lin(lo,hi,70,880);
+  const rowsY=[[30,'X₁','bar',[m1-a,m1+a],m1],[72,'X₂','c2',[m2-b,m2+b],m2],[114,'Z','hi',zs,mz]];
+  mk('rect',{x:X(mz-sd),y:100,width:X(mz+sd)-X(mz-sd),height:28,class:'zband'},svg);
+  const w=Math.abs(a-b);mk('line',{x1:X(mz-w),x2:X(mz+w),y1:134,y2:134,class:'ax','stroke-width':3,'stroke-dasharray':'5 3'},svg);
+  rowsY.forEach(([y,l,c,v,m])=>{txt(svg,10,y+4,l,'lab '+c,'start');mk('line',{x1:70,x2:880,y1:y,y2:y,class:'ax','stroke-opacity':.35},svg);mk('line',{x1:X(m),x2:X(m),y1:y-10,y2:y+10,class:'vl soft'},svg);v.forEach(t=>mk('circle',{cx:X(t),cy:y,r:6,class:'dot '+c},svg))});
+  axis(svg,lo,hi,X,152,10);
+}
+['z1s','z2s'].forEach(i=>$(i).addEventListener('input',w3z));
+
+/* ---------- Block 4 ---------- */
+function w4(){
+  const n=+$('b4n').value,p=+$('b4p').value;out('b4no',n);out('b4po',p.toFixed(2));
+  ['b4k','b4m'].forEach(i=>{$(i).max=n;if(+$(i).value>n)$(i).value=n});
+  let k=+$('b4k').value,m=+$('b4m').value;const ph=segVal('b4ph');$('b4mwrap').hidden=ph!=='between';
+  if(ph==='between'&&m<k){m=k;$('b4m').value=k}
+  out('b4ko',k);out('b4mo',m);
+  const C=j=>bcdf(n,p,j);let inSet,html,val;
+  const P='P(<i>X</i> ≤ ';
+  if(ph==='atmost'){inSet=j=>j<=k;val=C(k);html='at most '+k+' &nbsp;=&nbsp; '+P+k+') = '+f4(val)}
+  else if(ph==='fewer'){inSet=j=>j<k;val=C(k-1);html='fewer than '+k+' &nbsp;=&nbsp; '+P+(k-1)+') = '+f4(val)}
+  else if(ph==='atleast'){inSet=j=>j>=k;val=1-C(k-1);html='at least '+k+' &nbsp;=&nbsp; 1 − '+P+(k-1)+') = 1 − '+f4(C(k-1))+' = '+f4(val)}
+  else if(ph==='more'){inSet=j=>j>k;val=1-C(k);html='more than '+k+' &nbsp;=&nbsp; 1 − '+P+k+') = 1 − '+f4(C(k))+' = '+f4(val)}
+  else if(ph==='exactly'){inSet=j=>j===k;val=C(k)-C(k-1);html='exactly '+k+' &nbsp;=&nbsp; '+P+k+') − '+P+(k-1)+') = '+f4(C(k))+' − '+f4(C(k-1))+' = '+f4(val)}
+  else{inSet=j=>j>=k&&j<=m;val=C(m)-C(k-1);html=k+' to '+m+' inclusive &nbsp;=&nbsp; '+P+m+') − '+P+(k-1)+') = '+f4(C(m))+' − '+f4(C(k-1))+' = '+f4(val)}
+  $('r4f').innerHTML=html;
+  const svg=frame($('s4'),640,230);const X=lin(-0.5,n+0.5,30,610);let mx=0;for(let j=0;j<=n;j++)mx=Math.max(mx,bpmf(n,p,j));const Y=v=>200-v/mx*175;const bw=(X(1)-X(0))*0.86;
+  for(let j=0;j<=n;j++){const v=bpmf(n,p,j);mk('rect',{x:X(j)-bw/2,y:Y(v),width:bw,height:200-Y(v),class:'bar'+(inSet(j)?' on':'')},svg);if(n<=15||j%2===0)txt(svg,X(j),216,String(j))}
+  mk('line',{x1:30,x2:610,y1:200,y2:200,class:'ax'},svg);
+  txt(svg,600,20,'P = '+f4(val),'lab hi big','end');
+}
+['b4n','b4p','b4k','b4m'].forEach(i=>$(i).addEventListener('input',w4));seg('b4ph',w4);
+
+const QUIZ=[
+  ['Defective chips among 2000 shipped, defect rate 0.1%','Poisson',['Binomial','Poisson'],'Binomial(2000, 0.001) is exact; Poisson(λ = 2) approximates it well because n is large and p small. Either is acceptable.'],
+  ['Out-of-spec resistors when 5 are drawn without replacement from a box of 20 that holds 6','Hypergeometric',['Hypergeometric'],'Without replacement from a small population: 5 of 20 is 25%, far above 5%.'],
+  ['Welds inspected one at a time until the first crack; count welds inspected','Geometric',['Geometric'],'The number of successes is fixed at 1; the number of trials is random.'],
+  ['Customer calls arriving in a 10-minute window','Poisson',['Poisson'],'Events in a fixed interval at a constant rate, with no fixed number of trials.'],
+  ['Units tested until the 3rd failure','Negative binomial',['Negative binomial'],'Fixed number of successes r = 3, random number of trials.'],
+  ['50 items each graded good, minor defect or major defect; counts per grade','Multinomial',['Multinomial'],'Fixed n with more than two categories per trial.'],
+  ['15 independent pressure tests, each passes with probability 0.9; count passes','Binomial',['Binomial'],'Fixed n, two outcomes, same p, independent trials.']
+];
+const MODELS=['Binomial','Hypergeometric','Poisson','Geometric','Negative binomial','Multinomial'];
+(function(){const q=$('quiz');QUIZ.forEach((it,i)=>{const r=document.createElement('div');r.className='qrow';const t=document.createElement('div');t.innerHTML='<b>'+(i+1)+'.</b> ';t.appendChild(document.createTextNode(it[0]));r.appendChild(t);const o=document.createElement('div');o.className='opts';const why=document.createElement('div');why.className='why';why.hidden=true;
+  MODELS.forEach(m=>{const b=document.createElement('button');b.type='button';b.textContent=m;b.addEventListener('click',()=>{const ok=it[2].indexOf(m)>=0;b.classList.add(ok?'right':'wrong');if(ok){o.querySelectorAll('button').forEach(x=>{if(it[2].indexOf(x.textContent)>=0)x.classList.add('right')})}why.hidden=false;why.innerHTML=(ok?'<b style="color:var(--ok)">Yes.</b> ':'<b style="color:var(--hi)">Not quite.</b> ')+it[3]});o.appendChild(b)});
+  r.appendChild(o);r.appendChild(why);q.appendChild(r)})})();
+
+/* ---------- Block 5 ---------- */
+function w5(){
+  const l=+$('b5l').value,s=+$('b5s').value,t=+$('b5t').value;out('b5lo',l.toFixed(2));out('b5so',s.toFixed(2));out('b5to',t.toFixed(2));
+  const A=Math.exp(-l*s),B=Math.exp(-l*(s+t));out('r5a',f4(A));out('r5b',f4(B));out('r5r',f4(B/A));out('r5c',f4(Math.exp(-l*t)));out('r5m',(1/l).toFixed(2)+' / '+(Math.LN2/l).toFixed(2));
+  const svg=frame($('s5'),640,250);const hi=14;const X=lin(0,hi,30,610);const Y=v=>220-v/(l*1.08)*195;const f=v=>l*Math.exp(-l*v);
+  mk('path',{d:area(f,s,hi,X,Y,200,220),class:'shade c2'},svg);
+  mk('path',{d:area(f,Math.min(s+t,hi),hi,X,Y,200,220),class:'shade hi'},svg);
+  mk('path',{d:curve(f,0,hi,X,Y,300),class:'curve'},svg);
+  if(s<hi)mk('path',{d:curve(v=>v<s?0:l*Math.exp(-l*(v-s)),s,hi,X,Y,300),class:'curve hi','stroke-dasharray':'6 4'},svg);
+  mk('line',{x1:X(s),x2:X(s),y1:24,y2:220,class:'vl c2'},svg);txt(svg,X(s)+4,36,'s = '+s,'lab c2','start');
+  if(s+t<=hi){mk('line',{x1:X(s+t),x2:X(s+t),y1:44,y2:220,class:'vl hi'},svg);txt(svg,X(s+t)+4,56,'s + t = '+(s+t),'lab hi','start')}
+  axis(svg,0,hi,X,220,7);txt(svg,610,246,'wait T (min)','','end');
+}
+['b5l','b5s','b5t'].forEach(i=>$(i).addEventListener('input',w5));
+
+/* ---------- Block 6a ---------- */
+function w6(){
+  const n=+$('b6n').value,c=+$('b6c').value;out('b6no',n);out('b6co',c.toFixed(1));
+  const se=10/Math.sqrt(n);out('r6a',f4(1-Phi((c-500)/10)));out('r6se',se.toFixed(3)+' mL');out('r6b',f4(1-Phi((c-500)/se)));
+  const svg=frame($('s6'),640,250);const lo=465,hi=535;const X=lin(lo,hi,30,610);const top=npdf(500,500,se);const Y=v=>220-v/top*195;
+  mk('path',{d:area(v=>npdf(v,500,10),c,hi,X,Y,150,220),class:'shade'},svg);
+  mk('path',{d:area(v=>npdf(v,500,se),c,hi,X,Y,300,220),class:'shade hi'},svg);
+  mk('path',{d:curve(v=>npdf(v,500,10),lo,hi,X,Y,200),class:'curve'},svg);
+  mk('path',{d:curve(v=>npdf(v,500,se),lo,hi,X,Y,500),class:'curve hi'},svg);
+  mk('line',{x1:X(c),x2:X(c),y1:20,y2:220,class:'vl'},svg);txt(svg,X(c)+4,32,'c = '+c,'lab','start');
+  axis(svg,lo,hi,X,220,7);txt(svg,610,246,'fill volume (mL)','','end');
+}
+['b6n','b6c'].forEach(i=>$(i).addEventListener('input',w6));
+
+/* ---------- Block 6b ---------- */
+function w6b(){
+  const n=+$('b6bn').value,p=+$('b6bp').value;out('b6bno',n);out('b6bpo',p.toFixed(2));
+  $('b6bk').max=n;if(+$('b6bk').value>n)$('b6bk').value=n;const k=+$('b6bk').value;out('b6bko',k);
+  const mu=n*p,sd=Math.sqrt(n*p*(1-p));const ev=segVal('b6ev');const C=j=>bcdf(n,p,j);const Z=v=>Phi((v-mu)/sd);
+  let ex,cc,nc,inSet,a,b,cut,txtf;
+  if(ev==='le'){ex=C(k);cc=Z(k+.5);nc=Z(k);inSet=j=>j<=k;a=-Infinity;b=k+.5;cut=k;txtf='P(<i>X</i> ≤ '+k+') → P(<i>Y</i> &lt; '+(k+.5)+') = Φ(('+(k+.5)+' − '+(+mu.toFixed(2))+')/'+sd.toFixed(3)+')'}
+  else if(ev==='lt'){ex=C(k-1);cc=Z(k-.5);nc=Z(k);inSet=j=>j<k;a=-Infinity;b=k-.5;cut=k;txtf='P(<i>X</i> &lt; '+k+') = P(<i>X</i> ≤ '+(k-1)+') → P(<i>Y</i> &lt; '+(k-.5)+')'}
+  else if(ev==='ge'){ex=1-C(k-1);cc=1-Z(k-.5);nc=1-Z(k);inSet=j=>j>=k;a=k-.5;b=Infinity;cut=k;txtf='P(<i>X</i> ≥ '+k+') → P(<i>Y</i> &gt; '+(k-.5)+')'}
+  else if(ev==='gt'){ex=1-C(k);cc=1-Z(k+.5);nc=1-Z(k);inSet=j=>j>k;a=k+.5;b=Infinity;cut=k;txtf='P(<i>X</i> &gt; '+k+') = P(<i>X</i> ≥ '+(k+1)+') → P(<i>Y</i> &gt; '+(k+.5)+')'}
+  else{ex=bpmf(n,p,k);cc=Z(k+.5)-Z(k-.5);nc=0;inSet=j=>j===k;a=k-.5;b=k+.5;cut=null;txtf='P(<i>X</i> = '+k+') → P('+(k-.5)+' &lt; <i>Y</i> &lt; '+(k+.5)+'); without the correction the area is 0'}
+  $('r6f').innerHTML=txtf;out('r6ex',f4(ex));out('r6cc',f4(cc));out('r6nc',f4(nc));
+  const okc=mu>=5&&n*(1-p)>=5;out('r6chk',(+mu.toFixed(1))+', '+(+(n*(1-p)).toFixed(1))+(okc?' ✓':' ✗'));$('r6chk').style.color=okc?'var(--ok)':'var(--hi)';
+  const lo=Math.max(-0.5,Math.floor(mu-4.5*sd)-0.5),hi=Math.min(n+0.5,Math.ceil(mu+4.5*sd)+0.5);
+  const svg=frame($('s6b'),640,250);const X=lin(lo,hi,30,610);let mx=npdf(mu,mu,sd);for(let j=Math.ceil(lo);j<=hi;j++)mx=Math.max(mx,bpmf(n,p,j));const Y=v=>220-v/(mx*1.05)*195;
+  const aa=Math.max(lo,a),bb=Math.min(hi,b);if(bb>aa)mk('path',{d:area(v=>npdf(v,mu,sd),aa,bb,X,Y,200,220),class:'shade'},svg);
+  const bw=X(1)-X(0);const lblEvery=Math.max(1,Math.ceil((hi-lo)/16));
+  for(let j=Math.ceil(lo);j<=Math.floor(hi);j++){const v=bpmf(n,p,j);mk('rect',{x:X(j-.5),y:Y(v),width:bw,height:220-Y(v),class:'bar'+(inSet(j)?' on':''),'fill-opacity':'.85'},svg)}
+  mk('path',{d:curve(v=>npdf(v,mu,sd),lo,hi,X,Y,300),class:'curve'},svg);
+  if(cut!==null&&cut>=lo&&cut<=hi){mk('line',{x1:X(cut),x2:X(cut),y1:20,y2:220,class:'vl soft'},svg);txt(svg,X(cut),16,'no correction: '+cut,'')}
+  mk('line',{x1:30,x2:610,y1:220,y2:220,class:'ax'},svg);
+  for(let j=Math.ceil(lo);j<=Math.floor(hi);j++){if((j-Math.ceil(lo))%lblEvery===0)txt(svg,X(j),236,String(j))}
+}
+['b6bn','b6bp','b6bk'].forEach(i=>$(i).addEventListener('input',w6b));seg('b6ev',w6b);
+
+/* ---------- glossary filter ---------- */
+function gf(){
+  const q=$('gq').value.trim().toLowerCase();const rows=[...$('gloss').tBodies[0].rows];let head=null,headHas=false,shown=0,total=0;
+  const close=()=>{if(head)head.hidden=!headHas};
+  rows.forEach(r=>{if(r.classList.contains('grp')){close();head=r;headHas=false;return}total++;const m=!q||r.textContent.toLowerCase().indexOf(q)>=0;r.hidden=!m;if(m){headHas=true;shown++}});close();
+  out('gcount',q?shown+' of '+total+' phrases':total+' phrases');
+}
+$('gq').addEventListener('input',gf);gf();
+
+w1();w2();w3();w3z();w4();w5();w6();w6b();
+</script>
+
+</body></html>
