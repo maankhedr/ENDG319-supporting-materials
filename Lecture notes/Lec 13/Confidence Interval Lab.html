@@ -1,0 +1,1351 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Confidence Interval Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: the ENDG 319 lab-manual series — one long column of stations, each pairing a short concept panel with a live instrument. */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --sunk:#e3e8ee; --ink:#15202b; --muted:#566373; --line:#cfd7e0;
+  --bar:#3a64ad; --hi:#c8283e; --hi-soft:#f6dde1; --ok:#1f7a55; --warn:#a4620d;
+  --c2:#c58a14; --shade:rgba(58,100,173,.18); --shade-hi:rgba(200,40,62,.26); --shade-c2:rgba(197,138,20,.26);
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c2:#e2b14b; --shade:rgba(111,155,227,.22); --shade-hi:rgba(241,106,125,.3); --shade-c2:rgba(226,177,75,.28); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c2:#e2b14b; --shade:rgba(111,155,227,.22); --shade-hi:rgba(241,106,125,.3); --shade-c2:rgba(226,177,75,.28); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1060px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0;max-width:66ch}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hi);font-weight:600}
+.muted{color:var(--muted)}
+code,.m{font-family:var(--mono);font-size:.9em}
+:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+
+header.top{padding-block:40px 20px;display:grid;gap:14px}
+header.top p{font-size:1.08rem}
+nav.stations{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+nav.stations a{flex:none;text-decoration:none;color:var(--ink);font-family:var(--mono);font-size:.8rem;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+nav.stations a:hover{border-color:var(--bar)}
+nav.stations a.star{border-color:var(--hi);color:var(--hi)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+
+.part-head{padding-block:56px 14px;display:grid;gap:8px;border-bottom:2px solid var(--ink)}
+.part-head .eyebrow{color:var(--muted)}
+section.station{padding-block:48px 8px;display:grid;gap:22px;scroll-margin-top:60px}
+.head{display:grid;gap:8px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:22px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.stack{display:grid;gap:22px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:14px;min-width:0}
+.concept{display:grid;gap:12px;min-width:0}
+.concept ul,.concept ol{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.formula{font-family:"Times New Roman",Georgia,serif;font-size:1.22rem;background:var(--sunk);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:nowrap}
+.formula.live{font-size:1.08rem;line-height:1.9}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;margin:0 2px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.ov{text-decoration:overline}
+.warn{border-left:3px solid var(--hi);background:var(--hi-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.95rem}
+.note{border-left:3px solid var(--bar);background:var(--sunk);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.93rem}
+.added{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--warn);border:1px solid var(--warn);border-radius:999px;padding:1px 8px;justify-self:start}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 18px}
+.ctl{display:grid;gap:2px;min-width:0}
+.ctl label,.ctl .lbl{font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.ctl label output{font-family:var(--mono);color:var(--ink);font-weight:600}
+.ctl input[type=number],.ctl input[type=text]{font:inherit;font-family:var(--mono);font-size:.95rem;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);width:100%}
+input[type=range]{width:100%;accent-color:var(--hi)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);color:var(--ink);font:inherit;font-size:.85rem;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.btn{font:inherit;font-size:.88rem;padding:7px 14px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:var(--surface);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--bar)}
+.btn.red{background:var(--hi);border-color:var(--hi);color:#fff}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.ro{background:var(--sunk);border-radius:8px;padding:8px 10px;min-width:0}
+.ro .k{font-size:.78rem;color:var(--muted)}
+.ro .v{font-family:var(--mono);font-size:1.12rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ro.key .v{color:var(--hi)}
+.ro.bad .v{color:var(--muted);text-decoration:line-through}
+.ro.good .v{color:var(--ok)}
+
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:420px;height:auto}
+svg .curve{fill:none;stroke:var(--bar);stroke-width:2.2}
+svg .curve.c2{stroke:var(--c2)}
+svg .curve.hi{stroke:var(--hi)}
+svg .curve.ghost{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1.3}
+svg .shade{fill:var(--shade)}
+svg .shade.hi{fill:var(--shade-hi)}
+svg .shade.c2{fill:var(--shade-c2)}
+svg .bar{fill:var(--shade);stroke:var(--bar);stroke-width:.8}
+svg .bar.out{fill:var(--shade-hi);stroke:var(--hi)}
+svg .rug.gold{stroke:var(--c2)}
+svg .ax{stroke:var(--muted);stroke-width:1}
+svg .grid{stroke:var(--line);stroke-width:1}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+svg text.lab{fill:var(--ink);font-family:var(--body);font-size:12px}
+svg text.lab.hi{fill:var(--hi);font-weight:600}
+svg text.lab.c2{fill:var(--c2);font-weight:600}
+svg text.lab.bar{fill:var(--bar);font-weight:600}
+svg text.lab.ok{fill:var(--ok);font-weight:600}
+svg text.big{font-size:14px}
+svg .vl{stroke:var(--ink);stroke-dasharray:4 3;stroke-width:1.2}
+svg .vl.hi{stroke:var(--hi)}
+svg .vl.c2{stroke:var(--c2)}
+svg .vl.soft{stroke:var(--muted);stroke-width:1}
+svg .mu{stroke:var(--ink);stroke-dasharray:5 4;stroke-width:1.4}
+svg .dot{fill:var(--surface);stroke:var(--hi);stroke-width:2}
+svg .dot.bar{stroke:var(--bar)}
+svg .dot.solid{fill:var(--hi)}
+svg .rug{stroke:var(--bar);stroke-width:1.6}
+svg .rug.out{stroke:var(--hi)}
+svg rect.band{fill:var(--shade)}
+svg rect.band.hi{fill:var(--shade-hi)}
+svg .iv{stroke:var(--bar);stroke-width:2.6;fill:none;stroke-linecap:butt}
+svg .iv.miss{stroke:var(--hi);stroke-dasharray:6 4}
+svg .iv.ghost{stroke:var(--muted);stroke-width:2}
+svg .iv.thin{stroke-width:1.6}
+svg .cap{stroke:var(--bar);stroke-width:2}
+svg .cap.miss{stroke:var(--hi)}
+svg .cap.ghost{stroke:var(--muted)}
+svg .pt{fill:var(--bar)}
+svg .pt.miss{fill:var(--hi)}
+svg .pt.ghost{fill:var(--muted)}
+svg .gap{stroke:var(--hi);stroke-width:1.4;stroke-dasharray:2 3}
+svg .bracket{stroke:var(--c2);stroke-width:1.6;fill:none}
+svg .ray{stroke:var(--bar);stroke-width:3;fill:none}
+svg .arrow{fill:var(--bar)}
+svg .ln{fill:none;stroke:var(--bar);stroke-width:2}
+svg .iv.gold{stroke:var(--c2);stroke-width:3.4}
+svg .cap.gold{stroke:var(--c2);stroke-width:2.4}
+svg .pt.gold{fill:var(--c2)}
+svg .pin{fill:var(--ink)}
+svg .pin.hi{fill:var(--hi)}
+svg .strike{stroke:var(--hi);stroke-width:2.2}
+.quote{font-family:var(--display);font-size:1.12rem;font-weight:500;line-height:1.35}
+.attach{font-size:.9rem;border-top:1px dashed var(--line);padding-top:8px}
+.side.wrong{background:var(--hi-soft)}
+.bigp{font-family:var(--mono);font-size:1.3rem;font-weight:600;font-variant-numeric:tabular-nums}
+.bigp.pass{color:var(--bar)}
+.bigp.fail{color:var(--hi)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.sw{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.sw.ln{height:3px;vertical-align:3px}
+
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.8rem;color:var(--muted);font-weight:600}
+table.small{min-width:0;font-size:.88rem}
+table.small td{font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.small td.t{font-family:var(--body)}
+table.small tr{cursor:pointer}
+table.small tr.pick td{background:var(--hi-soft);font-weight:600}
+
+.vsgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:820px){.vsgrid{grid-template-columns:minmax(0,1fr)}}
+.side{display:grid;gap:10px;align-content:start;min-width:0;background:var(--sunk);border-radius:10px;padding:14px}
+.side .chart svg{min-width:300px}
+.side h3{font-size:1rem}
+.deriv{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.dstep{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.dnum{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--surface);font-family:var(--mono);font-size:.8rem;font-weight:600}
+.dnum.off{background:var(--sunk);color:var(--muted)}
+.dnum.now{background:var(--hi);color:#fff}
+.dbody{display:grid;gap:6px;min-width:0}
+.dbody .formula{font-size:1.05rem}
+
+.chip{font-family:var(--mono);font-size:.78rem;font-weight:600;border-radius:999px;padding:2px 10px;border:1px solid currentColor;justify-self:start}
+.chip.pass{color:var(--ok)}
+.chip.fail{color:var(--hi)}
+.verdict{font-family:var(--display);font-size:1.25rem;font-weight:700}
+.verdict.pass{color:var(--bar)}
+.verdict.fail{color:var(--hi)}
+.steps{display:grid;gap:6px}
+.stp{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;font-size:.93rem;color:var(--muted)}
+.stp.done{color:var(--ink)}
+.stp.now{color:var(--ink);font-weight:600}
+
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.check{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;align-content:start}
+.check .tag{font-family:var(--mono);font-weight:600;color:var(--hi)}
+.check .claim{font-style:italic}
+.check .fix{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:4px}
+.check .fix b{color:var(--ok)}
+.check .fix b.no{color:var(--hi)}
+.mistakes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.mk{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:6px;align-content:start}
+.mk .n{font-family:var(--mono);font-weight:600;color:var(--hi);font-size:.8rem}
+.mk a{color:var(--bar);font-size:.85rem}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}
+html{scroll-behavior:smooth}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">ENDG 319 · Lecture 13</span>
+  <h1>Confidence Interval Lab</h1>
+  <p>Twelve sections in three parts. Part A builds the interval from the sampling distribution of <span class="ov">X</span> and shows what "95% confident" means by drawing many samples. Part B turns that into calculations: cutoffs, the five-step method, and working backwards. Part C covers precision, sample-size planning and one-sided bounds. Running case: the piston diameters from Example 1, with μ = 14.0 cm and σ = 1 cm in the simulations.</p>
+</header>
+
+<nav class="stations" aria-label="Sections">
+  <a href="#s1">1 · SD vs SE</a><a href="#s2">2 · Middle 95%</a><a href="#s3">3 · Read both ways</a><a href="#s4" class="star">4 · Capture or miss</a><a href="#s5" class="star">5 · Many intervals</a><a href="#s6">6 · Before / after</a><a href="#s6b" class="star">6b · Ex 4 pictures</a><a href="#s7">7 · Cutoffs</a><a href="#s8">8 · Five steps</a><a href="#s9">9 · Ex 3 backwards</a><a href="#s10">10 · Three levers</a><a href="#s11">11 · Sample size</a><a href="#s12">12 · One-sided</a><a href="#s13">Check</a>
+</nav>
+
+<div class="part-head"><span class="eyebrow">Part A · Slides 3–13</span><h2>Where the interval comes from</h2></div>
+
+<!-- ============ STATION 1 ============ -->
+<section class="station" id="s1">
+  <div class="head">
+    <span class="eyebrow">Section 1 · Slides 3–4</span>
+    <h2>Individual spread vs. uncertainty in the mean</h2>
+    <p>Both plots share one cm axis. The top shows individual pistons, which spread with σ. The bottom collects sample means, which spread with σ/√n. Draw some samples and watch the bottom histogram form inside a much narrower curve.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">σ (or <i>s</i>) &nbsp;→&nbsp; <i>σ</i><sub><span class="ov">X</span></sub> = <span class="frac"><span>σ</span><span>√<i>n</i></span></span> &nbsp;→&nbsp; <span style="text-decoration:overline">SE</span> = <span class="frac"><span><i>s</i></span><span>√<i>n</i></span></span></div>
+      <ul>
+        <li><b>σ</b> describes one measurement: how far a single piston tends to be from μ.</li>
+        <li><b>σ/√n</b> describes the average of n: how far <span class="ov">X</span> tends to be from μ. It comes from Var(<span class="ov">X</span>) = σ²/n for iid observations.</li>
+        <li>All three are in cm. Units do not tell you which one a problem gave you; the wording does.</li>
+      </ul>
+      <div class="warn">If a problem already gives the standard error of the mean, do not divide by √n again.</div>
+      <div class="checks" style="grid-template-columns:minmax(0,1fr)">
+        <div class="check"><span class="claim">"The mean of 100 pistons is 14.0 cm, with standard error 0.1 cm."</span><button type="button" class="btn ghost" data-rev="r1a">Divide by √100?</button><div class="fix" id="r1a" hidden><b class="no">No.</b><span>0.1 already describes <span class="ov">X</span>. Use SE = 0.1 (Example 1).</span></div></div>
+        <div class="check"><span class="claim">"100 boxes: mean 12.05 oz, sample standard deviation 0.1 oz."</span><button type="button" class="btn ghost" data-rev="r1b">Divide by √100?</button><div class="fix" id="r1b" hidden><b>Yes.</b><span>s describes single boxes. SE = 0.1/√100 = 0.01 oz (Example 2-1).</span></div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s1n">Sample size n <output id="s1no"></output></label><input type="range" id="s1n" min="1" max="400" step="1" value="100"></div>
+      </div>
+      <div class="row"><button type="button" class="btn" id="s1one">Draw one sample</button><button type="button" class="btn ghost" id="s1many">Draw 300 samples</button><button type="button" class="btn ghost" id="s1clr">Clear</button></div>
+      <div class="chart"><svg id="s1top" role="img" aria-label="Population of individual piston diameters with the latest sample marked"></svg></div>
+      <div class="chart"><svg id="s1bot" role="img" aria-label="Histogram of sample means inside the sampling distribution curve"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>model curve</span><span><span class="sw" style="background:var(--shade)"></span>collected sample means</span><span><span class="sw ln" style="background:var(--hi)"></span>latest x̄</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">σ (individuals)</div><div class="v">1.000 cm</div></div>
+        <div class="ro key"><div class="k">σ/√n (means)</div><div class="v" id="s1se"></div></div>
+        <div class="ro"><div class="k">Latest x̄</div><div class="v" id="s1xb">–</div></div>
+        <div class="ro"><div class="k">SD of your x̄'s</div><div class="v" id="s1sd">–</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 2 ============ -->
+<section class="station" id="s2">
+  <div class="head">
+    <span class="eyebrow">Section 2 · Slides 6–8</span>
+    <h2>The middle 95% describes possible sample means</h2>
+    <p>This curve is the sampling distribution of <span class="ov">X</span> for the piston case: centred at μ = 14.0 with SE = 0.1 cm. The shaded band is where the middle (1 − α) of sample means land. Drop sample means and count how many land inside.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula"><i>P</i>(μ − 1.96<i>σ</i><sub><span class="ov">X</span></sub> ≤ <span class="ov">X</span> ≤ μ + 1.96<i>σ</i><sub><span class="ov">X</span></sub>) ≈ 0.95</div>
+      <ul>
+        <li><b>E[<span class="ov">X</span>] = μ</b>: the curve is centred on the truth.</li>
+        <li><b>Spread σ/√n</b>: here 1/√100 = 0.1 cm.</li>
+        <li><b>Shape</b>: exactly normal if pistons are normal, otherwise approximately normal by the CLT for large n (slide 7).</li>
+      </ul>
+      <div class="note">μ is fixed and unknown. Here the probability describes <span class="ov">X</span>, which is the quantity that varies from sample to sample.</div>
+      <div class="warn">Conditions first (slide 7): a random, representative sample and independent observations. A large n cannot fix a biased or dependent design. Section 5 lets you break independence.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s2c">Confidence 1 − α <output id="s2co"></output></label><input type="range" id="s2c" min="50" max="99.5" step="0.5" value="95"></div>
+      </div>
+      <div class="row"><button type="button" class="btn" id="s2one">Drop 1 sample mean</button><button type="button" class="btn ghost" id="s2many">Drop 100</button><button type="button" class="btn ghost" id="s2clr">Clear</button></div>
+      <div class="chart"><svg id="s2svg" role="img" aria-label="Sampling distribution of the mean with the central band shaded and dropped sample means as ticks"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade)"></span>middle 1 − α</span><span><span class="sw" style="background:var(--shade-hi)"></span>α/2 in each tail</span><span><span class="sw ln" style="background:var(--bar)"></span>x̄ inside</span><span><span class="sw ln" style="background:var(--hi)"></span>x̄ outside</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Cutoff z<sub>α/2</sub></div><div class="v" id="s2z"></div></div>
+        <div class="ro"><div class="k">Band μ ± z·SE</div><div class="v" id="s2band"></div></div>
+        <div class="ro"><div class="k">Means dropped</div><div class="v" id="s2cnt">0</div></div>
+        <div class="ro key"><div class="k">Fraction inside</div><div class="v" id="s2in">–</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 3 ============ -->
+<section class="station" id="s3">
+  <div class="head">
+    <span class="eyebrow">Section 3 · Slide 9</span>
+    <h2>The same distance, read in two directions</h2>
+    <p>Move x̄. The top row asks whether x̄ is close to μ. The bottom row asks whether the interval around x̄ reaches μ. The two answers always agree, because both measure the same distance |x̄ − μ| against the same margin M = 1.96 × 0.1 = 0.196 cm.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">|<span class="ov">X</span> − μ| ≤ 1.96<i>σ</i><sub><span class="ov">X</span></sub></div>
+      <p class="muted" style="text-align:center">is equivalent to</p>
+      <div class="formula"><span class="ov">X</span> − 1.96<i>σ</i><sub><span class="ov">X</span></sub> ≤ μ ≤ <span class="ov">X</span> + 1.96<i>σ</i><sub><span class="ov">X</span></sub></div>
+      <ul>
+        <li>We cannot see μ, so we cannot draw the top band in practice.</li>
+        <li>We can see x̄, so we draw the bottom interval instead. It contains μ exactly when x̄ landed inside the top band.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s3x">Observed x̄ (cm) <output id="s3xo"></output></label><input type="range" id="s3x" min="13.55" max="14.45" step="0.005" value="14.08"></div>
+      </div>
+      <div class="chart"><svg id="s3svg" role="img" aria-label="Two linked rows: x-bar against a band around mu, and an interval around x-bar against mu"></svg></div>
+      <div class="formula live" id="s3f"></div>
+      <div class="row"><span class="chip" id="s3c1"></span><span class="chip" id="s3c2"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 4 ============ -->
+<section class="station" id="s4">
+  <div class="head">
+    <span class="eyebrow">Section 4 · Slide 10 · step through it</span>
+    <h2>The same rule can capture μ, or miss it</h2>
+    <p>Run the construction one step at a time. μ never moves. Each sample produces an x̄, the rule puts the same arms of ±1.96 SE on it, and the only question is whether the arms reach the dashed μ line. Use <b>Unusual sample</b> to force an x̄ from the outer 5% and watch the interval fall short.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="panel" style="gap:10px">
+        <div class="steps" id="s4steps">
+          <div class="stp" data-k="0"><span class="dnum">1</span><span>μ is fixed (dashed line). Its sampling curve tells us where x̄ is likely to land.</span></div>
+          <div class="stp" data-k="1"><span class="dnum">2</span><span>Draw a sample. x̄ falls somewhere under the curve.</span></div>
+          <div class="stp" data-k="2"><span class="dnum">3</span><span>Apply the rule: extend arms of M = 1.96 × SE on each side of x̄.</span></div>
+          <div class="stp" data-k="3"><span class="dnum">4</span><span>Check: do the arms reach μ? Yes if |x̄ − μ| ≤ M.</span></div>
+        </div>
+        <div class="verdict" id="s4v"></div>
+        <div class="readouts">
+          <div class="ro"><div class="k">x̄</div><div class="v" id="s4x">–</div></div>
+          <div class="ro"><div class="k">|x̄ − μ|</div><div class="v" id="s4d">–</div></div>
+          <div class="ro"><div class="k">Arm M</div><div class="v">0.196</div></div>
+        </div>
+      </div>
+      <div class="note">Every row uses the same half-width. What differs between a capture and a miss is only where x̄ fell. A miss happens exactly when x̄ lands in one of the red tails of the curve.</div>
+    </div>
+    <div class="panel">
+      <div class="row"><button type="button" class="btn" id="s4next">Next step</button><button type="button" class="btn ghost" id="s4play">Play all four steps</button><button type="button" class="btn ghost" id="s4odd">Unusual sample</button><button type="button" class="btn ghost" id="s4clr">Clear history</button></div>
+      <div class="chart"><svg id="s4svg" role="img" aria-label="Step-by-step construction of a confidence interval and whether it captures the fixed mean"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade)"></span>x̄ lands here 95% of the time</span><span><span class="sw" style="background:var(--shade-hi)"></span>tails: interval will miss</span><span><span class="sw ln" style="background:var(--bar)"></span>captures μ</span><span><span class="sw ln" style="background:var(--hi)"></span>misses μ</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Intervals built</div><div class="v" id="s4n">0</div></div>
+        <div class="ro key"><div class="k">Captured μ</div><div class="v" id="s4h">0</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 5 ============ -->
+<section class="station" id="s5">
+  <div class="head">
+    <span class="eyebrow">Section 5 · Slide 12 · repeat the procedure</span>
+    <h2>Intervals move. μ does not.</h2>
+    <p>Each row is a fresh sample of n pistons from a population with μ = 14.0 cm and σ = 1 cm, turned into an interval by the same rule. The newest row is at the top. The right-hand chart tracks the running capture rate, which wanders early and settles near the nominal level when the method's conditions hold.</p>
+  </div>
+  <div class="panel">
+    <div class="controls">
+      <div class="ctl"><span class="lbl">Confidence</span><div class="seg" id="s5lvl"><button type="button" data-v="90" aria-pressed="false">90%</button><button type="button" data-v="95" aria-pressed="true">95%</button><button type="button" data-v="99" aria-pressed="false">99%</button></div></div>
+      <div class="ctl"><label for="s5n">Sample size n <output id="s5no"></output></label><input type="range" id="s5n" min="5" max="300" step="1" value="100"></div>
+      <div class="ctl"><span class="lbl">Method and data</span><div class="seg" id="s5mode"><button type="button" data-v="known" aria-pressed="true">σ known</button><button type="button" data-v="s" aria-pressed="false">σ unknown, use s</button><button type="button" data-v="dep" aria-pressed="false">Dependent data</button></div></div>
+    </div>
+    <div class="row"><button type="button" class="btn" id="s5one">+1 sample</button><button type="button" class="btn ghost" id="s5twenty">+20</button><button type="button" class="btn ghost" id="s5auto">Auto play</button><button type="button" class="btn ghost" id="s5k">+1000 instantly</button><button type="button" class="btn ghost" id="s5rst">Reset</button></div>
+    <div class="vsgrid">
+      <div class="stack" style="gap:6px">
+        <div class="chart"><svg id="s5svg" role="img" aria-label="Stack of the most recent confidence intervals with the fixed population mean"></svg></div>
+        <div class="chart"><svg id="s5hist" role="img" aria-label="Histogram of every sample mean so far, building toward the normal sampling distribution with the central band shaded"></svg></div>
+        <div class="legend"><span><span class="sw" style="background:var(--shade);border:1px solid var(--bar)"></span>x̄ inside μ ± z·SE: interval captured μ</span><span><span class="sw" style="background:var(--shade-hi);border:1px solid var(--hi)"></span>x̄ in a tail: interval missed</span><span><span class="sw ln" style="background:var(--bar)"></span>N(μ, σ²/n)</span><span id="s5leg" hidden><span class="sw ln" style="background:var(--c2)"></span>actual spread of x̄</span></div>
+      </div>
+      <div class="stack" style="gap:12px">
+        <div class="chart"><svg id="s5run" role="img" aria-label="Running coverage proportion against number of intervals"></svg></div>
+        <div class="readouts">
+          <div class="ro"><div class="k">Intervals</div><div class="v" id="s5tot">0</div></div>
+          <div class="ro"><div class="k">Missed μ</div><div class="v" id="s5miss">0</div></div>
+          <div class="ro key"><div class="k">Capture rate</div><div class="v" id="s5cov">–</div></div>
+          <div class="ro"><div class="k">Nominal</div><div class="v" id="s5nom"></div></div>
+        </div>
+        <div class="note" id="s5msg"></div>
+      </div>
+    </div>
+    <span class="added">Method toggles beyond "σ known" are my addition, not from the slides</span>
+  </div>
+  <div class="warn">A 95% method is reliable in repeated use. It does not guarantee any one interval: each row either covers μ or it doesn't, and in a short run the rate need not be exactly 95%.</div>
+</section>
+
+<!-- ============ STATION 6 ============ -->
+<section class="station" id="s6">
+  <div class="head">
+    <span class="eyebrow">Section 6 · Slides 13, 23–24</span>
+    <h2>Random interval before sampling, fixed interval afterwards</h2>
+    <p>Before sampling, the endpoints L and U are random variables: functions of a sample not yet drawn. After sampling they become two numbers, l and u. The 95% belongs to the procedure, so once the numbers exist you report confidence, not probability.</p>
+  </div>
+  <div class="vsgrid">
+    <div class="side">
+      <h3>Before sampling</h3>
+      <div class="formula" style="font-size:1.05rem"><i>L</i> = <span class="ov">X</span> − 0.196, &nbsp; <i>U</i> = <span class="ov">X</span> + 0.196</div>
+      <div class="chart"><svg id="s6svg" role="img" aria-label="Densities of the random endpoints L and U with their capture regions shaded, and linked L and U pairs from possible samples"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade-c2)"></span>L ∈ [μ − 0.392, μ]</span><span><span class="sw" style="background:var(--shade)"></span>U ∈ [μ, μ + 0.392]</span><span><span class="sw ln" style="background:var(--hi)"></span>interval misses μ</span></div>
+      <p style="font-size:.92rem">L ~ N(μ − 0.196, 0.1²) and U ~ N(μ + 0.196, 0.1²), but they are not independent: both come from the same <span class="ov">X</span>, so <b>U = L + 0.392 for every sample</b>. Each draw drops a linked pair onto the curves and a row below. The two curves don't add, so their crossing at μ has no meaning.</p>
+      <p style="font-size:.92rem">The capture event is the shaded middle 95% of <i>either</i> curve: <i>L</i> ≤ μ ≤ <i>U</i> ⟺ μ − 0.392 ≤ <i>L</i> ≤ μ ⟺ μ ≤ <i>U</i> ≤ μ + 0.392, so <b><i>P</i>(<i>L</i> ≤ μ ≤ <i>U</i>) = <i>P</i>(|<span class="ov">X</span> − μ| ≤ 0.196) = 0.95</b>.</p>
+      <button type="button" class="btn" id="s6draw" style="justify-self:start">Draw the sample</button>
+    </div>
+    <div class="side">
+      <h3>After the sample is observed</h3>
+      <div class="formula" style="font-size:1.05rem" id="s6lu">(<i>l</i>, <i>u</i>) = (13.804, 14.196)</div>
+      <div class="chart"><svg id="s6svg2" role="img" aria-label="The observed fixed interval with the unknown mean hidden"></svg></div>
+      <p style="font-size:.92rem" id="s6txt"></p>
+      <div class="row"><button type="button" class="btn ghost" id="s6rev">Reveal μ</button><span class="chip" id="s6chip" hidden></span></div>
+    </div>
+  </div>
+  <div class="note"><b>Example 4.</b> "The probability that the mean diameter is between 14.73 and 14.91 cm is 90%" is false in this framework. A correct report: "We are 90% confident that the population mean diameter is between 14.73 and 14.91 cm." It also says nothing about 90% of individual rods. Section 6b draws each reading of this sentence.</div>
+</section>
+
+<!-- ============ STATION 6b ============ -->
+<section class="station" id="s6b">
+  <div class="head">
+    <span class="eyebrow">Section 6b · Slides 23–24 · Example 4</span>
+    <h2>Same numbers, different meaning: what the 90% is attached to</h2>
+    <p>A 90% confidence interval for the mean diameter of steel rods is (14.73, 14.91) cm. The two statements below use the same limits, but each attaches the 90% to something different. Pictures A to C show what each reading would mean.</p>
+  </div>
+  <div class="vsgrid">
+    <div class="side wrong">
+      <span class="chip fail">False (frequentist)</span>
+      <span class="quote">"The probability that the mean diameter is between 14.73 and 14.91 cm is 90%."</span>
+      <span class="attach"><b>The 90% is attached to μ</b>, as if μ were a random quantity that falls inside these fixed limits 90% of the time. See picture A.</span>
+    </div>
+    <div class="side">
+      <span class="chip pass">Correct</span>
+      <span class="quote">"We are 90% confident that the population mean diameter is between 14.73 and 14.91 cm."</span>
+      <span class="attach"><b>The 90% is attached to the method</b> that produced 14.73 and 14.91: in repeated use, 90% of the intervals it builds contain μ. See picture B.</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="head"><span class="eyebrow">Picture A</span><h3>What the false statement assumes, and what is really there</h3></div>
+    <div class="grid2">
+      <div class="concept">
+        <p>The top row is what "probability 90%" would require: μ would need to have a distribution, so that 90% of its area sits between the limits. In this course, μ is a fixed constant. It has no distribution.</p>
+        <p>The bottom row is the real situation: one fixed interval and one fixed μ. We don't know where μ is, so the slider lets you put it anywhere.</p>
+        <div class="ctl"><label for="s6bmu">Suppose the true μ is (cm) <output id="s6bmuo"></output></label><input type="range" id="s6bmu" min="14.62" max="15.02" step="0.005" value="14.80"></div>
+        <div class="ro"><div class="k">P(14.73 ≤ μ ≤ 14.91), given this μ</div><div class="bigp" id="s6bP"></div></div>
+        <div class="note">Wherever μ is, this probability is 1 or 0, never 0.9. We only don't know which of the two it is. That lack of knowledge is what "confident" expresses.</div>
+      </div>
+      <div class="chart"><svg id="s6bA" role="img" aria-label="Top: a bell curve over mu, which the false statement implies. Bottom: the fixed interval and a single fixed mu"></svg></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="head"><span class="eyebrow">Picture B</span><h3>What "90% confident" refers to: the method, used again and again</h3></div>
+    <div class="grid2">
+      <div class="concept">
+        <p>The gold row is our interval, (14.73, 14.91), which is fixed. The rows below are what the same procedure would give on new samples of rods from a process whose true mean is the μ you set in picture A.</p>
+        <ul>
+          <li><b>Our interval</b> either contains μ or doesn't (yes/no).</li>
+          <li><b>The method</b> captures μ about 90% of the time wherever μ is. That rate is the "90%" in the correct statement.</li>
+        </ul>
+        <p>Move μ outside (14.73, 14.91) in picture A. Our gold interval now misses, but the method's rate stays near 90%. The two quantities are separate.</p>
+        <div class="row"><button type="button" class="btn" id="s6bmore">Repeat sampling ×30</button><button type="button" class="btn ghost" id="s6bk">×1000 instantly</button><button type="button" class="btn ghost" id="s6brst">Reset</button></div>
+        <div class="readouts">
+          <div class="ro"><div class="k">Our interval contains μ?</div><div class="v" id="s6bHit"></div></div>
+          <div class="ro"><div class="k">Repeats</div><div class="v" id="s6bN"></div></div>
+          <div class="ro key"><div class="k">Method's capture rate</div><div class="v" id="s6bRate"></div></div>
+        </div>
+      </div>
+      <div class="chart"><svg id="s6bB" role="img" aria-label="Our fixed interval above a stack of repeated intervals from the same procedure"></svg></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="head"><span class="eyebrow">Picture C · the second trap</span><h3>The interval is about the mean, not about individual rods</h3></div>
+    <div class="grid2">
+      <div class="concept">
+        <p>The curve is the spread of <b>individual rods</b>. The interval (14.73, 14.91) is narrow because it measures uncertainty in the <b>mean</b>, which shrinks with √n. Only a small fraction of rods fall inside it.</p>
+        <div class="formula" style="font-size:1.02rem">SE = <span class="frac"><span>0.09</span><span>1.645</span></span> ≈ 0.0547 cm, &nbsp; σ ≈ SE·√<i>n</i></div>
+        <div class="ctl"><label for="s6bn">Assumed sample size n <output id="s6bno"></output></label><input type="range" id="s6bn" min="10" max="200" step="1" value="50"></div>
+        <span class="added">The slides give no n or σ; n is assumed here so the rods can be drawn</span>
+        <div class="readouts">
+          <div class="ro"><div class="k">Implied σ (rods)</div><div class="v" id="s6bsig"></div></div>
+          <div class="ro key"><div class="k">Rods inside (14.73, 14.91)</div><div class="v" id="s6bfr"></div></div>
+          <div class="ro"><div class="k">Range for ≈90% of rods</div><div class="v" id="s6brng"></div></div>
+        </div>
+        <div class="note">The "≈90% of rods" range is the rough plug-in x̄ ± 1.645σ for normal rods. A proper prediction or tolerance interval, which this course doesn't cover, would be slightly wider.</div>
+      </div>
+      <div class="chart"><svg id="s6bC" role="img" aria-label="Distribution of individual rod diameters with the narrow confidence interval shaded"></svg></div>
+    </div>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Statement about (14.73, 14.91)</th><th>The 90% would describe</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>"P(μ in the interval) = 90%"</td><td>μ, treated as random (picture A)</td><td>False: after sampling it is 1 or 0</td></tr>
+      <tr><td>"We are 90% confident μ is in the interval"</td><td>The method's long-run capture rate (picture B)</td><td>Correct</td></tr>
+      <tr><td>"90% of rods are in the interval"</td><td>Individual rods (picture C)</td><td>False: far fewer rods are inside</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="added">Context, not on the slides</span> The slide says "false in the frequentist interpretation used here." In Bayesian statistics μ is given a distribution, as in the top row of picture A, and a credible interval does support a probability statement about μ. That is a different framework and is outside this course.</div>
+</section>
+
+<div class="part-head"><span class="eyebrow">Part B · Slides 11, 14–21</span><h2>Computing intervals</h2></div>
+
+<!-- ============ STATION 7 ============ -->
+<section class="station" id="s7">
+  <div class="head">
+    <span class="eyebrow">Section 7 · Slides 14, 16, 30</span>
+    <h2>Choose the cutoff from the tail areas</h2>
+    <p>The shaded middle is the confidence level. The table, though, gives Φ(z), the area from −∞ up to z, which also contains the left tail. The gold bracket under the axis shows that cumulative area, so you can see why you look up 1 − α/2 and not 1 − α.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula"><i>P</i>(<i>Z</i> &gt; <i>z<sub>q</sub></i>) = <i>q</i></div>
+      <div class="formula">Middle: &nbsp;Φ(<i>z</i>) − Φ(−<i>z</i>) = 2Φ(<i>z</i>) − 1 = 1 − α</div>
+      <div class="formula">Lookup: &nbsp;Φ(<i>z</i><sub>α/2</sub>) = <span class="frac"><span>α</span><span>2</span></span> + (1 − α) = 1 − <span class="frac"><span>α</span><span>2</span></span></div>
+      <ul>
+        <li><b>q</b> is any upper-tail area; the subscript names the cutoff by the area to its right.</li>
+        <li><b>Two-sided</b>: q = α/2. <b>One-sided</b>: q = α, all of the risk in one tail.</li>
+        <li>Click a row of the table to load it.</li>
+      </ul>
+      <div class="tbl"><table class="small" id="s7tbl">
+        <thead><tr><th>Statement</th><th>Look up Φ(z) =</th><th>z</th><th>Slide value</th></tr></thead>
+        <tbody>
+          <tr data-c="68.27" data-s="2"><td class="t">≈68% two-sided</td><td>0.8413</td><td>1.000</td><td>1.000</td></tr>
+          <tr data-c="85" data-s="2"><td class="t">85% two-sided</td><td>0.925</td><td>1.4395</td><td>1.4395</td></tr>
+          <tr data-c="90" data-s="2"><td class="t">90% two-sided</td><td>0.95</td><td>1.6449</td><td>1.645</td></tr>
+          <tr data-c="95" data-s="2"><td class="t">95% two-sided</td><td>0.975</td><td>1.9600</td><td>1.960</td></tr>
+          <tr data-c="99" data-s="2"><td class="t">99% two-sided</td><td>0.995</td><td>2.5758</td><td>2.580</td></tr>
+          <tr data-c="99.73" data-s="2"><td class="t">≈99.7% two-sided</td><td>0.99865</td><td>3.000</td><td>3.000</td></tr>
+          <tr data-c="95" data-s="1"><td class="t">95% one-sided</td><td>0.95</td><td>1.6449</td><td>1.645</td></tr>
+          <tr data-c="99" data-s="1"><td class="t">99% one-sided</td><td>0.99</td><td>2.3263</td><td>2.326</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note">The slides round the 99% two-sided value to 2.580; software gives 2.5758. Both are acceptable for hand work.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s7c">Confidence 1 − α (%) <output id="s7co"></output></label><input type="range" id="s7c" min="50" max="99.9" step="0.01" value="95"></div>
+        <div class="ctl"><span class="lbl">Statement</span><div class="seg" id="s7side"><button type="button" data-v="2" aria-pressed="true">Two-sided interval</button><button type="button" data-v="1" aria-pressed="false">One-sided bound</button></div></div>
+      </div>
+      <div class="chart"><svg id="s7svg" role="img" aria-label="Standard normal curve with confidence area, tails and the cumulative area bracket"></svg></div>
+      <div class="formula live" id="s7f"></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">α</div><div class="v" id="s7a"></div></div>
+        <div class="ro"><div class="k">Tail area q</div><div class="v" id="s7q"></div></div>
+        <div class="ro"><div class="k">Look up Φ(z) =</div><div class="v" id="s7p"></div></div>
+        <div class="ro key"><div class="k">Cutoff z</div><div class="v" id="s7z"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 8 ============ -->
+<section class="station" id="s8">
+  <div class="head">
+    <span class="eyebrow">Section 8 · Slides 5, 11, 15, 17–19</span>
+    <h2>The five-step calculation</h2>
+    <p>Point estimate ± critical value × standard error. Load an example or type your own numbers; each step updates. Pay attention to what the problem gives you: a standard error is used as is, while a standard deviation is divided by √n.</p>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <div class="row"><button type="button" class="btn ghost" data-p8="ex1a">Ex 1 · 3-SE</button><button type="button" class="btn ghost" data-p8="ex1b">Ex 1 · 95%</button><button type="button" class="btn ghost" data-p8="ex1c">Ex 1 · 99%</button><button type="button" class="btn ghost" data-p8="ex21">Ex 2-1 · 85%</button></div>
+      <div class="ctl"><span class="lbl">The problem gives</span><div class="seg" id="s8g"><button type="button" data-v="se" aria-pressed="true">SE of the mean</button><button type="button" data-v="s" aria-pressed="false">s and n</button><button type="button" data-v="sig" aria-pressed="false">σ and n</button></div></div>
+      <div class="controls">
+        <div class="ctl"><label for="s8x">Point estimate x̄</label><input type="number" id="s8x" value="14.0" step="any"></div>
+        <div class="ctl"><label for="s8v" id="s8vl">Standard error</label><input type="number" id="s8v" value="0.1" step="any" min="0"></div>
+        <div class="ctl"><label for="s8n">n</label><input type="number" id="s8n" value="100" step="1" min="2"></div>
+        <div class="ctl"><label for="s8u">Units</label><input type="text" id="s8u" value="cm"></div>
+        <div class="ctl"><label for="s8c">Confidence (%) <output id="s8co"></output></label><input type="range" id="s8c" min="50" max="99.9" step="0.01" value="95"></div>
+      </div>
+      <div class="chart"><svg id="s8svg" role="img" aria-label="The computed interval on a number line"></svg></div>
+      <div class="readouts">
+        <div class="ro key"><div class="k">Interval</div><div class="v" id="s8ci"></div></div>
+        <div class="ro"><div class="k">Margin M</div><div class="v" id="s8m"></div></div>
+        <div class="ro"><div class="k">Full width W</div><div class="v" id="s8w"></div></div>
+        <div class="ro bad" id="s8badbox"><div class="k" id="s8badk"></div><div class="v" id="s8bad"></div></div>
+      </div>
+    </div>
+    <div class="deriv" id="s8steps"></div>
+  </div>
+</section>
+
+<!-- ============ STATION 9 ============ -->
+<section class="station" id="s9">
+  <div class="head">
+    <span class="eyebrow">Section 9 · Slides 20–21</span>
+    <h2>Example 3: recover the confidence level</h2>
+    <p>Run the construction in reverse. Check the centre, take the half-width, divide by the standard error to get the multiplier, then convert the multiplier back into the middle area 2Φ(z*) − 1.</p>
+  </div>
+  <div class="grid2">
+    <div class="deriv" id="s9steps"></div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s9l">Lower limit l</label><input type="number" id="s9l" value="11.09" step="any"></div>
+        <div class="ctl"><label for="s9u">Upper limit u</label><input type="number" id="s9u" value="14.27" step="any"></div>
+        <div class="ctl"><label for="s9x">x̄</label><input type="number" id="s9x" value="12.68" step="any"></div>
+        <div class="ctl"><label for="s9s">s</label><input type="number" id="s9s" value="6.83" step="any" min="0"></div>
+        <div class="ctl"><label for="s9n">n</label><input type="number" id="s9n" value="50" step="1" min="2"></div>
+      </div>
+      <div class="chart"><svg id="s9svg" role="img" aria-label="Standard normal with the recovered middle area shaded"></svg></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">z* = M / SE</div><div class="v" id="s9z"></div></div>
+        <div class="ro key"><div class="k">Recovered level</div><div class="v" id="s9lvl"></div></div>
+        <div class="ro bad"><div class="k">Full width ÷ s (wrong)</div><div class="v" id="s9bad"></div></div>
+      </div>
+      <div class="note">1.6461 is not exactly 1.645 because the reported limits were rounded to two decimals. It is consistent with the 90% multiplier.</div>
+    </div>
+  </div>
+</section>
+
+<div class="part-head"><span class="eyebrow">Part C · Slides 22, 25–32</span><h2>Precision, planning and bounds</h2></div>
+
+<!-- ============ STATION 10 ============ -->
+<section class="station" id="s10">
+  <div class="head">
+    <span class="eyebrow">Section 10 · Slides 22, 28</span>
+    <h2>Three levers set the margin</h2>
+    <p>M = z<sub>α/2</sub> σ/√n. The grey row is the 95% piston interval from Example 1 (σ = 1, n = 100). Change one lever at a time and compare. The ×4 button shows the square-root law: four times the data, half the margin.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="tbl"><table>
+        <thead><tr><th>Change</th><th>Effect on M</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Higher confidence</td><td>Larger critical value</td><td>Wider</td></tr>
+          <tr><td>More variability</td><td>Larger σ</td><td>Wider</td></tr>
+          <tr><td>Larger sample size</td><td>Smaller σ/√n</td><td>Narrower</td></tr>
+        </tbody>
+      </table></div>
+      <div class="formula">Half the margin ⟹ 4 × the sample size</div>
+      <div class="note">Slide 22 keeps x̄ = 14.0 and SE = 0.1: ≈68% gives (13.9, 14.1), 95% gives (13.804, 14.196), 99% gives (13.742, 14.258). With the same data, more confidence costs precision.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s10c">Confidence (%) <output id="s10co"></output></label><input type="range" id="s10c" min="50" max="99.9" step="0.01" value="95"></div>
+        <div class="ctl"><label for="s10s">σ (cm) <output id="s10so"></output></label><input type="range" id="s10s" min="0.25" max="3" step="0.05" value="1"></div>
+        <div class="ctl"><label for="s10n">n <output id="s10no"></output></label><input type="range" id="s10n" min="4" max="1600" step="1" value="100"></div>
+      </div>
+      <div class="row"><span class="muted" style="font-size:.85rem">Presets:</span><button type="button" class="btn ghost" data-c10="68.27">≈68%</button><button type="button" class="btn ghost" data-c10="95">95%</button><button type="button" class="btn ghost" data-c10="99">99%</button><span class="muted" style="font-size:.85rem">n:</span><button type="button" class="btn ghost" id="s10x2">× 2</button><button type="button" class="btn ghost" id="s10x4">× 4</button><button type="button" class="btn ghost" id="s10d4">÷ 4</button><button type="button" class="btn ghost" id="s10rst">Reset</button></div>
+      <div class="chart"><svg id="s10svg" role="img" aria-label="Baseline and adjusted confidence interval compared on one axis"></svg></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">z</div><div class="v" id="s10z"></div></div>
+        <div class="ro key"><div class="k">Margin M</div><div class="v" id="s10m"></div></div>
+        <div class="ro"><div class="k">Width W = 2M</div><div class="v" id="s10w"></div></div>
+        <div class="ro"><div class="k">M vs baseline</div><div class="v" id="s10r"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 11 ============ -->
+<section class="station" id="s11">
+  <div class="head">
+    <span class="eyebrow">Section 11 · Slides 25–27</span>
+    <h2>Choose n to meet a target margin</h2>
+    <p>Set the margin no larger than d and solve for n. Read the target carefully: "within ±0.1 cm" means d = 0.1, and "total width 0.2 cm" also means d = 0.1. The curve shows how M falls with n; the smallest n under the line is the answer, which is why you always round up.</p>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><span class="lbl">Confidence (slide values)</span><div class="seg" id="s11lvl"><button type="button" data-v="1.645" aria-pressed="false">90%</button><button type="button" data-v="1.96" aria-pressed="true">95%</button><button type="button" data-v="2.58" aria-pressed="false">99%</button></div></div>
+        <div class="ctl"><label for="s11s">Planning σ</label><input type="number" id="s11s" value="1" step="any" min="0.0001"></div>
+        <div class="ctl"><label for="s11t">Target value</label><input type="number" id="s11t" value="0.1" step="any" min="0.0001"></div>
+        <div class="ctl"><span class="lbl">The target is</span><div class="seg" id="s11kind"><button type="button" data-v="m" aria-pressed="true">margin ±d</button><button type="button" data-v="w" aria-pressed="false">full width W</button></div></div>
+      </div>
+      <div class="chart"><svg id="s11svg" role="img" aria-label="Margin of error as a function of n with the target line and the minimum n"></svg></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">d used</div><div class="v" id="s11d"></div></div>
+        <div class="ro"><div class="k">(zσ/d)²</div><div class="v" id="s11raw"></div></div>
+        <div class="ro key"><div class="k">n<sub>min</sub></div><div class="v" id="s11n"></div></div>
+      </div>
+    </div>
+    <div class="deriv" id="s11steps"></div>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <h3>What planning controls</h3>
+      <p>Sample-size planning runs the usual problem in reverse. You decide <b>before</b> collecting data how precise the interval must be, then solve for how much data that takes. A smaller d means more precision, which needs a larger n.</p>
+      <div class="tbl"><table class="small" style="min-width:0">
+        <thead><tr><th>Quantity in M = z<sub>α/2</sub>σ/√n</th><th>Role in planning</th></tr></thead>
+        <tbody>
+          <tr><td>d</td><td class="t">You choose it: the required precision</td></tr>
+          <tr><td>z<sub>α/2</sub></td><td class="t">You choose it, through the confidence <b>level</b> (not the interval, which exists only after the data)</td></tr>
+          <tr><td>σ</td><td class="t">Not a choice. It is a property of the process, so you plug in a planning estimate from a pilot study, past data or judgement</td></tr>
+          <tr><td>n</td><td class="t">The unknown you solve for, and the one lever the study design controls</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><b>Piston example.</b> Want 95% confidence (z = 1.96) and a margin of ±0.1 cm, and expect σ ≈ 1 cm: n ≥ (1.96 × 1 / 0.1)² = 384.16, so measure 385 pistons. Halving d to 0.05 multiplies the required n by four (Section 10).</div>
+    </div>
+    <div class="panel">
+      <div class="head"><span class="eyebrow">Planned, not guaranteed</span><h3>What if the real data vary more than planned?</h3></div>
+      <p style="font-size:.93rem">The formula uses a guessed σ. After collecting n<sub>min</sub> observations, the actual interval uses the sample's s. Move the slider to see the margin you would actually get with the n you planned above.</p>
+      <div class="ctl"><label for="s11r">Actual s as a multiple of planning σ <output id="s11ro"></output></label><input type="range" id="s11r" min="0.5" max="1.6" step="0.01" value="1.2"></div>
+      <div class="chart"><svg id="s11svg2" role="img" aria-label="Planned margin compared with the realised margin when the sample SD differs from the planning value"></svg></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Actual s</div><div class="v" id="s11as"></div></div>
+        <div class="ro key"><div class="k">Realised M = z·s/√n<sub>min</sub></div><div class="v" id="s11am"></div></div>
+        <div class="ro"><div class="k">Target met?</div><div class="v" id="s11ok"></div></div>
+      </div>
+      <span class="added">This planned-vs-actual tool is my addition, not from the slides</span>
+    </div>
+  </div>
+  <div class="warn">n<sub>min</sub> is the total planned sample size, not additional observations. The planning σ is a guess; if the real data vary more, the final interval comes out wider than planned.</div>
+</section>
+
+<!-- ============ STATION 12 ============ -->
+<section class="station" id="s12">
+  <div class="head">
+    <span class="eyebrow">Section 12 · Slides 29–32</span>
+    <h2>One-sided confidence bounds</h2>
+    <p>When only one direction matters (a minimum mean strength, a maximum mean fill), put all of α in one tail. The cutoff becomes z<sub>α</sub> instead of z<sub>α/2</sub>, and the result is a ray instead of a segment. The ghost segment is the two-sided interval at the same level, for comparison.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">Lower: <i>L</i> = x̄ − <i>z</i><sub>α</sub>SE, &nbsp;[<i>L</i>, ∞)</div>
+      <div class="formula">Upper: <i>U</i> = x̄ + <i>z</i><sub>α</sub>SE, &nbsp;(−∞, <i>U</i>]</div>
+      <div class="formula">Φ(<i>z</i><sub>α</sub>) = 1 − α</div>
+      <ul>
+        <li>A 95% one-sided bound uses 1.645, the same multiplier as a 90% two-sided interval. The 95% lower bound equals the lower end of the 90% interval.</li>
+        <li>At the same level, a one-sided bound sits closer to x̄ than the matching two-sided endpoint.</li>
+      </ul>
+      <span class="added">My addition, not on the slides</span>
+      <div class="note">Putting Example 2-2's bounds together, [12.0336, 12.0733] oz, gives an exact 94% two-sided (asymmetric) interval: the two ways to miss are disjoint, so 0.05 + 0.01 = 0.06.</div>
+    </div>
+    <div class="panel">
+      <div class="row"><button type="button" class="btn ghost" data-p12="A">Ex 2-2 A · 95% lower</button><button type="button" class="btn ghost" data-p12="B">Ex 2-2 B · 99% upper</button></div>
+      <div class="controls">
+        <div class="ctl"><span class="lbl">Direction</span><div class="seg" id="s12dir"><button type="button" data-v="L" aria-pressed="true">Lower bound</button><button type="button" data-v="U" aria-pressed="false">Upper bound</button></div></div>
+        <div class="ctl"><label for="s12c">Confidence (%) <output id="s12co"></output></label><input type="range" id="s12c" min="80" max="99.9" step="0.1" value="95"></div>
+        <div class="ctl"><label for="s12x">x̄ (oz)</label><input type="number" id="s12x" value="12.05" step="any"></div>
+        <div class="ctl"><label for="s12s">s (oz)</label><input type="number" id="s12s" value="0.1" step="any" min="0"></div>
+        <div class="ctl"><label for="s12n">n</label><input type="number" id="s12n" value="100" step="1" min="2"></div>
+      </div>
+      <div class="chart"><svg id="s12svg" role="img" aria-label="Standard normal with a single tail shaded"></svg></div>
+      <div class="chart"><svg id="s12line" role="img" aria-label="Number line showing the one-sided bound as a ray and the two-sided interval for comparison"></svg></div>
+      <div class="formula live" id="s12f"></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">z<sub>α</sub> (one-sided)</div><div class="v" id="s12z"></div></div>
+        <div class="ro key"><div class="k">Bound</div><div class="v" id="s12b"></div></div>
+        <div class="ro"><div class="k">Two-sided z<sub>α/2</sub></div><div class="v" id="s12z2"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="head"><span class="eyebrow">Example 2-2 · Slides 31–32</span><h3>Two separate statements, and what happens if you combine them</h3></div>
+    <div class="grid2">
+      <div class="concept">
+        <p>Same box data: x̄ = 12.05 oz, SE = 0.1/√100 = 0.01 oz. Each bound has <b>its own level and its own direction</b>, so each puts its own α in its own tail.</p>
+        <div class="formula" style="font-size:1.02rem">A: <i>L</i> = 12.05 − <span id="s12xzl"></span>(0.01) ≈ <b id="s12xL"></b> &nbsp;→ [<i>L</i>, ∞)</div>
+        <div class="formula" style="font-size:1.02rem">B: <i>U</i> = 12.05 + <span id="s12xzu"></span>(0.01) ≈ <b id="s12xU"></b> &nbsp;→ (−∞, <i>U</i>]</div>
+        <div class="controls">
+          <div class="ctl"><label for="s12xcl">Lower-bound level <output id="s12xclo"></output></label><input type="range" id="s12xcl" min="80" max="99.9" step="0.1" value="95"></div>
+          <div class="ctl"><label for="s12xcu">Upper-bound level <output id="s12xcuo"></output></label><input type="range" id="s12xcu" min="80" max="99.9" step="0.1" value="99"></div>
+        </div>
+        <span class="added">Combining the bounds is my addition, not from the slides</span>
+        <div class="note"><b>Combined [L, U]:</b> μ can be missed by falling below L (risk α<sub>L</sub>) or above U (risk α<sub>U</sub>), never both at once, because L &lt; U for every sample. The risks add, so the coverage is 1 − α<sub>L</sub> − α<sub>U</sub>: <b id="s12xcomb"></b>. That is neither of the two stated levels.</div>
+      </div>
+      <div class="stack" style="gap:12px">
+        <div class="chart"><svg id="s12xz" role="img" aria-label="Standard normal with different risk in each tail for the two bounds"></svg></div>
+        <div class="chart"><svg id="s12xrows" role="img" aria-label="The lower bound ray, the upper bound ray and the combined interval on one axis"></svg></div>
+      </div>
+    </div>
+    <div class="head" style="gap:6px"><h3>Check by simulation</h3><p style="font-size:.93rem">Draw many samples from a process with true μ = 12.05 oz (assumed for illustration), build both bounds from each sample, and count each way of missing.</p></div>
+    <div class="row"><button type="button" class="btn" id="s12xrun">Simulate 1000 samples</button><button type="button" class="btn ghost" id="s12xclr">Reset</button></div>
+    <div class="readouts">
+      <div class="ro"><div class="k">Samples</div><div class="v" id="s12xn">0</div></div>
+      <div class="ro"><div class="k">μ below L (A misses)</div><div class="v" id="s12xmL">–</div></div>
+      <div class="ro"><div class="k">μ above U (B misses)</div><div class="v" id="s12xmU">–</div></div>
+      <div class="ro"><div class="k">Both miss at once</div><div class="v" id="s12xmB">–</div></div>
+      <div class="ro key"><div class="k">[L, U] covers μ</div><div class="v" id="s12xcov">–</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHECK ============ -->
+<section class="station" id="s13">
+  <div class="head">
+    <span class="eyebrow">Slides 23–24, 33–36</span>
+    <h2>Interpretation, common mistakes and concept check</h2>
+    <p>Check the target, the standard error, the tails and the interpretation before checking the arithmetic.</p>
+  </div>
+  <h3>Interpretation sorter (Example 4: 90% CI for mean rod diameter, (14.73, 14.91) cm)</h3>
+  <div class="checks" id="s13sort"></div>
+  <div class="mistakes">
+    <div class="mk"><span class="n">01</span><b>Using s as the SE</b><span>For a mean, compute s/√n unless the SE is already given.</span><a href="#s1">Section 1</a></div>
+    <div class="mk"><span class="n">02</span><b>Using 1.96 for every problem</b><span>Match the confidence level and the number of tails.</span><a href="#s7">Section 7</a></div>
+    <div class="mk"><span class="n">03</span><b>Confusing margin and full width</b><span>M is the half-width; W = 2M.</span><a href="#s11">Section 11</a></div>
+    <div class="mk"><span class="n">04</span><b>Describing individual observations</b><span>The target is the population mean μ.</span><a href="#s1">Section 1</a></div>
+    <div class="mk"><span class="n">05</span><b>Assigning probability to fixed limits</b><span>Confidence describes repeated-use coverage.</span><a href="#s6">Section 6</a></div>
+    <div class="mk"><span class="n">06</span><b>Rounding a required n down</b><span>Apply the ceiling.</span><a href="#s11">Section 11</a></div>
+  </div>
+  <p><b>Concept check (slides 34–35).</b> Name the quantity and the rule before you reveal.</p>
+  <div class="checks">
+    <div class="check"><span class="tag">A</span><span class="claim">SE = 0.1 cm is already supplied. Should it be divided by √100 again?</span><button type="button" class="btn ghost" data-rev="ca">Reveal</button><div class="fix" id="ca" hidden><b>No.</b><span>0.1 cm already measures the uncertainty in the sample mean.</span></div></div>
+    <div class="check"><span class="tag">B</span><span class="claim">Same sample, 95% → 99%: does the interval narrow?</span><button type="button" class="btn ghost" data-rev="cb">Reveal</button><div class="fix" id="cb" hidden><b>It widens.</b><span>A higher level needs a larger critical value.</span></div></div>
+    <div class="check"><span class="tag">C</span><span class="claim">A desired full width is 0.2 cm. What margin enters the n formula?</span><button type="button" class="btn ghost" data-rev="cc">Reveal</button><div class="fix" id="cc" hidden><b>d = 0.1 cm.</b><span>The margin is half the full width.</span></div></div>
+    <div class="check"><span class="tag">D</span><span class="claim">At fixed confidence and σ, what happens to M when n is quadrupled?</span><button type="button" class="btn ghost" data-rev="cd">Reveal</button><div class="fix" id="cd" hidden><b>It halves.</b><span>M ∝ 1/√n, and √4 = 2.</span></div></div>
+    <div class="check"><span class="tag">E</span><span class="claim">95% one-sided lower bound: 1.96 or 1.645?</span><button type="button" class="btn ghost" data-rev="ce">Reveal</button><div class="fix" id="ce" hidden><b>1.645.</b><span>All of α = 0.05 sits in one tail.</span></div></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Idea</th><th>Summary (slide 36)</th><th>Section</th></tr></thead>
+    <tbody>
+      <tr><td>Confidence interval</td><td>Estimate a population mean with a centre and a margin</td><td>3, 8</td></tr>
+      <tr><td>Standard error</td><td>Uncertainty in the sample mean, not individual spread</td><td>1</td></tr>
+      <tr><td>Confidence level</td><td>Long-run coverage of the interval-building method</td><td>4, 5, 6</td></tr>
+      <tr><td>Precision</td><td>Higher confidence widens; a larger valid sample narrows</td><td>10, 11</td></tr>
+      <tr><td>One-sided bounds</td><td>Correct direction and one-tail critical value</td><td>12</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>A complete result (slide 2)</b> states the parameter, the interval, the confidence level, the units and the assumptions. Example: "We are 95% confident that the mean piston diameter μ is between 13.804 and 14.196 cm, assuming independent measurements from a normal population."</div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const SQ2PI=Math.sqrt(2*Math.PI);
+const pdf=(x,m=0,s=1)=>Math.exp(-((x-m)**2)/(2*s*s))/(s*SQ2PI);
+function erf(x){const t=1/(1+0.3275911*Math.abs(x));const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return x>=0?y:-y;}
+function Phi(z){if(z===Infinity)return 1;if(z===-Infinity)return 0;return 0.5*erfc(-z/Math.SQRT2);}
+function erfc(x){/* W. J. Cody style via continued fraction / series, accurate ~1e-12 */
+  if(x<0)return 2-erfc(-x);
+  if(x<2.5){let sum=x,term=x,x2=x*x;for(let n=1;n<200;n++){term*=-x2/n;const t=term/(2*n+1);sum+=t;if(Math.abs(t)<1e-17)break;}return 1-2/Math.sqrt(Math.PI)*sum;}
+  let f=0;for(let n=60;n>=1;n--)f=n/2/(x+f);return Math.exp(-x*x)/Math.sqrt(Math.PI)/(x+f);}
+function invPhi(p){if(p<=0)return -Infinity;if(p>=1)return Infinity;
+  const a=[-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239];
+  const b=[-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1];
+  const c=[-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783];
+  const d=[7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];
+  const pl=0.02425;let x;
+  if(p<pl){const q=Math.sqrt(-2*Math.log(p));x=(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  else if(p<=1-pl){const q=p-0.5,r=q*q;x=(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+  else{const q=Math.sqrt(-2*Math.log(1-p));x=-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  /* one Newton step */
+  const e=Phi(x)-p;x=x-e*SQ2PI*Math.exp(x*x/2);return x;}
+const f=(v,d=2)=>{if(!isFinite(v))return v>0?'∞':'−∞';const s=Math.abs(v).toFixed(d);return (v<0&&+s!==0?'−':'')+s;};
+function setText(id,t){$(id).textContent=t;}
+function seg(groupEl,cb){groupEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{groupEl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));cb(b.dataset.v);}));}
+function press(groupEl,val){groupEl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===String(val)));}
+function segVal(groupEl){const b=groupEl.querySelector('button[aria-pressed=true]');return b?b.dataset.v:null;}
+let spare=null;function randn(){if(spare!==null){const s=spare;spare=null;return s;}let u=0,v=0;while(u===0)u=Math.random();v=Math.random();const r=Math.sqrt(-2*Math.log(u));spare=r*Math.sin(2*Math.PI*v);return r*Math.cos(2*Math.PI*v);}
+const RM=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function nice(span){const raw=span/5,p=Math.pow(10,Math.floor(Math.log10(raw))),r=raw/p;return (r<1.5?1:r<3?2:r<7?5:10)*p;}
+function ticks(a,b){const st=nice(b-a),d=st<1?Math.max(0,Math.ceil(-Math.log10(st)-1e-9)):0,o=[];for(let v=Math.ceil(a/st-1e-9)*st;v<=b+1e-9;v+=st)o.push({v,l:f(v,d)});return o;}
+function hist(data,x0,x1,nb){const w=(x1-x0)/nb,c=new Array(nb).fill(0);data.forEach(v=>{const i=Math.floor((v-x0)/w);if(i>=0&&i<nb)c[i]++;});return c.map((n,i)=>({a:x0+i*w,b:x0+(i+1)*w,h:data.length?n/(data.length*w):0}));}
+const num=id=>{const v=parseFloat($(id).value);return isFinite(v)?v:NaN;};
+
+/* generic plot (same helper as the earlier labs) */
+function plot(svg,o){
+  const W=o.w||640,H=o.h||250,L=o.L??46,R=16,Tp=o.Tp??20,B=o.B??(o.rug?62:42);
+  const X=x=>L+(x-o.x0)/(o.x1-o.x0)*(W-L-R);
+  const Y=y=>H-B-(Math.min(y,o.y1*1.03)/o.y1)*(H-B-Tp);
+  let s='';
+  (o.yt||[]).forEach(v=>{s+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${o.yfmt?o.yfmt(v):v}</text>`;});
+  (o.bars||[]).forEach(b=>{const a=Math.max(b.a,o.x0),bb=Math.min(b.b,o.x1);if(bb<=a)return;s+=`<rect class="bar ${b.cls||''}" x="${X(a)}" y="${Y(b.h)}" width="${Math.max(0,X(bb)-X(a))}" height="${Math.max(0,Y(0)-Y(b.h))}"/>`;});
+  (o.shade||[]).forEach(sh=>{const a=Math.max(sh.a,o.x0),b=Math.min(sh.b,o.x1);if(b<=a)return;let d=`M${X(a).toFixed(1)},${Y(0)}`;const n=160;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;d+=`L${X(x).toFixed(1)},${Y(sh.f(x)).toFixed(1)}`;}d+=`L${X(b).toFixed(1)},${Y(0)}Z`;s+=`<path class="shade ${sh.cls||''}" d="${d}"/>`;});
+  (o.curves||[]).forEach(c=>{let d='';const n=400;const a=c.a??o.x0,b=c.b??o.x1;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;d+=(i?'L':'M')+X(x).toFixed(1)+','+Y(c.f(x)).toFixed(1);}s+=`<path class="curve ${c.cls||''}" d="${d}"/>`;});
+  s+=`<line class="ax" x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  (o.vlines||[]).forEach(v=>{if(v.x<o.x0||v.x>o.x1)return;const top=v.top!=null?Y(v.top):Tp;s+=`<line class="vl ${v.cls||''}" x1="${X(v.x)}" x2="${X(v.x)}" y1="${Y(0)}" y2="${top}"/>`;if(v.label)s+=`<text class="lab ${v.lcls||''}" x="${X(v.x)+(v.dx??4)}" y="${top+(v.dy??10)}" text-anchor="${v.anchor||'start'}">${v.label}</text>`;});
+  (o.rug||[]).forEach(r=>{if(r.x<o.x0||r.x>o.x1)return;s+=`<line class="rug ${r.cls||''}" x1="${X(r.x).toFixed(1)}" x2="${X(r.x).toFixed(1)}" y1="${Y(0)+5}" y2="${Y(0)+17}"/>`;});
+  const ty=Y(0)+(o.rug?34:16);
+  (o.xt||[]).forEach(t=>{const v=typeof t==='object'?t.v:t,l=typeof t==='object'?t.l:f(t,o.xd??0);if(v<o.x0-1e-9||v>o.x1+1e-9)return;s+=`<line class="ax" x1="${X(v)}" x2="${X(v)}" y1="${Y(0)}" y2="${Y(0)+4}"/><text x="${X(v)}" y="${ty}" text-anchor="middle">${l}</text>`;});
+  (o.dots||[]).forEach(p=>{s+=`<circle class="dot ${p.cls||''}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${p.r||4}"/>`;});
+  (o.labels||[]).forEach(l=>{s+=`<text class="lab ${l.cls||''}" x="${X(l.x)}" y="${Y(l.y)}" text-anchor="${l.anchor||'middle'}">${l.t}</text>`;});
+  if(o.xlabel)s+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle">${o.xlabel}</text>`;
+  if(o.extra)s+=o.extra({X,Y,W,H,L,R,Tp,B});
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML=s;return{X,Y};
+}
+/* horizontal interval with caps and centre dot */
+function ivSVG(X,a,b,c,y,cls,cap=7){return `<line class="iv ${cls}" x1="${X(a)}" x2="${X(b)}" y1="${y}" y2="${y}"/><line class="cap ${cls}" x1="${X(a)}" x2="${X(a)}" y1="${y-cap}" y2="${y+cap}"/><line class="cap ${cls}" x1="${X(b)}" x2="${X(b)}" y1="${y-cap}" y2="${y+cap}"/>`+(c!=null?`<circle class="pt ${cls}" cx="${X(c)}" cy="${y}" r="4.5"/>`:'');}
+function axisSVG(X,x0,x1,y,tk,L,W,R){let s=`<line class="ax" x1="${X(x0)}" x2="${X(x1)}" y1="${y}" y2="${y}"/>`;tk.forEach(t=>{s+=`<line class="ax" x1="${X(t.v)}" x2="${X(t.v)}" y1="${y}" y2="${y+4}"/><text x="${X(t.v)}" y="${y+16}" text-anchor="middle">${t.l}</text>`;});return s;}
+function confZ(c){return invPhi(1-(1-c/100)/2);}
+const MU=14.0,SIG=1.0;
+
+/* ===== Section 1 ===== */
+let s1means=[],s1last=null;
+function s1draw(k){const n=+$('s1n').value;for(let j=0;j<k;j++){const xs=[];let sum=0;for(let i=0;i<n;i++){const v=MU+SIG*randn();xs.push(v);sum+=v;}const xb=sum/n;s1means.push(xb);s1last={xs,xb};}r1();}
+function r1(){const n=+$('s1n').value,se=SIG/Math.sqrt(n);setText('s1no',n);setText('s1se',se.toFixed(3)+' cm');
+  const x0=10.5,x1=17.5,xt=[11,12,13,14,15,16,17];
+  const rug=s1last?s1last.xs.slice(0,400).map(x=>({x})):[];
+  plot($('s1top'),{x0,x1,y1:0.45,h:190,rug,curves:[{f:x=>pdf(x,MU,SIG)}],
+    vlines:s1last?[{x:s1last.xb,cls:'hi',top:0.43,label:'x̄ of this sample',lcls:'hi',dx:6}]:[],
+    labels:[{x:16.1,y:0.33,t:'individual pistons: SD σ = 1',cls:'bar'}],xt,xlabel:''});
+  const pk=pdf(MU,MU,se),y1=Math.max(pk*1.1,0.5);
+  const bars=s1means.length?hist(s1means,x0,x1,Math.min(280,Math.max(70,Math.round(140/Math.max(se,0.05))))):[];
+  const hmax=bars.reduce((m,b)=>Math.max(m,b.h),0);const Y1=Math.max(y1,hmax*1.05);
+  plot($('s1bot'),{x0,x1,y1:Y1,h:190,bars,curves:[{f:x=>pdf(x,MU,se)}],
+    vlines:s1last?[{x:s1last.xb,cls:'hi',top:Y1*0.95}]:[],
+    labels:[{x:16.1,y:Y1*0.7,t:'sample means: SD σ/√n = '+se.toFixed(3),cls:'bar'}],xt,xlabel:'diameter (cm)'});
+  setText('s1xb',s1last?s1last.xb.toFixed(3)+' cm':'–');
+  if(s1means.length>1){const m=s1means.reduce((a,b)=>a+b,0)/s1means.length;const v=s1means.reduce((a,b)=>a+(b-m)**2,0)/(s1means.length-1);setText('s1sd',Math.sqrt(v).toFixed(3)+' ('+s1means.length+')');}else setText('s1sd','–');
+}
+$('s1n').addEventListener('input',()=>{s1means=[];s1last=null;r1();});
+$('s1one').addEventListener('click',()=>s1draw(1));
+$('s1many').addEventListener('click',()=>s1draw(300));
+$('s1clr').addEventListener('click',()=>{s1means=[];s1last=null;r1();});
+
+/* ===== Section 2 ===== */
+let s2pts=[];
+function r2(){const c=+$('s2c').value,se=0.1,z=confZ(c),M=z*se;setText('s2co',c.toFixed(1)+'%');
+  const fx=x=>pdf(x,MU,se),y1=fx(MU)*1.12;
+  const recent=s2pts.slice(-250);
+  plot($('s2svg'),{x0:13.6,x1:14.4,y1,rug:recent.map(x=>({x,cls:Math.abs(x-MU)<=M?'':'out'})),
+    shade:[{a:13.6,b:MU-M,f:fx,cls:'hi'},{a:MU-M,b:MU+M,f:fx},{a:MU+M,b:14.4,f:fx,cls:'hi'}],
+    curves:[{f:fx}],
+    vlines:[{x:MU,cls:'soft',top:y1*0.98,label:'μ = 14.0',dy:-2,dx:6},{x:MU-M,cls:'soft',top:fx(MU-M)},{x:MU+M,cls:'soft',top:fx(MU+M)}],
+    labels:[{x:MU,y:y1*0.45,t:c.toFixed(1)+'%',cls:'bar big'},{x:13.66,y:y1*0.16,t:((100-c)/2).toFixed(2)+'%',cls:'hi',anchor:'start'},{x:14.34,y:y1*0.16,t:((100-c)/2).toFixed(2)+'%',cls:'hi',anchor:'end'}],
+    xt:[{v:MU-M,l:'μ − '+z.toFixed(2)+'SE'},{v:MU,l:'14.0'},{v:MU+M,l:'μ + '+z.toFixed(2)+'SE'}],xlabel:'sample mean x̄ (cm)'});
+  setText('s2z',z.toFixed(4));setText('s2band','('+(MU-M).toFixed(3)+', '+(MU+M).toFixed(3)+')');
+  setText('s2cnt',s2pts.length);
+  if(s2pts.length){const k=s2pts.filter(x=>Math.abs(x-MU)<=M).length;setText('s2in',(100*k/s2pts.length).toFixed(1)+'% ('+k+')');}else setText('s2in','–');
+}
+$('s2c').addEventListener('input',r2);
+$('s2one').addEventListener('click',()=>{s2pts.push(MU+0.1*randn());r2();});
+$('s2many').addEventListener('click',()=>{for(let i=0;i<100;i++)s2pts.push(MU+0.1*randn());r2();});
+$('s2clr').addEventListener('click',()=>{s2pts=[];r2();});
+
+/* ===== Section 3 ===== */
+function r3(){const xb=+$('s3x').value,M=0.196;setText('s3xo',xb.toFixed(3));
+  const W=640,H=250,L=30,R=20,x0=13.5,x1=14.5,X=x=>L+(x-x0)/(x1-x0)*(W-L-R);
+  const inside=Math.abs(xb-MU)<=M+1e-12,cls=inside?'':'miss';
+  const tk=[13.6,13.8,14.0,14.2,14.4].map(v=>({v,l:v.toFixed(1)}));
+  let s='';
+  // row A
+  const yA=70;
+  s+=`<text class="lab" x="${L}" y="22">Is x̄ within M of μ?</text>`;
+  s+=`<rect class="band" x="${X(MU-M)}" y="${yA-18}" width="${X(MU+M)-X(MU-M)}" height="36"/>`;
+  s+=`<text class="lab bar" x="${X(MU)}" y="${yA-24}" text-anchor="middle">μ ± M = (13.804, 14.196)</text>`;
+  s+=axisSVG(X,x0,x1,yA+18,tk);
+  s+=`<line class="mu" x1="${X(MU)}" x2="${X(MU)}" y1="${yA-18}" y2="${yA+18}"/>`;
+  s+=`<line class="${inside?'iv':'iv miss'} thin" x1="${X(MU)}" x2="${X(xb)}" y1="${yA}" y2="${yA}"/>`;
+  s+=`<circle class="pt ${cls}" cx="${X(xb)}" cy="${yA}" r="6"/><text class="lab ${inside?'bar':'hi'}" x="${X(xb)}" y="${yA+(xb<MU?-8:-8)}" dy="-6" text-anchor="middle">x̄</text>`;
+  // row B
+  const yB=180;
+  s+=`<text class="lab" x="${L}" y="${yB-48}">Does x̄ ± M reach μ?</text>`;
+  s+=`<line class="mu" x1="${X(MU)}" x2="${X(MU)}" y1="${yB-34}" y2="${yB+20}"/><text class="lab" x="${X(MU)+5}" y="${yB-24}">μ</text>`;
+  s+=ivSVG(X,xb-M,xb+M,xb,yB,cls,9);
+  s+=`<text class="lab ${inside?'bar':'hi'}" x="${X(xb)}" y="${yB+26}" text-anchor="middle">(${(xb-M).toFixed(3)}, ${(xb+M).toFixed(3)})</text>`;
+  s+=axisSVG(X,x0,x1,yB+38,tk);
+  $('s3svg').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s3svg').innerHTML=s;
+  $('s3f').innerHTML=`|x̄ − μ| = |${xb.toFixed(3)} − 14.000| = ${Math.abs(xb-MU).toFixed(3)} &nbsp;${inside?'≤':'&gt;'}&nbsp; M = 0.196`;
+  const c1=$('s3c1'),c2=$('s3c2');
+  c1.textContent='x̄ close to μ: '+(inside?'TRUE':'FALSE');c2.textContent='interval contains μ: '+(inside?'TRUE':'FALSE');
+  c1.className='chip '+(inside?'pass':'fail');c2.className='chip '+(inside?'pass':'fail');
+}
+$('s3x').addEventListener('input',r3);
+
+/* ===== Section 4 (slide 10 process) ===== */
+const s4={stage:3,xb:14.07,drop:1,arm:1,hist:[{xb:14.07,hit:true},{xb:13.73,hit:false}],busy:false};
+const s4M=0.196,s4SE=0.1;
+function s4draw(){
+  const W=640,H=360,L=30,R=20,x0=13.55,x1=14.45,X=x=>L+(x-x0)/(x1-x0)*(W-L-R);
+  const yAx=150,top=26,pk=pdf(MU,MU,s4SE),Yc=y=>yAx-(y/pk)*(yAx-top-14);
+  let s='';
+  // sampling curve with shaded central band and tails
+  const path=(a,b)=>{let d=`M${X(a)},${yAx}`;for(let i=0;i<=120;i++){const x=a+(b-a)*i/120;d+=`L${X(x).toFixed(1)},${Yc(pdf(x,MU,s4SE)).toFixed(1)}`;}return d+`L${X(b)},${yAx}Z`;};
+  s+=`<path class="shade hi" d="${path(x0,MU-s4M)}"/><path class="shade" d="${path(MU-s4M,MU+s4M)}"/><path class="shade hi" d="${path(MU+s4M,x1)}"/>`;
+  let d='';for(let i=0;i<=300;i++){const x=x0+(x1-x0)*i/300;d+=(i?'L':'M')+X(x).toFixed(1)+','+Yc(pdf(x,MU,s4SE)).toFixed(1);}
+  s+=`<path class="curve" d="${d}"/>`;
+  s+=`<text class="lab" x="${L}" y="16">Sampling distribution of x̄ (SE = 0.1 cm)</text>`;
+  s+=`<text class="lab bar" x="${X(MU)}" y="${yAx-34}" text-anchor="middle">95%</text>`;
+  s+=`<text class="lab hi" x="${X(13.62)}" y="${yAx-8}" text-anchor="start">2.5%</text><text class="lab hi" x="${X(14.38)}" y="${yAx-8}" text-anchor="end">2.5%</text>`;
+  s+=axisSVG(X,x0,x1,yAx,[13.6,13.8,14.0,14.2,14.4].map(v=>({v,l:v.toFixed(1)})));
+  // mu line full height
+  s+=`<line class="mu" x1="${X(MU)}" x2="${X(MU)}" y1="${top-6}" y2="${H-8}"/><text class="lab" x="${X(MU)+5}" y="${top+2}">μ (fixed)</text>`;
+  // current interval row
+  const yI=205;
+  s+=`<text class="lab" x="${L}" y="${yI-26}">This sample</text>`;
+  if(s4.stage>=1&&s4.xb!=null){
+    const hit=Math.abs(s4.xb-MU)<=s4M;
+    const yDot=top+(yI-top)*s4.drop;
+    if(s4.drop<1)s+=`<line class="vl soft" x1="${X(s4.xb)}" x2="${X(s4.xb)}" y1="${top}" y2="${yI}"/>`;
+    else s+=`<line class="vl soft" x1="${X(s4.xb)}" x2="${X(s4.xb)}" y1="${yAx}" y2="${yI}"/>`;
+    if(s4.stage>=2){const a=s4.xb-s4M*s4.arm,b=s4.xb+s4M*s4.arm;const cl=s4.stage>=3?(hit?'':'miss'):'ghost';
+      s+=`<line class="iv ${cl}" x1="${X(a)}" x2="${X(b)}" y1="${yI}" y2="${yI}"/>`;
+      if(s4.arm>=1)s+=`<line class="cap ${cl}" x1="${X(a)}" x2="${X(a)}" y1="${yI-9}" y2="${yI+9}"/><line class="cap ${cl}" x1="${X(b)}" x2="${X(b)}" y1="${yI-9}" y2="${yI+9}"/>`;
+      if(s4.arm>=1){s+=`<text class="lab" x="${(X(s4.xb)+X(b))/2}" y="${yI-12}" text-anchor="middle">+M</text><text class="lab" x="${(X(s4.xb)+X(a))/2}" y="${yI-12}" text-anchor="middle">−M</text>`;}
+      if(s4.stage>=3&&!hit){const edge=s4.xb<MU?s4.xb+s4M:s4.xb-s4M;s+=`<line class="gap" x1="${X(edge)}" x2="${X(MU)}" y1="${yI+16}" y2="${yI+16}"/><text class="lab hi" x="${(X(edge)+X(MU))/2}" y="${yI+30}" text-anchor="middle">short by ${(Math.abs(s4.xb-MU)-s4M).toFixed(3)}</text>`;}
+    }
+    s+=`<circle class="pt ${s4.stage>=3?(hit?'':'miss'):''}" cx="${X(s4.xb)}" cy="${yDot}" r="6"/>`;
+    if(s4.drop>=1)s+=`<text class="lab" x="${X(s4.xb)}" y="${yI+(s4.stage>=3&&!hit?44:24)}" text-anchor="middle">x̄ = ${s4.xb.toFixed(3)}</text>`;
+  }
+  // history rows
+  const y0=258;s+=`<text class="lab" x="${L}" y="${y0-10}">Earlier samples (same rule, same width)</text>`;
+  s4.hist.slice(-6).reverse().forEach((h,i)=>{const y=y0+8+i*16;s+=ivSVG(X,h.xb-s4M,h.xb+s4M,h.xb,y,h.hit?'thin':'miss thin',5);});
+  $('s4svg').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s4svg').innerHTML=s;
+  // step list
+  document.querySelectorAll('#s4steps .stp').forEach(el=>{const k=+el.dataset.k;el.className='stp '+(k<s4.stage?'done':k===s4.stage?'now':'');const n=el.querySelector('.dnum');n.className='dnum '+(k<s4.stage?'':k===s4.stage?'now':'off');});
+  const v=$('s4v');
+  if(s4.stage>=3&&s4.xb!=null){const hit=Math.abs(s4.xb-MU)<=s4M;v.textContent=hit?'Captures μ':'Misses μ';v.className='verdict '+(hit?'pass':'fail');}
+  else{v.textContent=['μ is fixed. Next: draw a sample.','x̄ has landed. Next: apply the rule.','Arms of ±0.196 drawn. Next: check μ.',''][s4.stage]||'';v.className='verdict';}
+  setText('s4x',s4.stage>=1&&s4.xb!=null?s4.xb.toFixed(3):'–');
+  setText('s4d',s4.stage>=1&&s4.xb!=null?Math.abs(s4.xb-MU).toFixed(3):'–');
+  setText('s4n',s4.hist.length);setText('s4h',s4.hist.filter(h=>h.hit).length);
+}
+function tween(key,ms,done){if(RM){s4[key]=1;s4draw();done&&done();return;}s4.busy=true;const t0=performance.now();s4[key]=0;
+  const step=t=>{const p=Math.min(1,(t-t0)/ms);s4[key]=1-(1-p)*(1-p);s4draw();if(p<1)requestAnimationFrame(step);else{s4.busy=false;done&&done();}};requestAnimationFrame(step);}
+function s4typical(){let x;do{x=MU+s4SE*randn();}while(x<13.57||x>14.43);return x;}
+function s4unusual(){let z;do{z=randn();}while(Math.abs(z)<=1.96||Math.abs(z)>4.2);return MU+s4SE*z;}
+function s4advance(done){if(s4.busy)return;
+  if(s4.stage===3){s4.stage=0;s4.xb=null;s4draw();done&&done();return;}
+  if(s4.stage===0){if(s4.xb==null)s4.xb=s4typical();s4.stage=1;s4.arm=0;tween('drop',700,done);return;}
+  if(s4.stage===1){s4.stage=2;tween('arm',650,done);return;}
+  if(s4.stage===2){s4.stage=3;s4.hist.push({xb:s4.xb,hit:Math.abs(s4.xb-MU)<=s4M});s4draw();done&&done();return;}}
+function s4play(start){if(s4.busy)return;if(s4.stage===3){s4.stage=0;s4.xb=start??null;}else if(start!=null&&s4.stage===0)s4.xb=start;
+  const go=()=>{if(s4.stage<3)setTimeout(()=>s4advance(go),RM?0:350);};
+  s4draw();setTimeout(()=>s4advance(go),RM?0:450);}
+$('s4next').addEventListener('click',()=>s4advance());
+$('s4play').addEventListener('click',()=>s4play(null));
+$('s4odd').addEventListener('click',()=>{if(s4.busy)return;s4.stage=3;s4play(s4unusual());});
+$('s4clr').addEventListener('click',()=>{s4.hist=[];s4draw();});
+
+/* ===== Section 5 (slide 12 simulation) ===== */
+let s5=[],s5cum=[],s5timer=null;
+function s5conf(){return +segVal($('s5lvl'));}
+function s5one(){const n=+$('s5n').value,mode=segVal($('s5mode')),z=confZ(s5conf());let xb,se;
+  if(mode==='known'){xb=MU+SIG/Math.sqrt(n)*randn();se=SIG/Math.sqrt(n);}
+  else if(mode==='s'){let sum=0,ss=0;const xs=[];for(let i=0;i<n;i++){const v=MU+SIG*randn();xs.push(v);sum+=v;}xb=sum/n;xs.forEach(v=>ss+=(v-xb)**2);se=Math.sqrt(ss/(n-1))/Math.sqrt(n);}
+  else{const rho=0.6,k=Math.sqrt(1-rho*rho);let e=randn(),sum=e;for(let i=1;i<n;i++){e=rho*e+k*randn();sum+=e;}xb=MU+SIG*sum/n;se=SIG/Math.sqrt(n);}
+  const M=z*se,hit=Math.abs(xb-MU)<=M;s5.push({xb,M,hit});const prev=s5cum.length?s5cum[s5cum.length-1]*s5cum.length:0;s5cum.push((prev+(hit?1:0))/s5.length);}
+function s5add(k){for(let i=0;i<k;i++)s5one();r5();}
+function r5(){const n=+$('s5n').value,c=s5conf(),mode=segVal($('s5mode'));setText('s5no',n);setText('s5nom',c+'%');
+  const se=SIG/Math.sqrt(n),half=4.6*se,x0=MU-half,x1=MU+half;
+  const W=420,rows=40,rh=10,top=24,H=top+rows*rh+40,L=14,R=16,X=x=>L+(Math.max(x0,Math.min(x1,x))-x0)/(x1-x0)*(W-L-R);
+  let s=`<text class="lab" x="${L}" y="14">Newest sample at the top · each row is a fresh sample</text>`;
+  s+=`<line class="mu" x1="${X(MU)}" x2="${X(MU)}" y1="${top-4}" y2="${top+rows*rh+4}"/>`;
+  const recent=s5.slice(-rows).reverse();
+  recent.forEach((r,i)=>{const y=top+6+i*rh;const a=r.xb-r.M,b=r.xb+r.M;const cl=r.hit?'thin':'miss thin';
+    s+=`<line class="iv ${cl}" x1="${X(a)}" x2="${X(b)}" y1="${y}" y2="${y}"/><circle class="pt ${r.hit?'':'miss'}" cx="${X(r.xb)}" cy="${y}" r="2.6"/>`;});
+  if(!s5.length)s+=`<text class="lab" x="${W/2}" y="${top+rows*rh/2}" text-anchor="middle">Press +1 sample to start</text>`;
+  const ay=top+rows*rh+10;
+  s+=axisSVG(X,x0,x1,ay,ticks(x0,x1));s+=`<text class="lab" x="${X(MU)}" y="${ay+30}" text-anchor="middle">μ = 14.0 cm</text>`;
+  $('s5svg').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s5svg').innerHTML=s;
+  // histogram of every sample mean, building toward N(mu, sigma^2/n)
+  const zc=confZ(c),Mb=zc*se,nb=46,bars=hist(s5.map(r=>r.xb),x0,x1,nb).map(b=>({...b,cls:Math.abs((b.a+b.b)/2-MU)<=Mb?'':'out'}));
+  const fx=x=>pdf(x,MU,se),dep=mode==='dep',sdA=dep?se*Math.sqrt(1.6/0.4):se,fA=x=>pdf(x,MU,sdA);
+  const hmax=bars.reduce((m,b)=>Math.max(m,b.h),0),y1h=Math.max(fx(MU)*1.18,hmax*1.05);
+  plot($('s5hist'),{w:W,h:200,L,x0,x1,y1:y1h,Tp:24,bars,
+    shade:[{a:MU-Mb,b:MU+Mb,f:fx}],curves:[...(dep?[{f:fA,cls:'c2'}]:[]),{f:fx}],
+    vlines:[{x:MU,cls:'soft',top:y1h*0.98},{x:MU-Mb,cls:'soft',top:fx(MU-Mb)},{x:MU+Mb,cls:'soft',top:fx(MU+Mb)}],
+    labels:[{x:x0,y:y1h*1.0,t:s5.length?`All ${s5.length} sample means so far`:'Sample means will collect here',anchor:'start'},{x:MU,y:fx(MU)*0.4,t:c+'%',cls:'bar'}],
+    xt:[{v:MU-Mb,l:'μ − '+zc.toFixed(2)+'SE'},{v:MU,l:'μ'},{v:MU+Mb,l:'μ + '+zc.toFixed(2)+'SE'}]});
+  $('s5leg').hidden=!dep;
+  // running coverage
+  const N=s5cum.length,nom=c/100;
+  const pts=[];if(N){const stepk=Math.max(1,Math.floor(N/400));for(let i=0;i<N;i+=stepk)pts.push({k:i+1,v:s5cum[i]});pts.push({k:N,v:s5cum[N-1]});}
+  const xmax=Math.max(20,N);
+  plot($('s5run'),{w:420,h:230,x0:0,x1:xmax,y1:1,L:44,
+    xt:ticks(0,xmax).map(t=>({v:t.v,l:String(Math.round(t.v))})),xlabel:'number of intervals',
+    extra:({X,Y})=>{const yy=v=>Y(Math.max(0,(v-0.4)/0.6));let o=[0.4,0.6,0.8,1].map(v=>`<line class="grid" x1="${X(0)}" x2="${X(xmax)}" y1="${yy(v)}" y2="${yy(v)}"/><text x="${X(0)-6}" y="${yy(v)+4}" text-anchor="end">${Math.round(v*100)}%</text>`).join('')+`<line class="vl hi" x1="${X(0)}" x2="${X(xmax)}" y1="${yy(nom)}" y2="${yy(nom)}"/><text class="lab hi" x="${X(xmax)-4}" y="${yy(nom)-6}" text-anchor="end">nominal ${c}%</text>`;
+      if(pts.length){let d='';pts.forEach((p,i)=>{d+=(i?'L':'M')+X(p.k).toFixed(1)+','+yy(p.v).toFixed(1);});o+=`<path class="ln" d="${d}"/>`;}return o;}});
+  setText('s5tot',N);setText('s5miss',s5.filter(r=>!r.hit).length);
+  setText('s5cov',N?(100*s5cum[N-1]).toFixed(1)+'%':'–');
+  const msg={known:'Conditions hold: independent normal data, σ known. The running rate settles near the nominal level.',
+    s:'σ is estimated by s, so each interval has its own width. For large n the rate is close to nominal; drag n down to 5–10 and it falls short, which is why small samples use a t cutoff instead.',
+    dep:'Neighbouring observations are positively correlated (ρ = 0.6), but the SE still uses σ/√n. The true spread of x̄ is about twice that, so intervals are too narrow and the capture rate collapses, even for large n.'}[mode];
+  setText('s5msg',msg);
+}
+function s5reset(){s5=[];s5cum=[];r5();}
+seg($('s5lvl'),s5reset);seg($('s5mode'),s5reset);
+$('s5n').addEventListener('input',s5reset);
+$('s5one').addEventListener('click',()=>s5add(1));
+$('s5twenty').addEventListener('click',()=>s5add(20));
+$('s5k').addEventListener('click',()=>s5add(1000));
+$('s5rst').addEventListener('click',s5reset);
+$('s5auto').addEventListener('click',()=>{if(s5timer){clearInterval(s5timer);s5timer=null;$('s5auto').textContent='Auto play';}else{s5timer=setInterval(()=>s5add(1),120);$('s5auto').textContent='Pause';}});
+
+/* ===== Section 6 ===== */
+let s6={xb:14.0,shown:false,draws:0};
+const s6pairs=[{xb:14.07},{xb:13.93},{xb:14.21},{xb:13.98},{xb:14.0}];
+function r6(){const M=0.196,se=0.1,fL=x=>pdf(x,MU-M,se),fU=x=>pdf(x,MU+M,se),pk=pdf(0,0,se);
+  const pairs=s6pairs.slice(-6),last=pairs[pairs.length-1],rh=17;
+  plot($('s6svg'),{w:460,h:340,B:150,x0:13.35,x1:14.65,y1:pk*1.15,
+    shade:[{a:MU-2*M,b:MU,f:fL,cls:'c2'},{a:MU,b:MU+2*M,f:fU}],
+    curves:[{f:fL,cls:'c2'},{f:fU}],
+    vlines:[{x:MU,cls:'',top:pk*1.13,label:'μ (fixed)',dx:5,dy:2}],
+    labels:[{x:MU-M,y:pk*1.04,t:'L',cls:'c2'},{x:MU+M,y:pk*1.04,t:'U',cls:'bar'},{x:MU-M,y:pk*0.3,t:'95%',cls:'c2'},{x:MU+M,y:pk*0.3,t:'95%',cls:'bar'}],
+    xt:[13.4,13.6,13.8,14,14.2,14.4,14.6].map(v=>({v,l:v.toFixed(1)})),
+    extra:({X,Y})=>{const y0=Y(0),r0=y0+44;let o='';
+      pairs.forEach(p=>{o+=`<line class="rug gold" x1="${X(p.xb-M)}" x2="${X(p.xb-M)}" y1="${y0-9}" y2="${y0}"/><line class="rug" x1="${X(p.xb+M)}" x2="${X(p.xb+M)}" y1="${y0-9}" y2="${y0}"/>`;});
+      o+=`<text class="lab" x="${X(13.35)}" y="${r0-14}">Each sample gives L and U together (newest on top)</text>`;
+      o+=`<line class="mu" x1="${X(MU)}" x2="${X(MU)}" y1="${y0}" y2="${r0+(Math.max(pairs.length,1)-1)*rh+8}"/>`;
+      if(last){const l=last.xb-M,u=last.xb+M;
+        o+=`<line class="vl soft" x1="${X(l)}" x2="${X(l)}" y1="${Y(fL(l))}" y2="${r0}"/><line class="vl soft" x1="${X(u)}" x2="${X(u)}" y1="${Y(fU(u))}" y2="${r0}"/>`;
+        o+=`<circle class="pt gold" cx="${X(l)}" cy="${Y(fL(l))}" r="5"/><circle class="pt" cx="${X(u)}" cy="${Y(fU(u))}" r="5"/>`;}
+      pairs.slice().reverse().forEach((p,i)=>{const y=r0+i*rh,l=p.xb-M,u=p.xb+M,hit=Math.abs(p.xb-MU)<=M;
+        o+=`<line class="iv ${hit?'ghost':'miss'}" x1="${X(l)}" x2="${X(u)}" y1="${y}" y2="${y}"/><line class="cap gold" x1="${X(l)}" x2="${X(l)}" y1="${y-6}" y2="${y+6}"/><line class="cap" x1="${X(u)}" x2="${X(u)}" y1="${y-6}" y2="${y+6}"/>`;
+        if(i===0)o+=`<text class="lab" x="${X(u)+6}" y="${y+4}">width 0.392</text>`;});
+      return o;}});
+  const l=s6.xb-M,u=s6.xb+M;
+  $('s6lu').innerHTML=`(<i>l</i>, <i>u</i>) = (${l.toFixed(3)}, ${u.toFixed(3)})`;
+  const W=460,H=110,Lp=20,R=20,x0=13.5,x1=14.5,X=x=>Lp+(x-x0)/(x1-x0)*(W-Lp-R);
+  const hit=Math.abs(s6.xb-MU)<=M;
+  let s=ivSVG(X,l,u,s6.xb,40,s6.shown?(hit?'':'miss'):'ghost',9);
+  if(s6.shown)s+=`<line class="mu" x1="${X(MU)}" x2="${X(MU)}" y1="12" y2="64"/><text class="lab" x="${X(MU)+5}" y="18">μ = 14.0</text>`;
+  else s+=`<text class="lab hi big" x="${X(MU)}" y="20" text-anchor="middle">μ = ?</text>`;
+  s+=axisSVG(X,x0,x1,70,[13.6,13.8,14,14.2,14.4].map(v=>({v,l:v.toFixed(1)})));
+  $('s6svg2').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s6svg2').innerHTML=s;
+  $('s6txt').innerHTML=s6.shown?`Now you can see it: this interval ${hit?'<b>contains</b>':'<b>does not contain</b>'} μ. That was true the moment the numbers were computed; revealing μ only removed our ignorance. The probability was never "95% for this interval".`:`Both endpoints are fixed numbers and μ is a fixed unknown constant. The interval either contains μ or it doesn't. We report <b>95% confidence</b>: it came from a method that captures μ 95% of the time.`;
+  const ch=$('s6chip');ch.hidden=!s6.shown;if(s6.shown){ch.textContent=hit?'contains μ':'misses μ';ch.className='chip '+(hit?'pass':'fail');}
+  $('s6rev').textContent=s6.shown?'Hide μ':'Reveal μ';
+}
+$('s6draw').addEventListener('click',()=>{s6.xb=MU+0.1*randn();s6pairs.push({xb:s6.xb});s6.shown=false;s6.draws++;r6();});
+$('s6rev').addEventListener('click',()=>{s6.shown=!s6.shown;r6();});
+
+/* ===== Section 6b (Example 4 pictures) ===== */
+const E4L=14.73,E4U=14.91,E4C=14.82,E4M=0.09,E4Z=invPhi(0.95),E4SE=E4M/E4Z;
+let s6bReps=[];
+function s6bMu(){return +$('s6bmu').value;}
+function r6bA(){const mu=s6bMu(),inside=mu>=E4L&&mu<=E4U;setText('s6bmuo',mu.toFixed(3));
+  const W=640,H=290,L=24,R=20,x0=14.5,x1=15.14,X=x=>L+(x-x0)/(x1-x0)*(W-L-R);
+  const tk=[14.6,14.7,14.8,14.9,15.0,15.1].map(v=>({v,l:v.toFixed(1)}));
+  const base=118,pk=pdf(0,0,E4SE),Yc=v=>base-v/pk*76;
+  let s=`<text class="lab" x="${L}" y="16">What the false reading needs: μ as a random quantity, spread like this</text>`;
+  let d=`M${X(E4L)},${base}`;for(let i=0;i<=80;i++){const x=E4L+(E4U-E4L)*i/80;d+=`L${X(x).toFixed(1)},${Yc(pdf(x,E4C,E4SE)).toFixed(1)}`;}d+=`L${X(E4U)},${base}Z`;
+  s+=`<path class="shade hi" d="${d}"/>`;
+  let c='';for(let i=0;i<=240;i++){const x=x0+(x1-x0)*i/240;c+=(i?'L':'M')+X(x).toFixed(1)+','+Yc(pdf(x,E4C,E4SE)).toFixed(1);}
+  s+=`<path class="curve hi" d="${c}"/>`;
+  s+=`<text class="lab hi big" x="${X(E4C)}" y="${base-20}" text-anchor="middle">90%</text>`;
+  s+=`<text class="lab hi" x="${X(15.0)}" y="58" text-anchor="middle">"density of μ"</text><text class="lab hi" x="${X(15.0)}" y="74" text-anchor="middle">does not exist here:</text><text class="lab hi" x="${X(15.0)}" y="90" text-anchor="middle">μ is a fixed constant</text>`;
+  s+=`<line class="strike" x1="${X(14.6)}" x2="${X(15.04)}" y1="${base-6}" y2="${base-82}" opacity=".55"/>`;
+  s+=`<line class="ax" x1="${X(x0)}" x2="${X(x1)}" y1="${base}" y2="${base}"/>`;
+  s+=`<text class="lab" x="${L}" y="166">What is really there: one fixed interval and one fixed μ</text>`;
+  const yI=212;
+  s+=ivSVG(X,E4L,E4U,null,yI,'gold',10);
+  s+=`<text class="lab c2" x="${X(E4L)}" y="${yI+24}" text-anchor="middle">14.73</text><text class="lab c2" x="${X(E4U)}" y="${yI+24}" text-anchor="middle">14.91</text>`;
+  s+=`<line class="mu" x1="${X(mu)}" x2="${X(mu)}" y1="186" y2="${yI+12}"/><path class="pin ${inside?'':'hi'}" d="M${X(mu)} 188 l-7 -12 h14z"/>`;
+  const right=X(mu)>W-150;
+  s+=`<text class="lab ${inside?'bar':'hi'}" x="${X(mu)+(right?-12:12)}" y="184" text-anchor="${right?'end':'start'}">true μ = ${mu.toFixed(3)} (${inside?'inside':'outside'})</text>`;
+  s+=axisSVG(X,x0,x1,256,tk);
+  $('s6bA').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s6bA').innerHTML=s;
+  const p=$('s6bP');p.textContent=inside?'= 1   (μ is inside)':'= 0   (μ is outside)';p.className='bigp '+(inside?'pass':'fail');
+}
+function s6bAdd(k){const mu=s6bMu();for(let i=0;i<k;i++){const xb=mu+E4SE*randn();s6bReps.push({xb,hit:Math.abs(xb-mu)<=E4M});}r6bB();}
+function r6bB(){const mu=s6bMu(),inside=mu>=E4L&&mu<=E4U;
+  const W=640,rows=30,rh=10,top=78,H=top+rows*rh+46,L=24,R=20,x0=14.45,x1=15.19,X=x=>L+(Math.max(x0,Math.min(x1,x))-x0)/(x1-x0)*(W-L-R);
+  let s=`<text class="lab c2" x="${L}" y="18">Our interval (14.73, 14.91): fixed, ${inside?'contains':'misses'} μ</text>`;
+  s+=ivSVG(X,E4L,E4U,E4C,36,'gold',9);
+  s+=`<text class="lab" x="${L}" y="${top-12}">Same procedure on new samples (newest on top)</text>`;
+  s+=`<line class="mu" x1="${X(mu)}" x2="${X(mu)}" y1="24" y2="${top+rows*rh+2}"/><text class="lab" x="${X(mu)+5}" y="${top+rows*rh+2}">μ</text>`;
+  s6bReps.slice(-rows).reverse().forEach((r,i)=>{const y=top+4+i*rh;s+=`<line class="iv ${r.hit?'thin':'miss thin'}" x1="${X(r.xb-E4M)}" x2="${X(r.xb+E4M)}" y1="${y}" y2="${y}"/><circle class="pt ${r.hit?'':'miss'}" cx="${X(r.xb)}" cy="${y}" r="2.6"/>`;});
+  s+=axisSVG(X,x0,x1,top+rows*rh+14,[14.5,14.6,14.7,14.8,14.9,15.0,15.1].map(v=>({v,l:v.toFixed(1)})));
+  $('s6bB').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s6bB').innerHTML=s;
+  const h=$('s6bHit');h.textContent=inside?'yes (1)':'no (0)';h.style.color=inside?'var(--bar)':'var(--hi)';
+  const N=s6bReps.length,k=s6bReps.filter(r=>r.hit).length;
+  setText('s6bN',N);setText('s6bRate',N?(100*k/N).toFixed(1)+'% ('+k+')':'–');
+}
+function r6bC(){const n=+$('s6bn').value,sg=E4SE*Math.sqrt(n);setText('s6bno',n);
+  const fr=2*Phi(E4M/sg)-1,lo=E4C-E4Z*sg,hi=E4C+E4Z*sg;
+  setText('s6bsig',sg.toFixed(3)+' cm');setText('s6bfr',(100*fr).toFixed(1)+'%');setText('s6brng','('+lo.toFixed(2)+', '+hi.toFixed(2)+')');
+  const x0=E4C-3.6*sg,x1=E4C+3.6*sg,fx=x=>pdf(x,E4C,sg),y1=fx(E4C)*1.25;
+  plot($('s6bC'),{x0,x1,y1,h:270,B:70,shade:[{a:lo,b:hi,f:fx,cls:'c2'},{a:E4L,b:E4U,f:fx,cls:'hi'}],curves:[{f:fx}],
+    vlines:[{x:E4L,cls:'hi',top:y1*0.98},{x:E4U,cls:'hi',top:y1*0.98}],
+    labels:[{x:E4C,y:y1*1.0,t:'CI (14.73, 14.91): '+(100*fr).toFixed(1)+'% of rods',cls:'hi'},{x:E4C,y:fx(E4C)*0.35,t:'≈90% of rods',cls:'c2'}],
+    xt:ticks(x0,x1),
+    extra:({X,Y})=>{const y=Y(0)+34;return `<path class="bracket" d="M${X(lo)},${y-6} L${X(lo)},${y} L${X(hi)},${y} L${X(hi)},${y-6}"/><text class="lab c2" x="${X(E4C)}" y="${y+16}" text-anchor="middle">individual rods: (${lo.toFixed(2)}, ${hi.toFixed(2)}) cm</text>`;}});
+}
+$('s6bmu').addEventListener('input',()=>{s6bReps=[];r6bA();s6bAdd(30);});
+$('s6bmore').addEventListener('click',()=>s6bAdd(30));
+$('s6bk').addEventListener('click',()=>s6bAdd(1000));
+$('s6brst').addEventListener('click',()=>{s6bReps=[];r6bB();});
+$('s6bn').addEventListener('input',r6bC);
+
+/* ===== Section 7 ===== */
+function r7(){const c=+$('s7c').value,side=+segVal($('s7side')),a=1-c/100,q=side===2?a/2:a,z=invPhi(1-q);
+  setText('s7co',c.toFixed(2)+'%');
+  const fx=x=>pdf(x);
+  const sh=side===2?[{a:-4,b:-z,f:fx,cls:'hi'},{a:-z,b:z,f:fx},{a:z,b:4,f:fx,cls:'hi'}]:[{a:-4,b:z,f:fx},{a:z,b:4,f:fx,cls:'hi'}];
+  const lab=side===2?[{x:0,y:0.17,t:'1 − α = '+c.toFixed(2)+'%',cls:'bar big'},{x:-3.3,y:0.06,t:'α/2',cls:'hi'},{x:3.3,y:0.06,t:'α/2',cls:'hi'}]:[{x:Math.min(0,z-1.2),y:0.17,t:'1 − α = '+c.toFixed(2)+'%',cls:'bar big'},{x:3.3,y:0.06,t:'α',cls:'hi'}];
+  const xt=side===2?[{v:-z,l:'−'+z.toFixed(3)},{v:0,l:'0'},{v:z,l:z.toFixed(3)}]:[{v:0,l:'0'},{v:z,l:z.toFixed(3)}];
+  plot($('s7svg'),{x0:-4,x1:4,y1:0.44,h:270,B:72,shade:sh,curves:[{f:fx}],labels:lab,xt,
+    vlines:[{x:z,cls:'soft',top:fx(z)},...(side===2?[{x:-z,cls:'soft',top:fx(-z)}]:[])],
+    extra:({X,Y})=>{const y=Y(0)+34;return `<path class="bracket" d="M${X(-4)},${y-6} L${X(-4)},${y} L${X(z)},${y} L${X(z)},${y-6}"/><text class="lab c2" x="${(X(-4)+X(z))/2}" y="${y+16}" text-anchor="middle">Φ(${z.toFixed(3)}) = ${(1-q).toFixed(4)} : area from −∞, includes the left tail</text>`;}});
+  setText('s7a',a.toFixed(4));setText('s7q',(side===2?'α/2 = ':'α = ')+q.toFixed(4));setText('s7p',(1-q).toFixed(4));setText('s7z',z.toFixed(4));
+  $('s7f').innerHTML=side===2?`Φ(${z.toFixed(4)}) = ${q.toFixed(4)} + ${(c/100).toFixed(4)} = ${(1-q).toFixed(4)} &nbsp;&nbsp; check: 2Φ(z) − 1 = ${(2*(1-q)-1).toFixed(4)}`:`Φ(${z.toFixed(4)}) = 1 − α = ${(1-q).toFixed(4)} &nbsp;&nbsp; all of α = ${a.toFixed(4)} in the upper tail`;
+  document.querySelectorAll('#s7tbl tbody tr').forEach(tr=>tr.classList.toggle('pick',Math.abs(+tr.dataset.c-c)<0.005&&+tr.dataset.s===side));
+}
+$('s7c').addEventListener('input',r7);seg($('s7side'),r7);
+document.querySelectorAll('#s7tbl tbody tr').forEach(tr=>tr.addEventListener('click',()=>{$('s7c').value=tr.dataset.c;press($('s7side'),tr.dataset.s);r7();}));
+
+/* ===== Section 8 ===== */
+function r8(){const g=segVal($('s8g')),xb=num('s8x'),v=num('s8v'),n=Math.round(num('s8n')),u=$('s8u').value||'',c=+$('s8c').value;setText('s8co',c.toFixed(2)+'%');
+  $('s8vl').textContent=g==='se'?'Standard error of the mean':g==='s'?'Sample SD s':'Population σ';
+  $('s8n').disabled=g==='se';
+  const a=1-c/100,z=confZ(c),se=g==='se'?v:v/Math.sqrt(n),M=z*se,lo=xb-M,hi=xb+M;
+  const ok=isFinite(xb)&&isFinite(v)&&v>0&&(g==='se'||n>=2);
+  const dp=Math.max(3,Math.min(5,Math.ceil(-Math.log10(Math.max(M,1e-9)))+2));
+  const st=$('s8steps');
+  if(!ok){st.innerHTML='<p class="muted">Enter a point estimate, a positive spread and n ≥ 2.</p>';return;}
+  const seLine=g==='se'?`SE = ${v} ${u} <span class="muted">(given: use as is, no √n)</span>`:`SE = <span class="frac"><span>${v}</span><span>√${n}</span></span> = ${se.toFixed(dp)} ${u}`;
+  const parm=g==='sig'?'σ known: exact z method if the mean is normal.':g==='s'?'σ unknown, replaced by s: approximate large-sample z method.':'SE supplied directly.';
+  st.innerHTML=`
+  <div class="dstep"><span class="dnum">1</span><div class="dbody"><b>Specify</b><span>Parameter μ (population mean), units ${u||'(none)'}, confidence 1 − α = ${(c/100).toFixed(4)}, so α = ${a.toFixed(4)}.</span></div></div>
+  <div class="dstep"><span class="dnum">2</span><div class="dbody"><b>Select</b><span>Two-sided: upper-tail area α/2 = ${(a/2).toFixed(4)}, look up Φ(z) = ${(1-a/2).toFixed(4)}.</span><div class="formula">z<sub>α/2</sub> = ${z.toFixed(4)}</div></div></div>
+  <div class="dstep"><span class="dnum">3</span><div class="dbody"><b>Compute the SE</b><div class="formula">${seLine}</div></div></div>
+  <div class="dstep"><span class="dnum">4</span><div class="dbody"><b>Construct</b><div class="formula">M = ${z.toFixed(4)} × ${se.toFixed(dp)} = ${M.toFixed(dp)}</div><div class="formula">${xb} ± ${M.toFixed(dp)} = (${lo.toFixed(dp)}, ${hi.toFixed(dp)}) ${u}</div></div></div>
+  <div class="dstep"><span class="dnum">5</span><div class="dbody"><b>Report</b><span>We are ${+c.toFixed(2)}% confident that the population mean is between ${lo.toFixed(dp)} and ${hi.toFixed(dp)} ${u}. ${parm} Assumes an independent random sample.</span></div></div>`;
+  setText('s8ci','('+lo.toFixed(dp)+', '+hi.toFixed(dp)+')');setText('s8m',M.toFixed(dp));setText('s8w',(2*M).toFixed(dp));
+  if(g==='se'){$('s8badbox').hidden=false;setText('s8badk','If you divided the SE by √100 again');setText('s8bad','('+(xb-M/10).toFixed(dp+1)+', '+(xb+M/10).toFixed(dp+1)+')');}
+  else{$('s8badbox').hidden=false;setText('s8badk','If you used s or σ as the SE');setText('s8bad','('+(xb-z*v).toFixed(dp)+', '+(xb+z*v).toFixed(dp)+')');}
+  const span=Math.max(M*2.2,1e-6),x0=xb-span,x1=xb+span;
+  const W=640,H=90,L=20,R=20,X=x=>L+(x-x0)/(x1-x0)*(W-L-R);
+  let s=ivSVG(X,lo,hi,xb,34,'',9)+`<text class="lab bar" x="${X(lo)}" y="16" text-anchor="middle">${lo.toFixed(dp)}</text><text class="lab bar" x="${X(hi)}" y="16" text-anchor="middle">${hi.toFixed(dp)}</text><text class="lab" x="${X(xb)}" y="16" text-anchor="middle">x̄</text>`;
+  s+=axisSVG(X,x0,x1,60,ticks(x0,x1));
+  $('s8svg').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s8svg').innerHTML=s;
+}
+['s8x','s8v','s8n','s8u','s8c'].forEach(id=>$(id).addEventListener('input',r8));seg($('s8g'),r8);
+const P8={ex1a:{g:'se',x:14.0,v:0.1,n:100,u:'cm',c:99.73},ex1b:{g:'se',x:14.0,v:0.1,n:100,u:'cm',c:95},ex1c:{g:'se',x:14.0,v:0.1,n:100,u:'cm',c:99},ex21:{g:'s',x:12.05,v:0.1,n:100,u:'oz',c:85}};
+document.querySelectorAll('[data-p8]').forEach(b=>b.addEventListener('click',()=>{const p=P8[b.dataset.p8];press($('s8g'),p.g);$('s8x').value=p.x;$('s8v').value=p.v;$('s8n').value=p.n;$('s8u').value=p.u;$('s8c').value=p.c;r8();}));
+
+/* ===== Section 9 ===== */
+function r9(){const l=num('s9l'),u=num('s9u'),xb=num('s9x'),s=num('s9s'),n=Math.round(num('s9n'));
+  const st=$('s9steps');if(![l,u,xb,s,n].every(isFinite)||u<=l||s<=0||n<2){st.innerHTML='<p class="muted">Enter l &lt; u, s &gt; 0 and n ≥ 2.</p>';return;}
+  const ctr=(l+u)/2,M=(u-l)/2,se=s/Math.sqrt(n),z=M/se,lvl=2*Phi(z)-1,okc=Math.abs(ctr-xb)<0.006;
+  st.innerHTML=`
+  <div class="dstep"><span class="dnum">0</span><div class="dbody"><b>Check the centre</b><div class="formula">(${l} + ${u}) / 2 = ${ctr.toFixed(3)} ${okc?'= x̄ ✓':'≠ x̄ = '+xb+' ✗'}</div>${okc?'':'<span class="muted">Not centred on x̄, so this is not a symmetric z-interval around the sample mean.</span>'}</div></div>
+  <div class="dstep"><span class="dnum">1</span><div class="dbody"><b>Half-width</b><div class="formula">M = <span class="frac"><span>${u} − ${l}</span><span>2</span></span> = ${M.toFixed(4)}</div></div></div>
+  <div class="dstep"><span class="dnum">2</span><div class="dbody"><b>Standard error</b><div class="formula">SE = <span class="frac"><span>${s}</span><span>√${n}</span></span> ≈ ${se.toFixed(7)}</div></div></div>
+  <div class="dstep"><span class="dnum">3</span><div class="dbody"><b>Multiplier</b><div class="formula">z* = <span class="frac"><span>${M.toFixed(4)}</span><span>${se.toFixed(7)}</span></span> ≈ ${z.toFixed(4)}</div></div></div>
+  <div class="dstep"><span class="dnum">4</span><div class="dbody"><b>Middle area</b><div class="formula">1 − α = 2Φ(${z.toFixed(4)}) − 1 ≈ ${lvl.toFixed(4)}</div><span>Φ(z*) counts the left tail as well, so subtract one tail twice: Φ − (1 − Φ).</span></div></div>`;
+  setText('s9z',z.toFixed(4));setText('s9lvl',(100*lvl).toFixed(2)+'%');setText('s9bad',((u-l)/s).toFixed(4)+' (meaningless)');
+  plot($('s9svg'),{x0:-4,x1:4,y1:0.44,h:220,shade:[{a:-4,b:-z,f:pdf,cls:'hi'},{a:-z,b:z,f:pdf},{a:z,b:4,f:pdf,cls:'hi'}],curves:[{f:pdf}],
+    labels:[{x:0,y:0.16,t:(100*lvl).toFixed(2)+'%',cls:'bar big'}],xt:[{v:-z,l:'−'+z.toFixed(3)},{v:0,l:'0'},{v:z,l:z.toFixed(3)}],xlabel:'z'});
+}
+['s9l','s9u','s9x','s9s','s9n'].forEach(id=>$(id).addEventListener('input',r9));
+
+/* ===== Section 10 ===== */
+function r10(){const c=+$('s10c').value,sg=+$('s10s').value,n=+$('s10n').value;setText('s10co',c.toFixed(2)+'%');setText('s10so',sg.toFixed(2));setText('s10no',n);
+  const z=confZ(c),M=z*sg/Math.sqrt(n),M0=confZ(95)*1/Math.sqrt(100);
+  setText('s10z',z.toFixed(4));setText('s10m',M.toFixed(4)+' cm');setText('s10w',(2*M).toFixed(4)+' cm');setText('s10r','× '+(M/M0).toFixed(3));
+  const span=Math.max(0.6,M*1.15,M0*1.15),x0=MU-span,x1=MU+span;
+  const W=640,H=170,L=110,R=20,X=x=>L+(x-x0)/(x1-x0)*(W-L-R);
+  let s=`<line class="mu" x1="${X(MU)}" x2="${X(MU)}" y1="10" y2="120"/>`;
+  s+=`<text class="lab" x="10" y="44">Baseline 95%</text><text x="10" y="58">σ = 1, n = 100</text>`+ivSVG(X,MU-M0,MU+M0,MU,46,'ghost',8);
+  s+=`<text class="lab" x="${X(MU-M0)}" y="30" text-anchor="middle">13.804</text><text class="lab" x="${X(MU+M0)}" y="30" text-anchor="middle">14.196</text>`;
+  s+=`<text class="lab bar" x="10" y="94">Your settings</text>`+ivSVG(X,MU-M,MU+M,MU,92,M>M0+1e-9?'miss':'',8);
+  s+=`<text class="lab" x="${X(MU-M)}" y="116" text-anchor="middle">${(MU-M).toFixed(3)}</text><text class="lab" x="${X(MU+M)}" y="116" text-anchor="middle">${(MU+M).toFixed(3)}</text>`;
+  s+=axisSVG(X,x0,x1,136,ticks(x0,x1));
+  $('s10svg').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s10svg').innerHTML=s;
+}
+['s10c','s10s','s10n'].forEach(id=>$(id).addEventListener('input',r10));
+document.querySelectorAll('[data-c10]').forEach(b=>b.addEventListener('click',()=>{$('s10c').value=b.dataset.c10;r10();}));
+const setN10=v=>{$('s10n').value=Math.max(4,Math.min(1600,Math.round(v)));r10();};
+$('s10x2').addEventListener('click',()=>setN10(+$('s10n').value*2));
+$('s10x4').addEventListener('click',()=>setN10(+$('s10n').value*4));
+$('s10d4').addEventListener('click',()=>setN10(+$('s10n').value/4));
+$('s10rst').addEventListener('click',()=>{$('s10c').value=95;$('s10s').value=1;$('s10n').value=100;r10();});
+
+/* ===== Section 11 ===== */
+function r11(){const z=+segVal($('s11lvl')),sg=num('s11s'),t=num('s11t'),kind=segVal($('s11kind'));
+  const st=$('s11steps');if(!(sg>0&&t>0)){st.innerHTML='<p class="muted">Enter a positive σ and target.</p>';return;}
+  const d=kind==='w'?t/2:t,raw=(z*sg/d)**2,nm=Math.max(1,Math.ceil(raw-1e-12));
+  const Mn=z*sg/Math.sqrt(nm),Mp=nm>1?z*sg/Math.sqrt(nm-1):NaN;
+  setText('s11d',d.toPrecision(4));setText('s11raw',raw.toFixed(2));setText('s11n',nm);
+  const lvl={1.645:'90%',1.96:'95%',2.58:'99%'}[z];
+  st.innerHTML=`
+  <div class="dstep"><span class="dnum">1</span><div class="dbody"><b>Target half-width</b><span>${kind==='w'?`Full width W = ${t}, so d = W/2 = ${d}`:`Margin ±${t}, so d = ${d}`}</span></div></div>
+  <div class="dstep"><span class="dnum">2</span><div class="dbody"><b>Require M ≤ d and solve</b><div class="formula">n ≥ (<span class="frac"><span>${z} × ${sg}</span><span>${d}</span></span>)² = ${raw.toFixed(2)}</div></div></div>
+  <div class="dstep"><span class="dnum">3</span><div class="dbody"><b>Round up</b><div class="formula">n<sub>min</sub> = ⌈${raw.toFixed(2)}⌉ = ${nm}</div></div></div>
+  <div class="dstep"><span class="dnum">4</span><div class="dbody"><b>Check</b><span>${nm>1?`n = ${nm-1} gives M ≈ ${Mp.toFixed(6)} ${Mp>d?'&gt;':'≤'} ${d}; `:''}n = ${nm} gives M ≈ ${Mn.toFixed(6)} ≤ ${d}.</span><span class="muted">${lvl} uses the slide's multiplier ${z}.</span></div></div>`;
+  r11b(z,sg,d,nm);
+  const a=Math.max(1,Math.floor(nm*0.3)),b=Math.max(nm*2,a+10),Mf=n=>z*sg/Math.sqrt(n);const ytop=Mf(a)*1.05;
+  plot($('s11svg'),{x0:a,x1:b,y1:ytop,h:240,L:56,yt:ticks(0,ytop).map(t=>t.v).filter(v=>v>0),yfmt:v=>f(v,Math.max(2,Math.ceil(-Math.log10(ytop))+2)),
+    curves:[{f:Mf}],xt:ticks(a,b).map(t=>({v:t.v,l:String(Math.round(t.v))})),xlabel:'sample size n',
+    extra:({X,Y})=>`<line class="vl hi" x1="${X(a)}" x2="${X(b)}" y1="${Y(d)}" y2="${Y(d)}"/><text class="lab hi" x="${X(b)-4}" y="${Y(d)-6}" text-anchor="end">target d = ${d}</text><line class="vl" x1="${X(nm)}" x2="${X(nm)}" y1="${Y(0)}" y2="${Y(d)}"/><circle class="dot solid" cx="${X(nm)}" cy="${Y(Mn)}" r="4"/><text class="lab" x="${X(nm)+6}" y="${Y(d)+18}">n_min = ${nm}</text>`});
+}
+function r11b(z,sg,d,nm){const k=+$('s11r').value;setText('s11ro','× '+k.toFixed(2));
+  const s=k*sg,M=z*s/Math.sqrt(nm),ok=M<=d+1e-12,dp=Math.max(3,Math.ceil(-Math.log10(d))+3);
+  setText('s11as',s.toPrecision(4));setText('s11am',M.toFixed(dp));
+  const o=$('s11ok');o.textContent=ok?'yes, M ≤ d':'no, '+(100*(M/d-1)).toFixed(0)+'% wider';o.style.color=ok?'var(--ok)':'var(--hi)';
+  const span=Math.max(d,M)*1.35,W=640,H=130,L=130,R=20,X=x=>L+(x+span)/(2*span)*(W-L-R);
+  let g=`<line class="mu" x1="${X(0)}" x2="${X(0)}" y1="12" y2="92"/>`;
+  g+=`<text class="lab" x="10" y="38">Planned ±d</text>`+ivSVG(X,-d,d,0,34,'ghost',8);
+  g+=`<text class="lab ${ok?'bar':'hi'}" x="10" y="78">Realised ±M</text>`+ivSVG(X,-M,M,0,74,ok?'':'miss',8);
+  g+=axisSVG(X,-span,span,100,ticks(-span,span));
+  g+=`<text x="${X(0)}" y="128" text-anchor="middle">distance from x̄</text>`;
+  $('s11svg2').setAttribute('viewBox',`0 0 ${W} ${H+6}`);$('s11svg2').innerHTML=g;}
+seg($('s11lvl'),r11);seg($('s11kind'),r11);['s11s','s11t','s11r'].forEach(id=>$(id).addEventListener('input',r11));
+
+/* ===== Section 12 ===== */
+function r12(){const dir=segVal($('s12dir')),c=+$('s12c').value,xb=num('s12x'),s=num('s12s'),n=Math.round(num('s12n'));setText('s12co',c.toFixed(1)+'%');
+  const a=1-c/100,z=invPhi(1-a),z2=invPhi(1-a/2);
+  const sh=dir==='L'?[{a:-4,b:-z,f:pdf,cls:'hi'},{a:-z,b:4,f:pdf}]:[{a:-4,b:z,f:pdf},{a:z,b:4,f:pdf,cls:'hi'}];
+  plot($('s12svg'),{x0:-4,x1:4,y1:0.44,h:200,shade:sh,curves:[{f:pdf}],
+    labels:[{x:dir==='L'?0.6:-0.6,y:0.16,t:c.toFixed(1)+'%',cls:'bar big'},{x:dir==='L'?-3.3:3.3,y:0.06,t:'α',cls:'hi'}],
+    xt:[{v:dir==='L'?-z:z,l:(dir==='L'?'−':'')+z.toFixed(3)},{v:0,l:'0'}],xlabel:dir==='L'?'all of α in the lower tail':'all of α in the upper tail'});
+  setText('s12z',z.toFixed(5));setText('s12z2',z2.toFixed(4));
+  if(!(isFinite(xb)&&s>0&&n>=2)){setText('s12b','–');return;}
+  const se=s/Math.sqrt(n),B=dir==='L'?xb-z*se:xb+z*se,lo2=xb-z2*se,hi2=xb+z2*se;
+  setText('s12b',dir==='L'?'['+B.toFixed(4)+', ∞)':'(−∞, '+B.toFixed(4)+']');
+  $('s12f').innerHTML=dir==='L'?`L = ${xb} − ${z.toFixed(5)} × ${se.toFixed(4)} ≈ ${B.toFixed(4)}`:`U = ${xb} + ${z.toFixed(5)} × ${se.toFixed(4)} ≈ ${B.toFixed(4)}`;
+  const span=Math.max(z2,z)*se*1.9,x0=xb-span,x1=xb+span,W=640,H=130,L=20,R=20,X=x=>L+(x-x0)/(x1-x0)*(W-L-R);
+  let g=`<text class="lab" x="${L}" y="16">${c.toFixed(1)}% two-sided (for comparison)</text>`+ivSVG(X,lo2,hi2,xb,30,'ghost',6);
+  const yr=74;g+=`<text class="lab bar" x="${L}" y="${yr-20}">${c.toFixed(1)}% ${dir==='L'?'lower':'upper'} bound</text>`;
+  if(dir==='L')g+=`<line class="ray" x1="${X(B)}" x2="${X(x1)-8}" y1="${yr}" y2="${yr}"/><path class="arrow" d="M${X(x1)} ${yr} l-10 -6 v12z"/><line class="cap" x1="${X(B)}" x2="${X(B)}" y1="${yr-9}" y2="${yr+9}"/>`;
+  else g+=`<line class="ray" x1="${X(x0)+8}" x2="${X(B)}" y1="${yr}" y2="${yr}"/><path class="arrow" d="M${X(x0)} ${yr} l10 -6 v12z"/><line class="cap" x1="${X(B)}" x2="${X(B)}" y1="${yr-9}" y2="${yr+9}"/>`;
+  g+=`<circle class="pt" cx="${X(xb)}" cy="${yr}" r="4.5"/><text class="lab bar" x="${X(B)}" y="${yr+22}" text-anchor="middle">${B.toFixed(4)}</text>`;
+  g+=axisSVG(X,x0,x1,H-24,ticks(x0,x1));
+  $('s12line').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s12line').innerHTML=g;
+}
+seg($('s12dir'),r12);['s12c','s12x','s12s','s12n'].forEach(id=>$(id).addEventListener('input',r12));
+document.querySelectorAll('[data-p12]').forEach(b=>b.addEventListener('click',()=>{const A=b.dataset.p12==='A';press($('s12dir'),A?'L':'U');$('s12c').value=A?95:99;$('s12x').value=12.05;$('s12s').value=0.1;$('s12n').value=100;r12();}));
+
+/* ===== Section 12 extension: Example 2-2 both bounds ===== */
+let s12x={n:0,mL:0,mU:0,mB:0};
+function r12x(){const cl=+$('s12xcl').value,cu=+$('s12xcu').value;setText('s12xclo',cl.toFixed(1)+'%');setText('s12xcuo',cu.toFixed(1)+'%');
+  const aL=1-cl/100,aU=1-cu/100,zL=invPhi(1-aL),zU=invPhi(1-aU),xb=12.05,se=0.01,L=xb-zL*se,U=xb+zU*se,comb=1-aL-aU;
+  setText('s12xzl',zL.toFixed(5));setText('s12xzu',zU.toFixed(5));setText('s12xL',L.toFixed(4));setText('s12xU',U.toFixed(4));
+  setText('s12xcomb','1 − '+aL.toFixed(3)+' − '+aU.toFixed(3)+' = '+comb.toFixed(3)+', a '+(100*comb).toFixed(1)+'% two-sided (asymmetric) interval');
+  plot($('s12xz'),{x0:-4,x1:4,y1:0.44,h:210,w:520,shade:[{a:-4,b:-zL,f:pdf,cls:'hi'},{a:-zL,b:zU,f:pdf},{a:zU,b:4,f:pdf,cls:'hi'}],curves:[{f:pdf}],
+    vlines:[{x:-zL,cls:'soft',top:pdf(zL)},{x:zU,cls:'soft',top:pdf(zU)}],
+    labels:[{x:(zU-zL)/2,y:0.15,t:'combined '+(100*comb).toFixed(1)+'%',cls:'bar'},{x:-3.2,y:0.07,t:'α_L = '+aL.toFixed(3),cls:'hi'},{x:3.2,y:0.07,t:'α_U = '+aU.toFixed(3),cls:'hi'}],
+    xt:[{v:-zL,l:'−'+zL.toFixed(3)},{v:0,l:'0'},{v:zU,l:zU.toFixed(3)}],xlabel:'z (each bound uses its own tail)'});
+  const W=520,H=196,Lp=16,R=16,x0=12.0,x1=12.1,X=x=>Lp+(Math.max(x0,Math.min(x1,x))-x0)/(x1-x0)*(W-Lp-R);
+  let g=`<line class="vl soft" x1="${X(xb)}" x2="${X(xb)}" y1="10" y2="158"/><text x="${X(xb)+4}" y="18">x̄ = 12.05</text>`;
+  const yA=44,yB=92,yC=140;
+  g+=`<text class="lab bar" x="${Lp}" y="${yA-14}">A · ${cl.toFixed(1)}% lower bound</text><line class="ray" x1="${X(L)}" x2="${X(x1)-8}" y1="${yA}" y2="${yA}"/><path class="arrow" d="M${X(x1)} ${yA} l-10 -6 v12z"/><line class="cap" x1="${X(L)}" x2="${X(L)}" y1="${yA-9}" y2="${yA+9}"/><text class="lab bar" x="${X(L)-6}" y="${yA+5}" text-anchor="end">${L.toFixed(4)}</text>`;
+  g+=`<text class="lab bar" x="${W-R}" y="${yB-14}" text-anchor="end">B · ${cu.toFixed(1)}% upper bound</text><line class="ray" x1="${X(x0)+8}" x2="${X(U)}" y1="${yB}" y2="${yB}"/><path class="arrow" d="M${X(x0)} ${yB} l10 -6 v12z"/><line class="cap" x1="${X(U)}" x2="${X(U)}" y1="${yB-9}" y2="${yB+9}"/><text class="lab bar" x="${X(U)+6}" y="${yB+5}">${U.toFixed(4)}</text>`;
+  g+=`<text class="lab c2" x="${Lp}" y="${yC-14}">Combined [L, U]: ${(100*comb).toFixed(1)}%</text>`+ivSVG(X,L,U,null,yC,'gold',9);
+  g+=axisSVG(X,x0,x1,166,[12.0,12.02,12.04,12.06,12.08,12.1].map(v=>({v,l:v.toFixed(2)})));
+  $('s12xrows').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s12xrows').innerHTML=g;
+  const p=k=>s12x.n?(100*k/s12x.n).toFixed(1)+'% ('+k+')':'–';
+  setText('s12xn',s12x.n);setText('s12xmL',p(s12x.mL));setText('s12xmU',p(s12x.mU));setText('s12xmB',s12x.n?String(s12x.mB):'–');
+  setText('s12xcov',s12x.n?(100*(1-(s12x.mL+s12x.mU-s12x.mB)/s12x.n)).toFixed(1)+'% (theory '+(100*comb).toFixed(1)+'%)':'–');
+  return {zL,zU};}
+function s12xSim(k){const {zL,zU}=r12x(),mu=12.05,se=0.01;for(let i=0;i<k;i++){const xb=mu+se*randn(),lo=mu<xb-zL*se,hi=mu>xb+zU*se;s12x.n++;if(lo)s12x.mL++;if(hi)s12x.mU++;if(lo&&hi)s12x.mB++;}r12x();}
+['s12xcl','s12xcu'].forEach(id=>$(id).addEventListener('input',()=>{s12x={n:0,mL:0,mU:0,mB:0};r12x();}));
+$('s12xrun').addEventListener('click',()=>s12xSim(1000));
+$('s12xclr').addEventListener('click',()=>{s12x={n:0,mL:0,mU:0,mB:0};r12x();});
+
+/* ===== Check: interpretation sorter ===== */
+const SORT=[
+  {t:'There is a 90% probability that μ is between 14.73 and 14.91 cm.',ok:false,why:'Both limits and μ are fixed after sampling. No probability is left for this particular interval.'},
+  {t:'We are 90% confident that the population mean diameter is between 14.73 and 14.91 cm.',ok:true,why:'The 90% describes the method that produced these limits.'},
+  {t:'90% of rods from this machine have diameters between 14.73 and 14.91 cm.',ok:false,why:'The interval targets the mean μ, not individual rods. Individual rods spread far more widely.'},
+  {t:'If the sampling and construction were repeated many times, about 90% of the intervals would contain μ.',ok:true,why:'This is the long-run coverage meaning of confidence (Section 5).'},
+  {t:'Before the sample is drawn, the interval we are about to compute has a 90% chance of covering μ.',ok:true,why:'Before sampling, L and U are random, so P(L ≤ μ ≤ U) = 0.90 is valid (Section 6).'},
+  {t:'90% of possible sample means lie between 14.73 and 14.91 cm.',ok:false,why:'Sample means centre on the unknown μ, not on this x̄. The band of likely x̄ values is μ ± M, which we cannot draw.'}];
+$('s13sort').innerHTML=SORT.map((q,i)=>`<div class="check"><span class="tag">S${i+1}</span><span class="claim">"${q.t}"</span><div class="row"><button type="button" class="btn ghost" data-sort="${i}" data-a="1">Correct</button><button type="button" class="btn ghost" data-sort="${i}" data-a="0">Not correct</button></div><div class="fix" id="so${i}" hidden></div></div>`).join('');
+document.querySelectorAll('[data-sort]').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.sort,q=SORT[i],pick=b.dataset.a==='1',right=pick===q.ok;const el=$('so'+i);el.hidden=false;el.innerHTML=`<b class="${right?'':'no'}">${right?'Right':'Not quite'}: this statement is ${q.ok?'correct':'not correct'}.</b><span>${q.why}</span>`;}));
+
+/* reveals */
+document.querySelectorAll('[data-rev]').forEach(b=>{const lbl=b.textContent;b.addEventListener('click',()=>{const el=$(b.dataset.rev);el.hidden=!el.hidden;b.textContent=el.hidden?lbl:'Hide';});});
+
+/* initial draw: start in realistic, filled states */
+s1draw(150);
+for(let i=0;i<60;i++)s2pts.push(MU+0.1*randn());
+r2();r3();s4draw();s5add(40);r6();r6bA();s6bAdd(30);r6bC();r7();r8();r9();r10();r11();r12();s12xSim(1000);
+</script>
+
+</body></html>

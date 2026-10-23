@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ENDG 319 · Linear functions of random variables</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F5F7; --surface:#FFFFFF; --ink:#18212B; --muted:#5A6573; --rule:#D3DAE1;
+  --red:#C8102E; --blue:#2356A8; --teal:#0E7A76; --gold:#A87808; --ok:#1E7B45; --bad:#B42318;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --sans:"Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#11161C; --surface:#18202A; --ink:#E7EBEF; --muted:#9BA6B2; --rule:#2B3540;
+    --red:#FF5C70; --blue:#7EA8FF; --teal:#3CC2BB; --gold:#E0B84A; --ok:#4CC27E; --bad:#FF7A6B;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11161C; --surface:#18202A; --ink:#E7EBEF; --muted:#9BA6B2; --rule:#2B3540;
+  --red:#FF5C70; --blue:#7EA8FF; --teal:#3CC2BB; --gold:#E0B84A; --ok:#4CC27E; --bad:#FF7A6B;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:1.125rem;line-height:1.62;-webkit-font-smoothing:antialiased}
+.page{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+p,ul,ol,.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;letter-spacing:-0.01em}
+h1{font-size:clamp(2.2rem,5vw,3.4rem);margin:0 0 .4em}
+h2{font-size:clamp(1.6rem,3.2vw,2.15rem);margin:0 0 .2em}
+h3{font-size:1.25rem;margin:1.6em 0 .4em}
+a{color:var(--blue)}
+.m{font-family:var(--serif);font-style:italic;white-space:nowrap}
+.m sub,.m sup{font-style:normal;font-size:.72em}
+.meta{font-family:var(--sans);font-size:.85rem;color:var(--muted);margin:0 0 1.2em}
+.sans{font-family:var(--sans)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:36px;align-items:center;padding:56px 0 40px;border-bottom:1px solid var(--rule)}
+.hero .course{font-family:var(--sans);font-size:.95rem;color:var(--red);font-weight:600;margin:0 0 .8em}
+.hero p.lede{font-size:1.2rem;color:var(--ink)}
+.stage{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:12px}
+#hero-canvas{width:100%;aspect-ratio:1/1;max-height:560px;display:block}
+.stage-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px}
+.readout-matrix{display:flex;align-items:center;gap:14px;font-family:var(--sans);font-size:.9rem;color:var(--muted);margin-top:10px;flex-wrap:wrap}
+.matrix{display:inline-grid;grid-template-columns:auto auto;gap:0 14px;padding:2px 10px;border-left:2px solid var(--ink);border-right:2px solid var(--ink);font-family:var(--serif);font-size:1.05rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.matrix span{text-align:right;min-width:3.2ch}
+.matrix .c1{color:var(--red)} .matrix .c2{color:var(--blue)}
+.note{font-family:var(--sans);font-size:.92rem;color:var(--muted);min-height:2.8em;margin:8px 0 0}
+
+nav.toc{padding:28px 0 8px}
+nav.toc ol{font-family:var(--sans);font-size:.95rem;columns:2;column-gap:40px;padding-left:1.3em;margin:0}
+nav.toc li{margin:.2em 0;break-inside:avoid}
+
+section{padding:56px 0 8px;border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+
+/* figures & controls */
+.fig{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:16px;margin:22px 0}
+.fig canvas{width:100%;display:block}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 20px;margin-top:14px}
+.ctl{display:flex;flex-direction:column;gap:4px;font-family:var(--sans);font-size:.88rem;color:var(--muted)}
+.ctl .lab{display:flex;justify-content:space-between;gap:8px}
+.ctl output{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--teal);height:28px;margin:0}
+.btn{font-family:var(--sans);font-size:.88rem;font-weight:500;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:7px 12px;cursor:pointer;line-height:1.2}
+.btn:hover{border-color:var(--muted)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 24px;margin-top:14px;font-family:var(--sans);font-size:.92rem}
+.ro{border-top:2px solid var(--rule);padding-top:6px}
+.ro .k{color:var(--muted);display:block;font-size:.82rem}
+.ro .v{font-variant-numeric:tabular-nums;font-size:1.05rem;color:var(--ink)}
+.ro.x{border-top-color:var(--red)} .ro.y{border-top-color:var(--teal)} .ro.w{border-top-color:var(--gold)}
+.eq{font-family:var(--serif);font-size:1.15rem;margin:12px 0;padding:10px 14px;border-left:3px solid var(--rule);font-variant-numeric:tabular-nums;overflow-x:auto}
+.eq .m{white-space:normal}
+.callout{border-left:3px solid var(--red);padding:4px 0 4px 16px;margin:20px 0;max-width:68ch}
+.legend{font-family:var(--sans);font-size:.85rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+
+/* exercises */
+.task{border:1px solid var(--rule);border-left:4px solid var(--teal);border-radius:6px;background:var(--surface);padding:16px 18px;margin:18px 0}
+.task h4{font-family:var(--sans);font-size:.95rem;margin:0 0 6px;font-weight:600}
+.task .q{margin:.2em 0 .7em}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{text-align:left;font-family:var(--serif);font-size:1.02rem;background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:4px;padding:9px 12px;cursor:pointer}
+.opt:hover{border-color:var(--muted)}
+.opt.is-right{border-color:var(--ok);box-shadow:inset 3px 0 0 var(--ok)}
+.opt.is-wrong{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
+.fb{font-family:var(--sans);font-size:.93rem;margin:.7em 0 0;min-height:1em}
+.fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)} .fb.hint{color:var(--muted)}
+.numrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.numrow input{font-family:var(--serif);font-size:1.05rem;width:10ch;padding:6px 8px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.unit{font-family:var(--sans);color:var(--muted);font-size:.9rem}
+details{font-family:var(--sans);font-size:.92rem;margin-top:10px}
+details summary{cursor:pointer;color:var(--blue)}
+details .work{font-family:var(--serif);font-size:1.02rem;padding:8px 0 0}
+table.data{border-collapse:collapse;font-family:var(--sans);font-size:.92rem;margin:12px 0}
+table.data th,table.data td{padding:6px 14px;border-bottom:1px solid var(--rule);text-align:right}
+table.data th:first-child,table.data td:first-child{text-align:left}
+.score{font-family:var(--sans);font-size:1rem;margin-top:16px}
+.locked{opacity:.45;pointer-events:none}
+footer{font-family:var(--sans);font-size:.85rem;color:var(--muted);padding-top:32px}
+
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;gap:20px;padding-top:36px}
+  .twocol{grid-template-columns:1fr}
+  nav.toc ol{columns:1}
+  body{font-size:1.06rem}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hero">
+  <div>
+    <p class="course">ENDG 319 · Lecture 8, part 1</p>
+    <h1>Linear functions of random variables</h1>
+    <p class="lede">Every rule in the first half of this lecture comes from one idea: a linear transformation moves every point in the same disciplined way. Watch it happen to the plane first, then to a random variable.</p>
+    <p class="sans" style="font-size:.95rem;color:var(--muted)">The animation cycles through five matrices. Pick one yourself, or set the four entries below it.</p>
+  </div>
+  <div class="stage">
+    <canvas id="hero-canvas" aria-label="A grid being transformed by a 2 by 2 matrix. The red arrow is i-hat, the blue arrow is j-hat."></canvas>
+    <div class="stage-bar" role="group" aria-label="Choose a transformation">
+      <button class="btn" id="hero-play" aria-pressed="true">Pause</button>
+      <button class="btn" data-preset="shear">Shear</button>
+      <button class="btn" data-preset="stretch">Stretch</button>
+      <button class="btn" data-preset="rotate">Rotate</button>
+      <button class="btn" data-preset="reflect">Reflect</button>
+      <button class="btn" data-preset="mixed">Mixed</button>
+      <button class="btn" data-preset="identity">Reset</button>
+    </div>
+    <div class="readout-matrix">
+      <div class="matrix" aria-live="off"><span class="c1" id="m-a">1.00</span><span class="c2" id="m-b">0.00</span><span class="c1" id="m-c">0.00</span><span class="c2" id="m-d">1.00</span></div>
+      <span>det = <strong id="m-det" style="color:var(--ink)">1.00</strong></span>
+    </div>
+    <p class="note" id="hero-note">The identity: nothing moves.</p>
+    <div class="controls">
+      <label class="ctl"><span class="lab">a (î, x) <output id="h-a-o">1.0</output></span><input type="range" id="h-a" min="-2" max="2" step="0.1" value="1"></label>
+      <label class="ctl"><span class="lab">b (ĵ, x) <output id="h-b-o">0.0</output></span><input type="range" id="h-b" min="-2" max="2" step="0.1" value="0"></label>
+      <label class="ctl"><span class="lab">c (î, y) <output id="h-c-o">0.0</output></span><input type="range" id="h-c" min="-2" max="2" step="0.1" value="0"></label>
+      <label class="ctl"><span class="lab">d (ĵ, y) <output id="h-d-o">1.0</output></span><input type="range" id="h-d" min="-2" max="2" step="0.1" value="1"></label>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <ol>
+    <li><a href="#what">What a linear transformation is</a></li>
+    <li><a href="#line">The same idea on a number line (slide 3)</a></li>
+    <li><a href="#means">The mean of a combination (slide 4)</a></li>
+    <li><a href="#vars">Variances under independence (slides 5–6)</a></li>
+    <li><a href="#ex18">Example 18: piston clearance (slides 7–8)</a></li>
+    <li><a href="#xbar">The sample mean (slides 9–10)</a></li>
+    <li><a href="#ex19">Example 19: bottle fill volume (slide 11)</a></li>
+    <li><a href="#check">Checkpoint (slides 12–13)</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="what">
+  <h2>What a linear transformation is</h2>
+  <p class="meta">Background for the lecture</p>
+  <p>Linear algebra studies vectors and the functions that move them around in the simplest possible way. A transformation <span class="m">T</span> is <em>linear</em> if it respects addition and scaling:</p>
+  <div class="eq"><span class="m">T(u + v) = T(u) + T(v)</span> &nbsp;and&nbsp; <span class="m">T(cu) = c T(u)</span></div>
+  <p>In the animation this shows up three ways: the origin never moves, grid lines stay straight and parallel, and they stay evenly spaced. Because the grid is rigidly tied together, you only need to know where the two basis arrows land. The red arrow <span class="m">î</span> lands at <span class="m">(a, c)</span> and the blue arrow <span class="m">ĵ</span> lands at <span class="m">(b, d)</span>. Those landing spots are the two columns of the matrix, and every other point follows: <span class="m">(x, y) ↦ x·î′ + y·ĵ′</span>.</p>
+  <p>The determinant <span class="m">ad − bc</span> tells you how area changes. The shaded unit square turns into a parallelogram of area <span class="m">|det|</span>. When the determinant is negative the plane has been flipped over, which is why the flag points the other way after <em>Reflect</em>. When it is zero the whole plane is squashed onto a line.</p>
+  <p class="callout">Keep one picture in mind for the rest of the page: a linear map moves <em>every</em> point by the same rule. A random variable is a whole cloud of possible values, so a linear map moves the whole cloud at once, and its centre and spread change in predictable ways.</p>
+</section>
+
+<!-- 2 -->
+<section id="line">
+  <h2>The same idea on a number line</h2>
+  <p class="meta">Slide 3 · <span class="m">Y = aX + b</span></p>
+  <p>A line has only one basis vector, so a linear map on it is just multiplication by a single number <span class="m">a</span>. If <span class="m">|a| &gt; 1</span> it stretches, if <span class="m">|a| &lt; 1</span> it compresses, and a negative <span class="m">a</span> flips the line over, just like a negative determinant. Adding <span class="m">b</span> afterwards slides everything along. Strictly, <span class="m">aX + b</span> is an <em>affine</em> map (linear, then shifted), and that is the version the slides use.</p>
+  <p>Below, <span class="m">X</span> has mean 2 and SD 1. Each grey line connects one possible value of <span class="m">X</span> (top) to where the map sends it (bottom). Parallel lines mean a pure shift; lines that cross mean a reflection.</p>
+  <div class="fig">
+    <canvas id="map-canvas" style="height:380px" aria-label="Mapping diagram from values of X to values of Y equals aX plus b, with both densities drawn."></canvas>
+    <div class="legend"><span><i class="sw" style="background:var(--red)"></i>X (mean 2, SD 1)</span><span><i class="sw" style="background:var(--teal)"></i>Y = aX + b</span></div>
+    <div class="controls">
+      <label class="ctl"><span class="lab">scale a <output id="map-a-o">1.0</output></span><input type="range" id="map-a" min="-3" max="3" step="0.1" value="1"></label>
+      <label class="ctl"><span class="lab">shift b <output id="map-b-o">0.0</output></span><input type="range" id="map-b" min="-6" max="6" step="0.5" value="0"></label>
+    </div>
+    <div class="stage-bar" role="group" aria-label="Try a preset">
+      <button class="btn" data-map="1,4">Shift only</button>
+      <button class="btn" data-map="2,0">Stretch ×2</button>
+      <button class="btn" data-map="0.5,0">Compress ×½</button>
+      <button class="btn" data-map="-1,0">Reflect</button>
+      <button class="btn" data-map="-1.5,3">Reflect, stretch, shift</button>
+    </div>
+    <div class="readouts">
+      <div class="ro y"><span class="k">Mean: scale the centre, then shift</span><span class="v" id="map-mu"></span></div>
+      <div class="ro y"><span class="k">Variance: square the scale factor</span><span class="v" id="map-var"></span></div>
+      <div class="ro y"><span class="k">SD: use the absolute scale factor</span><span class="v" id="map-sd"></span></div>
+    </div>
+    <p class="note" id="map-note"></p>
+  </div>
+  <p>Try the reflection preset and watch the SD readout: the lines cross, the curve flips, but its width does not change. Spread is a distance, and distances can't be negative, which is why the SD uses <span class="m">|a|</span> and the variance uses <span class="m">a²</span>.</p>
+</section>
+
+<!-- 3 -->
+<section id="means">
+  <h2>The mean of a combination is the combination of the means</h2>
+  <p class="meta">Slide 4 · <span class="m">E[c₁X + c₂Y] = c₁E[X] + c₂E[Y]</span></p>
+  <p>Start with two random variables, each with its own distribution and its own mean. Then build a new variable from them, <span class="m">Z = c₁X + c₂Y</span>. The rule on slide 4 says you can find the mean of <span class="m">Z</span> without ever looking at its distribution: scale each mean by its coefficient, keeping the sign, and add.</p>
+  <p>Below, <span class="m">X</span> is roughly bell-shaped with mean 10, and <span class="m">Y</span> is flat between 3 and 7, with mean 5. Each is simulated 2,000 times, and each simulated pair gives one value of <span class="m">Z</span>.</p>
+  <div class="fig">
+    <div class="twocol">
+      <div>
+        <canvas id="cm-x" style="height:220px" aria-label="Histogram of X with its mean marked"></canvas>
+        <div class="readouts" style="margin-top:6px"><div class="ro x"><span class="k">Mean of X</span><span class="v" id="cm-xm"></span></div></div>
+      </div>
+      <div>
+        <canvas id="cm-y" style="height:220px" aria-label="Histogram of Y with its mean marked"></canvas>
+        <div class="readouts" style="margin-top:6px"><div class="ro" style="border-top-color:var(--blue)"><span class="k">Mean of Y</span><span class="v" id="cm-ym"></span></div></div>
+      </div>
+    </div>
+    <p class="sans" id="cm-combine" style="text-align:center;margin:18px auto 6px;font-size:1rem;max-width:none"></p>
+    <canvas id="cm-z" style="height:260px" aria-label="Histogram of the linear combination Z with its mean marked"></canvas>
+    <div class="legend"><span><i class="sw" style="background:var(--red)"></i>X</span><span><i class="sw" style="background:var(--blue)"></i>Y</span><span><i class="sw" style="background:var(--teal)"></i>Z = c₁X + c₂Y</span><span><i class="sw" style="background:var(--ink)"></i>mean from the formula</span></div>
+    <div class="controls">
+      <label class="ctl"><span class="lab">coefficient c₁ <output id="cm-c1-o">1.0</output></span><input type="range" id="cm-c1" min="-2" max="2" step="0.5" value="1"></label>
+      <label class="ctl"><span class="lab">coefficient c₂ <output id="cm-c2-o">1.0</output></span><input type="range" id="cm-c2" min="-2" max="2" step="0.5" value="1"></label>
+      <label class="ctl"><span class="lab">dependence between X and Y <output id="cm-r-o">0.0</output></span><input type="range" id="cm-r" min="-0.9" max="0.9" step="0.1" value="0"></label>
+      <div class="ctl"><span class="lab">&nbsp;</span><button class="btn" id="cm-go" type="button">Draw new values</button></div>
+    </div>
+    <h3 style="margin-top:22px">Evaluating the equation</h3>
+    <div class="eq" id="cm-eq" style="line-height:2"></div>
+    <p class="sans" id="cm-check" style="font-size:.95rem;color:var(--muted);max-width:none"></p>
+  </div>
+  <p>Try <span class="m">c₂ = −1</span>: the mean of <span class="m">X − Y</span> is <span class="m">10 − 5 = 5</span>, because the sign stays with the coefficient. Then drag the dependence slider. The shapes and the spread of <span class="m">Z</span> change, but every mean stays where the formula puts it. Dependence matters for variances (slide 41), never for means.</p>
+</section>
+
+<!-- 4 -->
+<section id="vars">
+  <h2>Variances add, even for a difference</h2>
+  <p class="meta">Slides 5–6 · <span class="m">Var(Σ cᵢXᵢ) = Σ cᵢ²σ²<sub>Xᵢ</sub></span>, for independent Xᵢ</p>
+  <p>Independence (slide 5) means that <em>every</em> event about <span class="m">X</span> is independent of <em>every</em> event about <span class="m">Y</span>. One matching probability is not enough. When it holds, the covariance terms vanish and variances simply add, with each coefficient squared. A minus sign becomes <span class="m">(−1)² = 1</span>, so subtracting a noisy quantity still adds its noise.</p>
+  <p>Standard deviations combine like the sides of a right triangle, not like lengths laid end to end. This is the root-sum-square rule from tolerance stacking.</p>
+  <div class="fig">
+    <canvas id="tri-canvas" style="height:300px" aria-label="Right triangle with legs sigma X and sigma Y and hypotenuse equal to the SD of X plus or minus Y"></canvas>
+    <div class="controls">
+      <label class="ctl"><span class="lab">σ<sub>X</sub> <output id="tri-x-o">3.0</output></span><input type="range" id="tri-x" min="0.5" max="5" step="0.5" value="3"></label>
+      <label class="ctl"><span class="lab">σ<sub>Y</sub> <output id="tri-y-o">4.0</output></span><input type="range" id="tri-y" min="0.5" max="5" step="0.5" value="4"></label>
+      <div class="ctl"><span class="lab">combination</span><div class="stage-bar" style="margin:0" role="group" aria-label="Sum or difference"><button class="btn" id="tri-sum" aria-pressed="true">X + Y</button><button class="btn" id="tri-diff" aria-pressed="false">X − Y</button></div></div>
+    </div>
+    <div class="eq" id="tri-eq"></div>
+  </div>
+  <div class="task" id="q-rss"></div>
+</section>
+
+<!-- 5 -->
+<section id="ex18">
+  <h2>Example 18: piston–cylinder clearance</h2>
+  <p class="meta">Slides 7–8 · work through it one step at a time</p>
+  <table class="data" aria-label="Example 18 data">
+    <thead><tr><th>Quantity</th><th>Mean (cm)</th><th>SD (cm)</th></tr></thead>
+    <tbody><tr><td>Piston diameter P</td><td>80.85</td><td>0.02</td></tr><tr><td>Cylinder diameter C</td><td>80.95</td><td>0.03</td></tr></tbody>
+  </table>
+  <p>Pistons and cylinders come from separate processes and are paired at random, so treat <span class="m">C</span> and <span class="m">P</span> as independent. The clearance <span class="m">G</span> is the gap on one side, between piston wall and cylinder wall.</p>
+
+  <div class="task" id="q18-1"></div>
+
+  <div class="task locked" id="q18-2wrap" aria-disabled="true">
+    <h4>Step 2 · Mean clearance</h4>
+    <p class="q">Using your model, what is <span class="m">μ<sub>G</sub></span>? Use the coefficients with their signs.</p>
+    <div id="q18-2"></div>
+    <details><summary>Show the working</summary><div class="work"><span class="m">μ<sub>G</sub> = ½μ<sub>C</sub> − ½μ<sub>P</sub> = ½(80.95 − 80.85) = 0.050 cm</span></div></details>
+  </div>
+
+  <div class="task locked" id="q18-3wrap" aria-disabled="true">
+    <h4>Step 3 · Standard deviation of the clearance</h4>
+    <p class="q">What is <span class="m">σ<sub>G</sub></span>? Square every coefficient, add the variances, then take the square root.</p>
+    <div id="q18-3"></div>
+    <details><summary>Show the working</summary><div class="work"><span class="m">σ²<sub>G</sub> = (½)²(0.03)² + (−½)²(0.02)² = 0.000225 + 0.0001 = 0.000325 cm²</span><br><span class="m">σ<sub>G</sub> = √0.000325 ≈ 0.01803 cm</span></div></details>
+  </div>
+
+  <h3>Explore: how often does a piston fail to fit?</h3>
+  <p>The mean and SD need no distributional assumption. To estimate how often <span class="m">G &lt; 0</span> (the piston is wider than the bore), you do need one, so this part assumes <span class="m">C</span> and <span class="m">P</span> are normal. Tighten or loosen the tolerances and move the piston size to see the trade-off.</p>
+  <div class="fig">
+    <canvas id="ex18-canvas" style="height:260px" aria-label="Histogram of simulated clearance with interference region shaded"></canvas>
+    <div class="legend"><span><i class="sw" style="background:var(--teal)"></i>Simulated clearance G</span><span><i class="sw" style="background:var(--red)"></i>Interference, G &lt; 0</span></div>
+    <div class="controls">
+      <label class="ctl"><span class="lab">piston mean (cm) <output id="e18-mp-o">80.850</output></span><input type="range" id="e18-mp" min="80.80" max="80.94" step="0.005" value="80.85" data-dp="3"></label>
+      <label class="ctl"><span class="lab">piston SD (cm) <output id="e18-sp-o">0.020</output></span><input type="range" id="e18-sp" min="0.005" max="0.06" step="0.005" value="0.02" data-dp="3"></label>
+      <label class="ctl"><span class="lab">cylinder SD (cm) <output id="e18-sc-o">0.030</output></span><input type="range" id="e18-sc" min="0.005" max="0.06" step="0.005" value="0.03" data-dp="3"></label>
+    </div>
+    <div class="readouts">
+      <div class="ro y"><span class="k">Mean clearance μ<sub>G</sub></span><span class="v" id="e18-mu"></span></div>
+      <div class="ro y"><span class="k">SD of clearance σ<sub>G</sub></span><span class="v" id="e18-sd"></span></div>
+      <div class="ro x"><span class="k">P(G &lt; 0), normal model</span><span class="v" id="e18-p"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="xbar">
+  <h2>The sample mean is a random variable too</h2>
+  <p class="meta">Slides 9–10 · <span class="m">E[X̄] = μ</span>, <span class="m">σ<sub>X̄</sub> = σ/√n</span></p>
+  <p>The formulas need the i.i.d. model: observations are <em>independent</em> (none carries information about another) and <em>identically distributed</em> (all come from the same population). Sampling without replacement from a finite lot breaks independence slightly, which is harmless when the sample is a small fraction of the lot.</p>
+  <p>The average <span class="m">X̄ = (1/n)ΣXᵢ</span> is a linear combination with every coefficient equal to <span class="m">1/n</span>. The mean rule gives <span class="m">n · (1/n)μ = μ</span>. The variance rule squares each coefficient: <span class="m">n · (1/n²)σ² = σ²/n</span>.</p>
+  <p>The simulator draws 2,000 samples of size <span class="m">n</span>, averages each one, and plots the averages against the population they came from. Pick a population and drag <span class="m">n</span>.</p>
+  <div class="fig">
+    <canvas id="xb-canvas" style="height:300px" aria-label="Histogram of 2000 sample means compared with the population density"></canvas>
+    <div class="legend"><span><i class="sw" style="background:var(--muted);opacity:.5"></i>Population, one observation</span><span><i class="sw" style="background:var(--teal)"></i>2,000 sample means</span><span><i class="sw" style="background:var(--red)"></i>μ ± σ/√n</span></div>
+    <div class="controls">
+      <div class="ctl"><span class="lab">population</span><div class="stage-bar" style="margin:0" role="group" aria-label="Population shape"><button class="btn" data-pop="unif" aria-pressed="true">Uniform</button><button class="btn" data-pop="exp" aria-pressed="false">Skewed</button><button class="btn" data-pop="bi" aria-pressed="false">Two peaks</button></div></div>
+      <label class="ctl"><span class="lab">sample size n <output id="xb-n-o">1</output></span><input type="range" id="xb-n" min="1" max="64" step="1" value="1" data-dp="0"></label>
+      <div class="ctl"><span class="lab">&nbsp;</span><button class="btn" id="xb-go">Draw 2,000 new samples</button></div>
+    </div>
+    <div class="readouts">
+      <div class="ro"><span class="k">Population μ, σ</span><span class="v" id="xb-pop"></span></div>
+      <div class="ro y"><span class="k">Mean of the averages</span><span class="v" id="xb-m"></span></div>
+      <div class="ro y"><span class="k">SD of the averages, simulated</span><span class="v" id="xb-s"></span></div>
+      <div class="ro x"><span class="k">σ/√n, formula</span><span class="v" id="xb-t"></span></div>
+    </div>
+  </div>
+  <p>Three things to notice. The histogram stays centred on <span class="m">μ</span> for every <span class="m">n</span>. Its width falls like <span class="m">1/√n</span>, so going from 16 to 64 only halves it. And even for the skewed and two-peaked populations, the averages start to look bell-shaped as <span class="m">n</span> grows. That last effect is the central limit theorem, which comes later in the course.</p>
+</section>
+
+<!-- 7 -->
+<section id="ex19">
+  <h2>Example 19: average fill volume in a case</h2>
+  <p class="meta">Slide 11 · 24 bottles, each with mean 2.013 L and SD 0.005 L</p>
+  <div class="task">
+    <h4>Your turn</h4>
+    <p class="q">Treating the 24 bottles as i.i.d., what is the standard deviation of the case average <span class="m">X̄</span>?</p>
+    <div id="q19"></div>
+    <details><summary>Show the working</summary><div class="work"><span class="m">μ<sub>X̄</sub> = 2.013 L</span> (averaging keeps the mean)<br><span class="m">σ<sub>X̄</sub> = 0.005/√24 ≈ 0.001021 L</span>, about a fifth of one bottle's SD</div></details>
+  </div>
+  <h3>What if the bottles aren't independent?</h3>
+  <p>Bottles in a case are usually filled one after another on the same line, so a drifting filler can push them all high or all low together. If every pair of bottles has correlation <span class="m">ρ</span>, the covariance terms from slide 41 give</p>
+  <div class="eq"><span class="m">σ<sub>X̄</sub> = σ √[(1 + (n − 1)ρ) / n]</span></div>
+  <p>which reduces to <span class="m">σ/√n</span> at <span class="m">ρ = 0</span>. Drag <span class="m">ρ</span> up and watch the curve flatten out: with correlated bottles, adding more of them stops helping, because the shared error doesn't average away. This is the warning on slide 9 made concrete.</p>
+  <div class="fig">
+    <canvas id="ex19-canvas" style="height:280px" aria-label="SD of the case average against case size for independent and correlated bottles"></canvas>
+    <div class="legend"><span><i class="sw" style="background:var(--red)"></i>i.i.d., σ/√n</span><span><i class="sw" style="background:var(--teal)"></i>correlated, chosen ρ</span></div>
+    <div class="controls">
+      <label class="ctl"><span class="lab">bottles per case n <output id="e19-n-o">24</output></span><input type="range" id="e19-n" min="1" max="48" step="1" value="24" data-dp="0"></label>
+      <label class="ctl"><span class="lab">correlation within a case ρ <output id="e19-r-o">0.10</output></span><input type="range" id="e19-r" min="0" max="0.5" step="0.02" value="0.1" data-dp="2"></label>
+    </div>
+    <div class="readouts">
+      <div class="ro x"><span class="k">σ<sub>X̄</sub>, i.i.d. formula</span><span class="v" id="e19-a"></span></div>
+      <div class="ro y"><span class="k">σ<sub>X̄</sub>, with correlation</span><span class="v" id="e19-b"></span></div>
+      <div class="ro"><span class="k">Understatement by the i.i.d. formula</span><span class="v" id="e19-c"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="check">
+  <h2>Checkpoint: choose the correct moment rule</h2>
+  <p class="meta">Slides 12–13 · name the rule and its assumption before answering</p>
+  <div class="task" id="cp-a"></div>
+  <div class="task" id="cp-b"></div>
+  <div class="task" id="cp-c"></div>
+  <div class="task" id="cp-d"></div>
+  <p class="score" id="cp-score" aria-live="polite">First-try score: 0 / 4</p>
+  <p class="callout">A sign changes a mean; a squared coefficient decides a variance contribution; and every variance shortcut on this page quietly assumes the covariance terms are zero.</p>
+</section>
+
+<footer>Interactive companion to ENDG 319 Lecture 8 (Fall 2026), slides 1–13. Simulations use fresh random draws, so simulated figures vary slightly from run to run.</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FONT='12px "Public Sans", system-ui, sans-serif';
+
+function rgba(hex,a){hex=(hex||'#000').replace('#','');if(hex.length===3)hex=hex.split('').map(c=>c+c).join('');const n=parseInt(hex,16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
+function fit(c){const r=c.getBoundingClientRect();const d=window.devicePixelRatio||1;const W=Math.max(1,Math.round(r.width*d)),H=Math.max(1,Math.round(r.height*d));if(c.width!==W||c.height!==H){c.width=W;c.height=H;}const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);return{ctx,w:r.width,h:r.height};}
+function randn(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+const npdf=(x,m,s)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+function f(v,dp=3){if(!isFinite(v))return '—';if(Math.abs(v)<0.5*Math.pow(10,-dp))v=0;return v.toFixed(dp).replace('-','−');}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function variance(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return s/(a.length-1);}
+function niceTicks(lo,hi,n){const raw=(hi-lo)/n;const p=Math.pow(10,Math.floor(Math.log10(raw)));const r=raw/p;const step=(r<1.5?1:r<3?2:r<7?5:10)*p;const out=[];for(let v=Math.ceil(lo/step-1e-9)*step;v<=hi+1e-9;v+=step)out.push(+v.toPrecision(12));const dp=Math.max(0,-Math.floor(Math.log10(step)+1e-9));return{out,dp};}
+function line(ctx,x0,y0,x1,y1){ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();}
+function arrow(ctx,x0,y0,x1,y1,color,w){ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=w;const ang=Math.atan2(y1-y0,x1-x0),L=Math.hypot(x1-x0,y1-y0),hl=Math.min(12,L*0.4);const bx=x1-hl*Math.cos(ang),by=y1-hl*Math.sin(ang);line(ctx,x0,y0,bx,by);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(bx+hl*0.45*Math.sin(ang),by-hl*0.45*Math.cos(ang));ctx.lineTo(bx-hl*0.45*Math.sin(ang),by+hl*0.45*Math.cos(ang));ctx.closePath();ctx.fill();}
+
+const redraws=[];
+let rt=null;
+window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>redraws.forEach(fn=>fn()),60);});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>redraws.forEach(fn=>fn()));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>redraws.forEach(fn=>fn()));
+
+// slider outputs
+function syncOut(r){const o=document.getElementById(r.id+'-o');if(!o)return;const dp=r.dataset.dp!==undefined?+r.dataset.dp:1;o.textContent=f(+r.value,dp);}
+$$('input[type=range]').forEach(r=>{r.addEventListener('input',()=>syncOut(r));syncOut(r);});
+
+// generic histogram plot
+function histPlot(c,o){
+  const{ctx,w,h}=fit(c);ctx.clearRect(0,0,w,h);
+  const m={l:14,r:14,t:16,b:34};const lo=o.lo,hi=o.hi,nb=o.bins,bw=(hi-lo)/nb;
+  const counts=new Array(nb).fill(0);for(const v of o.data){const k=Math.floor((v-lo)/bw);if(k>=0&&k<nb)counts[k]++;}
+  const dens=counts.map(n=>n/(o.data.length*bw));
+  let ymax=Math.max(...dens);(o.curves||[]).forEach(cv=>{for(let i=0;i<=300;i++){const x=lo+(hi-lo)*i/300;ymax=Math.max(ymax,Math.min(cv.f(x),cv.cap||Infinity));}});
+  ymax=ymax>0?ymax*1.12:1;
+  const X=x=>m.l+(x-lo)/(hi-lo)*(w-m.l-m.r),Y=y=>h-m.b-Math.min(y,ymax)/ymax*(h-m.t-m.b);
+  const muted=cssv('--muted'),ink=cssv('--ink');
+  const drawCurve=cv=>{ctx.beginPath();for(let i=0;i<=300;i++){const x=lo+(hi-lo)*i/300;const yy=Y(cv.f(x));i?ctx.lineTo(X(x),yy):ctx.moveTo(X(x),yy);}
+    if(cv.fill){ctx.lineTo(X(hi),Y(0));ctx.lineTo(X(lo),Y(0));ctx.closePath();ctx.fillStyle=cv.fill;ctx.fill();}
+    else{ctx.strokeStyle=cv.color;ctx.lineWidth=cv.width||1.5;ctx.setLineDash(cv.dash||[]);ctx.stroke();ctx.setLineDash([]);}};
+  (o.curves||[]).filter(cv=>cv.under).forEach(drawCurve);
+  for(let k=0;k<nb;k++){if(!dens[k])continue;const x0=X(lo+k*bw),x1=X(lo+(k+1)*bw);const mid=lo+(k+0.5)*bw;
+    ctx.fillStyle=(o.shadeBelow!==undefined&&mid<o.shadeBelow)?o.shadeColor:o.color;ctx.fillRect(x0+0.5,Y(dens[k]),Math.max(0.5,x1-x0-1),Y(0)-Y(dens[k]));}
+  (o.curves||[]).filter(cv=>!cv.under).forEach(drawCurve);
+  ctx.strokeStyle=muted;ctx.lineWidth=1;line(ctx,m.l,h-m.b,w-m.r,h-m.b);
+  const t=niceTicks(lo,hi,Math.max(3,Math.floor((w-m.l-m.r)/80)));
+  ctx.fillStyle=muted;ctx.font=FONT;ctx.textAlign='center';
+  t.out.forEach(v=>{line(ctx,X(v),h-m.b,X(v),h-m.b+4);ctx.fillText(f(v,t.dp),X(v),h-m.b+17);});
+  if(o.xlabel){ctx.textAlign='right';ctx.fillText(o.xlabel,w-m.r,h-3);}
+  (o.vlines||[]).forEach(vl=>{ctx.strokeStyle=vl.color;ctx.lineWidth=vl.width||2;ctx.setLineDash(vl.dash||[]);line(ctx,X(vl.x),m.t,X(vl.x),h-m.b);ctx.setLineDash([]);
+    if(vl.label){ctx.fillStyle=vl.color;ctx.textAlign=vl.align||'left';ctx.fillText(vl.label,X(vl.x)+(vl.align==='right'?-5:5),m.t+10);}});
+  (o.bands||[]).forEach(b=>{ctx.strokeStyle=b.color;ctx.fillStyle=b.color;ctx.lineWidth=2;const yy=m.t+22;line(ctx,X(b.a),yy,X(b.b),yy);line(ctx,X(b.a),yy-5,X(b.a),yy+5);line(ctx,X(b.b),yy-5,X(b.b),yy+5);});
+  return{X,Y,ctx,w,h};
+}
+
+/* ---------------- HERO ---------------- */
+(function(){
+  const c=$('#hero-canvas');
+  const r2=Math.SQRT1_2;
+  const P={identity:[1,0,0,1],shear:[1,1,0,1],stretch:[1.6,0,0,0.6],rotate:[r2,-r2,r2,r2],reflect:[-1,0,0,1],mixed:[1.2,0.8,-0.4,0.9]};
+  const notes={
+    identity:'The identity: nothing moves.',
+    shear:'Shear: î stays put, ĵ tips over to (1, 1). Squares become parallelograms but keep their area, so det = 1.',
+    stretch:'Stretch: x is scaled by 1.6 and y by 0.6. Grid lines stay parallel and evenly spaced; area scales by 0.96.',
+    rotate:'Rotate 45°: lengths, angles and area are all preserved, so det = 1.',
+    reflect:'Reflect across the vertical axis: det = −1. The flag now points the other way, because orientation has flipped.',
+    mixed:'A general matrix: î lands at (1.2, −0.4), ĵ at (0.8, 0.9). Every other point follows from those two.'
+  };
+  const seq=['shear','stretch','rotate','reflect','mixed'];
+  let cur=[1,0,0,1],from=cur.slice(),to=cur.slice(),t0=0,dur=1,phase='idle',holdEnd=0,hold=0,auto=!reduce,si=0,queue=[];
+  const playBtn=$('#hero-play');
+  const sl=['a','b','c','d'].map(k=>$('#h-'+k));
+  function setAuto(v){auto=v;playBtn.textContent=v?'Pause':'Play';playBtn.setAttribute('aria-pressed',v?'true':'false');}
+  setAuto(auto);
+  function go(m,d){from=cur.slice();to=m.slice();t0=performance.now();dur=reduce?1:d;phase='move';kick();}
+  function setSliders(m){sl.forEach((s,i)=>{s.value=Math.round(m[i]*10)/10;syncOut(s);});}
+  function setNote(key,m){$('#hero-note').textContent=key?notes[key]:customNote(m);}
+  function customNote(m){const d=m[0]*m[3]-m[1]*m[2];let s=`Your matrix: î lands at (${f(m[0],1)}, ${f(m[2],1)}), ĵ at (${f(m[1],1)}, ${f(m[3],1)}). `;
+    if(Math.abs(d)<0.05)s+='The determinant is about zero, so the plane collapses onto a line.';else if(d<0)s+=`det = ${f(d,2)}: area scales by ${f(Math.abs(d),2)} and orientation flips.`;else s+=`det = ${f(d,2)}: area scales by ${f(d,2)}.`;return s;}
+  function nextAuto(){const k=seq[si%seq.length];si++;queue=[{m:P[k],key:k,d:1500,h:1800},{m:P.identity,key:'identity',d:900,h:500}];runQueue();}
+  function runQueue(){const s=queue.shift();if(!s){nextAuto();return;}go(s.m,s.d);hold=s.h;setNote(s.key);setSliders(s.m);}
+  const ease=p=>p<0.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+  let raf=null;
+  function kick(){if(!raf)raf=requestAnimationFrame(frame);}
+  function frame(now){raf=null;
+    if(phase==='move'){const p=Math.min(1,(now-t0)/dur),e=ease(p);cur=from.map((v,i)=>v+(to[i]-v)*e);if(p>=1){phase='hold';holdEnd=now+hold;}draw();kick();}
+    else if(phase==='hold'&&auto){if(now>=holdEnd)runQueue();kick();}
+  }
+  playBtn.addEventListener('click',()=>{if(auto){setAuto(false);}else{setAuto(true);queue=[];if(reduce)nextAuto();else{phase='hold';holdEnd=0;kick();}}});
+  $$('[data-preset]').forEach(b=>b.addEventListener('click',()=>{setAuto(false);queue=[];const k=b.dataset.preset;go(P[k],900);setNote(k);setSliders(P[k]);}));
+  sl.forEach(s=>s.addEventListener('input',()=>{setAuto(false);queue=[];const m=sl.map(x=>+x.value);cur=m.slice();to=m.slice();phase='hold';setNote(null,m);draw();}));
+
+  function draw(){
+    const{ctx,w,h}=fit(c);ctx.clearRect(0,0,w,h);
+    const u=Math.min(w,h)/7.2,cx=w/2,cy=h/2;const[a,b,cc,d]=cur;
+    const T=(x,y)=>[cx+(a*x+b*y)*u,cy-(cc*x+d*y)*u],S=(x,y)=>[cx+x*u,cy-y*u];
+    const rule=cssv('--rule'),teal=cssv('--teal'),ink=cssv('--ink'),red=cssv('--red'),blue=cssv('--blue'),gold=cssv('--gold'),muted=cssv('--muted');
+    const N=14;
+    ctx.lineWidth=1;ctx.strokeStyle=rule;
+    for(let k=-N;k<=N;k++){let p=S(k,-N),q=S(k,N);line(ctx,p[0],p[1],q[0],q[1]);p=S(-N,k);q=S(N,k);line(ctx,p[0],p[1],q[0],q[1]);}
+    for(let k=-N;k<=N;k++){
+      ctx.strokeStyle=k===0?rgba(ink,.75):rgba(teal,.55);ctx.lineWidth=k===0?1.6:1;
+      let p=T(k,-N),q=T(k,N);line(ctx,p[0],p[1],q[0],q[1]);p=T(-N,k);q=T(N,k);line(ctx,p[0],p[1],q[0],q[1]);
+    }
+    // unit square
+    ctx.beginPath();[[0,0],[1,0],[1,1],[0,1]].forEach((pt,i)=>{const p=T(pt[0],pt[1]);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]);});ctx.closePath();ctx.fillStyle=rgba(teal,.18);ctx.fill();
+    // flag
+    ctx.strokeStyle=ink;ctx.lineWidth=2;let p=T(1.6,0.4),q=T(1.6,2.3);line(ctx,p[0],p[1],q[0],q[1]);
+    ctx.beginPath();[[1.6,2.3],[2.7,1.95],[1.6,1.6]].forEach((pt,i)=>{const r=T(pt[0],pt[1]);i?ctx.lineTo(r[0],r[1]):ctx.moveTo(r[0],r[1]);});ctx.closePath();ctx.fillStyle=gold;ctx.fill();
+    // basis
+    const o=T(0,0),ih=T(1,0),jh=T(0,1);
+    arrow(ctx,o[0],o[1],ih[0],ih[1],red,3.2);arrow(ctx,o[0],o[1],jh[0],jh[1],blue,3.2);
+    ctx.font='italic 600 17px "Source Serif 4", Georgia, serif';ctx.textAlign='center';
+    ctx.fillStyle=red;ctx.fillText('î',ih[0]+(ih[0]-o[0])*0.18+8,ih[1]+(ih[1]-o[1])*0.18+6);
+    ctx.fillStyle=blue;ctx.fillText('ĵ',jh[0]+(jh[0]-o[0])*0.18+8,jh[1]+(jh[1]-o[1])*0.18+2);
+    // readout
+    $('#m-a').textContent=f(a,2);$('#m-b').textContent=f(b,2);$('#m-c').textContent=f(cc,2);$('#m-d').textContent=f(d,2);$('#m-det').textContent=f(a*d-b*cc,2);
+  }
+  redraws.push(draw);draw();
+  if(auto){nextAuto();}
+})();
+
+/* ---------------- NUMBER LINE MAP ---------------- */
+(function(){
+  const c=$('#map-canvas'),aS=$('#map-a'),bS=$('#map-b');const mu=2,sd=1;
+  const xs=Array.from({length:44},()=>mu+sd*randn());
+  let disp=xs.slice(),raf=null;
+  const targets=()=>{const a=+aS.value,b=+bS.value;return xs.map(x=>a*x+b);};
+  function step(){raf=null;const t=targets();let moving=false;disp=disp.map((v,i)=>{const nv=reduce?t[i]:v+(t[i]-v)*0.16;if(Math.abs(nv-t[i])>0.005)moving=true;return moving&&!reduce?nv:nv;});
+    if(reduce)disp=t.slice();draw();if(moving&&!reduce)raf=requestAnimationFrame(step);}
+  function kick(){if(!raf)raf=requestAnimationFrame(step);}
+  function update(){const a=+aS.value,b=+bS.value;
+    $('#map-mu').innerHTML=`μ<sub>Y</sub> = (${f(a,1)})(2) + (${f(b,1)}) = <strong>${f(a*mu+b,2)}</strong>`;
+    $('#map-var').innerHTML=`σ²<sub>Y</sub> = (${f(a,1)})²(1)² = <strong>${f(a*a,2)}</strong>`;
+    $('#map-sd').innerHTML=`σ<sub>Y</sub> = |${f(a,1)}|(1) = <strong>${f(Math.abs(a),2)}</strong>`;
+    let n='';
+    if(Math.abs(a)<0.05)n='With a = 0 every value maps to the same point b: the spread collapses to zero.';
+    else if(a<0)n='Negative a reflects: the lines cross and the order of values reverses. The spread depends only on |a|.';
+    else if(Math.abs(a-1)<1e-9&&b!==0)n='Pure shift: every line is parallel, the curve slides by b, and its width is unchanged.';
+    else if(Math.abs(a-1)<1e-9)n='The identity map: Y is just X.';
+    else if(a>1)n='Stretch: values spread apart, so the curve gets wider and lower. Its area is still 1.';
+    else n='Compress: values squeeze together, so the curve gets narrower and taller.';
+    $('#map-note').textContent=n;kick();}
+  aS.addEventListener('input',update);bS.addEventListener('input',update);
+  $$('[data-map]').forEach(btn=>btn.addEventListener('click',()=>{const[a,b]=btn.dataset.map.split(',').map(Number);aS.value=a;bS.value=b;syncOut(aS);syncOut(bS);update();}));
+  function draw(){
+    const{ctx,w,h}=fit(c);ctx.clearRect(0,0,w,h);
+    const pad=24,L=-14,R=14,px=x=>pad+(x-L)/(R-L)*(w-2*pad);const y0=115,y1=h-115;
+    const a=+aS.value,b=+bS.value,muY=a*mu+b,sdY=Math.abs(a)*sd;
+    const muted=cssv('--muted'),red=cssv('--red'),teal=cssv('--teal'),ink=cssv('--ink');
+    const K=150,CAP=92;
+    // mapping lines
+    ctx.strokeStyle=rgba(muted,.32);ctx.lineWidth=1;xs.forEach((x,i)=>line(ctx,px(x),y0,px(disp[i]),y1));
+    // densities
+    const dens=(m,s,yb,dir,col)=>{ctx.beginPath();ctx.moveTo(px(L),yb);for(let i=0;i<=500;i++){const x=L+(R-L)*i/500;ctx.lineTo(px(x),yb-dir*Math.min(CAP,K*npdf(x,m,s)));}ctx.lineTo(px(R),yb);ctx.closePath();ctx.fillStyle=rgba(col,.16);ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();};
+    dens(mu,sd,y0,1,red);
+    if(sdY>0.12)dens(muY,sdY,y1,-1,teal);else{ctx.strokeStyle=teal;ctx.lineWidth=3;line(ctx,px(muY),y1,px(muY),y1+CAP);}
+    // axes & ticks
+    ctx.strokeStyle=muted;ctx.lineWidth=1;line(ctx,pad,y0,w-pad,y0);line(ctx,pad,y1,w-pad,y1);
+    ctx.font=FONT;ctx.fillStyle=muted;ctx.textAlign='center';
+    const lstep=w<520?8:4;
+    for(let t=-14;t<=14;t+=2){line(ctx,px(t),y0-3,px(t),y0+3);line(ctx,px(t),y1-3,px(t),y1+3);if(t%lstep===0){ctx.fillText(f(t,0),px(t),y0+16);ctx.fillText(f(t,0),px(t),y1-8);}}
+    ctx.textAlign='left';ctx.font='italic 600 16px "Source Serif 4", Georgia, serif';ctx.fillStyle=red;ctx.fillText('X',pad,y0-10);ctx.fillStyle=teal;ctx.fillText('Y = aX + b',pad,y1+22);
+    // dots
+    xs.forEach((x,i)=>{ctx.fillStyle=red;ctx.beginPath();ctx.arc(px(x),y0,2.6,0,7);ctx.fill();ctx.fillStyle=teal;ctx.beginPath();ctx.arc(px(disp[i]),y1,2.6,0,7);ctx.fill();});
+    // mean & SD markers
+    ctx.font=FONT;ctx.textAlign='center';
+    const hx=Math.min(CAP,K*npdf(mu,mu,sd));ctx.strokeStyle=ink;ctx.setLineDash([4,3]);ctx.lineWidth=1.2;line(ctx,px(mu),y0,px(mu),y0-hx);
+    const hy=sdY>0.12?Math.min(CAP,K*npdf(muY,muY,sdY)):CAP;line(ctx,px(muY),y1,px(muY),y1+hy);ctx.setLineDash([]);
+    ctx.fillStyle=ink;ctx.fillText('μX = 2',px(mu),y0-hx-6);ctx.fillText('μY = '+f(muY,1),px(muY),Math.min(h-3,y1+hy+14));
+    const br=(m,s,yy,col)=>{if(s<0.12)return;ctx.strokeStyle=col;ctx.lineWidth=2;line(ctx,px(m-s),yy,px(m+s),yy);line(ctx,px(m-s),yy-4,px(m-s),yy+4);line(ctx,px(m+s),yy-4,px(m+s),yy+4);};
+    br(mu,sd,y0-22,red);br(muY,sdY,y1+22,teal);
+  }
+  redraws.push(draw);update();draw();
+})();
+
+/* ---------------- COMBINATION MEANS ---------------- */
+(function(){
+  const N=2000;let Z1=[],Z2=[];
+  const mx=10,sx=2,ya=3,yb=7,my=5;const c1S=$('#cm-c1'),c2S=$('#cm-c2'),rS=$('#cm-r');
+  const sgnTerm=(c,v)=>`(${f(c,1)})(${v})`;
+  function regen(){Z1=Array.from({length:N},randn);Z2=Array.from({length:N},randn);draw();}
+  function draw(){
+    const c1=+c1S.value,c2=+c2S.value,r=+rS.value,k=Math.sqrt(1-r*r);
+    const X=Z1.map(z=>mx+sx*z),Y=Z1.map((z,i)=>ya+(yb-ya)*Phi(r*z+k*Z2[i])),Z=X.map((x,i)=>c1*x+c2*Y[i]);
+    const xb=mean(X),yb_=mean(Y),zb=mean(Z),mz=c1*mx+c2*my;
+    const red=cssv('--red'),blue=cssv('--blue'),teal=cssv('--teal'),ink=cssv('--ink');
+    histPlot($('#cm-x'),{data:X,lo:2,hi:18,bins:40,color:rgba(red,.75),vlines:[{x:mx,color:ink,label:'μX = 10'}],xlabel:'X'});
+    histPlot($('#cm-y'),{data:Y,lo:2,hi:8,bins:30,color:rgba(blue,.75),vlines:[{x:my,color:ink,label:'μY = 5'}],xlabel:'Y'});
+    $('#cm-xm').innerHTML=`formula <strong>10</strong> · simulated x̄ = ${f(xb,3)}`;
+    $('#cm-ym').innerHTML=`formula <strong>5</strong> · simulated ȳ = ${f(yb_,3)}`;
+    const smax=Math.abs(c1)*4*sx+Math.abs(c2)*2.2||1;
+    histPlot($('#cm-z'),{data:Z,lo:mz-smax,hi:mz+smax,bins:50,color:rgba(teal,.8),vlines:[{x:mz,color:ink,label:'E[Z] = '+f(mz,1)}],xlabel:'Z = c₁X + c₂Y'});
+    const zs=`${f(c1,1)}X ${c2<0?'−':'+'} ${f(Math.abs(c2),1)}Y`;
+    $('#cm-combine').innerHTML=`Combine them: <span class="m" style="font-size:1.1rem">Z = ${zs}</span>`;
+    $('#cm-eq').innerHTML=
+      `<span class="m">E[Z] = E[c₁X + c₂Y]</span><br>`+
+      `<span class="m">&emsp;&ensp;= c₁E[X] + c₂E[Y]</span> <span class="sans" style="font-size:.85rem;color:var(--muted)">linearity, slide 4</span><br>`+
+      `<span class="m">&emsp;&ensp;= ${sgnTerm(c1,10)} + ${sgnTerm(c2,5)}</span><br>`+
+      `<span class="m">&emsp;&ensp;= ${f(c1*mx,1)} ${c2*my<0?'−':'+'} ${f(Math.abs(c2*my),1)}</span><br>`+
+      `<span class="m">&emsp;&ensp;= <strong>${f(mz,2)}</strong></span>`;
+    $('#cm-check').innerHTML=`Check against the simulation: the average of the 2,000 simulated Z values is <strong style="color:var(--ink)">${f(zb,3)}</strong>, and c₁x̄ + c₂ȳ = (${f(c1,1)})(${f(xb,3)}) + (${f(c2,1)})(${f(yb_,3)}) = ${f(c1*xb+c2*yb_,3)}. These two agree exactly, because averaging is itself linear. Both sit close to ${f(mz,2)}; the small gap is sampling noise and changes when you draw new values.`;
+  }
+  [c1S,c2S,rS].forEach(s=>s.addEventListener('input',draw));$('#cm-go').addEventListener('click',regen);redraws.push(draw);regen();
+})();
+
+/* ---------------- TRIANGLE ---------------- */
+(function(){
+  const xS=$('#tri-x'),yS=$('#tri-y'),bs=$('#tri-sum'),bd=$('#tri-diff');let diff=false;
+  function setMode(d){diff=d;bs.setAttribute('aria-pressed',d?'false':'true');bd.setAttribute('aria-pressed',d?'true':'false');draw();}
+  bs.addEventListener('click',()=>setMode(false));bd.addEventListener('click',()=>setMode(true));
+  function draw(){
+    const sx=+xS.value,sy=+yS.value,hyp=Math.hypot(sx,sy);
+    const{ctx,w,h}=fit($('#tri-canvas'));ctx.clearRect(0,0,w,h);
+    const red=cssv('--red'),blue=cssv('--blue'),teal=cssv('--teal'),muted=cssv('--muted'),ink=cssv('--ink'),bad=cssv('--bad');
+    const narrow=w<560;const triW=narrow?w:w*0.5;const u=Math.min((triW-60)/5,(h-60)/5);
+    const ox=30,oy=h-30;
+    ctx.lineWidth=4;ctx.strokeStyle=red;line(ctx,ox,oy,ox+sx*u,oy);ctx.strokeStyle=blue;line(ctx,ox+sx*u,oy,ox+sx*u,oy-sy*u);ctx.strokeStyle=teal;line(ctx,ox,oy,ox+sx*u,oy-sy*u);
+    ctx.strokeStyle=muted;ctx.lineWidth=1;ctx.strokeRect(ox+sx*u-10,oy-10,10,10);
+    ctx.font='italic 600 15px "Source Serif 4", Georgia, serif';ctx.textAlign='center';
+    ctx.fillStyle=red;ctx.fillText('σX = '+f(sx,1),ox+sx*u/2,oy+20);
+    ctx.fillStyle=blue;ctx.textAlign='left';ctx.fillText('σY = '+f(sy,1),ox+sx*u+8,oy-sy*u/2);
+    ctx.fillStyle=teal;ctx.textAlign='right';const lab=(diff?'SD(X − Y)':'SD(X + Y)')+' = '+f(hyp,2);ctx.fillText(lab,ox+sx*u/2-8,oy-sy*u/2-8);
+    if(!narrow){
+      const bx=w*0.56,bw=w*0.4,sc=bw/10;ctx.font=FONT;ctx.textAlign='left';
+      ctx.fillStyle=muted;ctx.fillText('Adding SDs (wrong)',bx,70);ctx.fillStyle=rgba(bad,.25);ctx.fillRect(bx,78,(sx+sy)*sc,22);ctx.strokeStyle=bad;ctx.strokeRect(bx,78,(sx+sy)*sc,22);ctx.fillStyle=ink;ctx.fillText(f(sx+sy,2),bx+(sx+sy)*sc+6,94);
+      ctx.fillStyle=muted;ctx.fillText('Root-sum-square (right)',bx,140);ctx.fillStyle=rgba(teal,.35);ctx.fillRect(bx,148,hyp*sc,22);ctx.strokeStyle=teal;ctx.strokeRect(bx,148,hyp*sc,22);ctx.fillStyle=ink;ctx.fillText(f(hyp,2),bx+hyp*sc+6,164);
+      ctx.fillStyle=muted;ctx.fillText('The sum of SDs is only right when X and Y',bx,210);ctx.fillText('move in perfect lockstep (ρ = 1).',bx,228);
+    }
+    const sgn=diff?'−':'+';
+    $('#tri-eq').innerHTML=`<span class="m">Var(X ${sgn} Y) = (1)²σ²<sub>X</sub> + (${diff?'−1':'1'})²σ²<sub>Y</sub> = ${f(sx*sx,2)} + ${f(sy*sy,2)} = ${f(sx*sx+sy*sy,2)}</span>, so <span class="m">SD = √${f(sx*sx+sy*sy,2)} = ${f(hyp,2)}</span>`+(diff?'<br><span class="sans" style="font-size:.9rem;color:var(--muted)">Same answer as the sum: the minus sign is squared away.</span>':'');
+  }
+  [xS,yS].forEach(s=>s.addEventListener('input',draw));redraws.push(draw);draw();
+})();
+
+/* ---------------- EXERCISE COMPONENTS ---------------- */
+function mcq(root,q){
+  root.innerHTML=(q.title?`<h4>${q.title}</h4>`:'')+`<p class="q">${q.prompt}</p><div class="opts"></div><p class="fb" aria-live="polite"></p>`;
+  const opts=root.querySelector('.opts'),fb=root.querySelector('.fb');let first=true;
+  q.options.forEach(o=>{const b=document.createElement('button');b.className='opt';b.type='button';b.innerHTML=o.t;
+    b.addEventListener('click',()=>{opts.querySelectorAll('.opt').forEach(x=>x.classList.remove('is-right','is-wrong'));b.classList.add(o.ok?'is-right':'is-wrong');
+      fb.className='fb '+(o.ok?'ok':'bad');fb.innerHTML=(o.ok?'<strong>Correct.</strong> ':'<strong>Not quite.</strong> ')+o.fb;
+      if(q.onAnswer)q.onAnswer(o.ok,first);first=false;});
+    opts.appendChild(b);});
+}
+function numCheck(root,o){
+  root.innerHTML=`<div class="numrow"><input type="text" inputmode="decimal" autocomplete="off" aria-label="${o.label}" placeholder="${o.placeholder||''}"><span class="unit">${o.unit||''}</span><button class="btn primary" type="button">Check</button><button class="btn" type="button">Hint</button></div><p class="fb" aria-live="polite"></p>`;
+  const inp=root.querySelector('input'),[chk,hint]=root.querySelectorAll('button'),fb=root.querySelector('.fb');
+  function check(){const v=parseFloat(inp.value.replace(/[−–]/g,'-').replace(/,/g,'').trim());
+    if(!isFinite(v)){fb.className='fb bad';fb.textContent='Enter a number, for example '+o.example+'.';return;}
+    if(Math.abs(v-o.answer)<=o.tol){fb.className='fb ok';fb.innerHTML='<strong>Correct.</strong> '+o.ok;if(o.onRight)o.onRight();return;}
+    for(const wr of o.wrongs||[]){if(Math.abs(v-wr.v)<=wr.tol){fb.className='fb bad';fb.innerHTML='<strong>Not quite.</strong> '+wr.fb;return;}}
+    fb.className='fb bad';fb.innerHTML='<strong>Not yet.</strong> '+o.generic;}
+  chk.addEventListener('click',check);inp.addEventListener('keydown',e=>{if(e.key==='Enter')check();});
+  hint.addEventListener('click',()=>{fb.className='fb hint';fb.innerHTML=o.hint;});
+}
+
+mcq($('#q-rss'),{title:'Quick check',prompt:'Two independent machined parts are stacked end to end. Their lengths have SDs of 3 µm and 4 µm. What is the SD of the total length?',
+  options:[{t:'7 µm',fb:'That adds the SDs. Variances add: 9 + 16 = 25, and √25 = 5 µm.'},
+    {t:'5 µm',ok:true,fb:'Variances add under independence (9 + 16 = 25), then take the square root.'},
+    {t:'25 µm',fb:'25 µm² is the variance. The SD is its square root, 5 µm.'},
+    {t:'1 µm',fb:'SDs never subtract. Even for a difference of lengths, the variances add.'}]});
+
+function unlock(id){const el=$(id);el.classList.remove('locked');el.removeAttribute('aria-disabled');}
+mcq($('#q18-1'),{title:'Step 1 · Write the physical relationship',prompt:'Which expression gives the radial clearance <span class="m">G</span>?',
+  options:[{t:'<span class="m">G = C − P</span>',fb:'C − P is the total diameter difference, which is split between the two sides of the piston. The gap on one side is half of it.'},
+    {t:'<span class="m">G = (C − P)/2 = ½C − ½P</span>',ok:true,fb:'The diameter difference is shared between two sides. Writing it as ½C − ½P shows the coefficients: +½ and −½.'},
+    {t:'<span class="m">G = (C + P)/2</span>',fb:'That is the average of the two diameters, about 80.9 cm, not a gap.'},
+    {t:'<span class="m">G = (P − C)/2</span>',fb:'Right size, wrong sign: this would be negative whenever the piston fits. Clearance is cylinder minus piston.'}],
+  onAnswer:ok=>{if(ok)unlock('#q18-2wrap');}});
+numCheck($('#q18-2'),{label:'Mean clearance in cm',unit:'cm',example:'0.05',answer:0.05,tol:0.0005,
+  ok:'μ<sub>G</sub> = ½(80.95) − ½(80.85) = 0.050 cm.',
+  wrongs:[{v:0.1,tol:0.0005,fb:'0.10 cm is the full diameter difference C − P. The radial gap is half of that.'},{v:-0.05,tol:0.0005,fb:'Check the sign: G is cylinder minus piston, and the cylinder is larger.'}],
+  generic:'Apply the coefficients ½ and −½ to the two means.',hint:'μ<sub>G</sub> = ½μ<sub>C</sub> − ½μ<sub>P</sub>. No independence is needed for this step.',onRight:()=>unlock('#q18-3wrap')});
+numCheck($('#q18-3'),{label:'Standard deviation of clearance in cm',unit:'cm',example:'0.018',answer:0.018028,tol:0.00025,
+  ok:'σ²<sub>G</sub> = ¼(0.0009) + ¼(0.0004) = 0.000325, so σ<sub>G</sub> ≈ 0.01803 cm.',
+  wrongs:[{v:0.025,tol:0.0003,fb:'(0.03 + 0.02)/2 adds standard deviations. Add the variances, then take the square root.'},
+    {v:0.036056,tol:0.0004,fb:'That is the SD of C − P. The clearance is half of it: the coefficients are ±½, and they get squared.'},
+    {v:0.011180,tol:0.0002,fb:'It looks like the variances were subtracted. The −½ on P is squared to +¼, so its contribution adds.'},
+    {v:0.000325,tol:0.00001,fb:'That is the variance σ²<sub>G</sub> in cm². Take the square root for the SD.'},
+    {v:0.005,tol:0.0003,fb:'(0.03 − 0.02)/2 subtracts SDs. Variances add, even for a difference.'}],
+  generic:'Square each coefficient, multiply by that variable\'s variance, add, then take the square root.',hint:'σ²<sub>G</sub> = (½)²σ²<sub>C</sub> + (−½)²σ²<sub>P</sub>. This step does need C and P to be independent.'});
+
+/* ---------------- EX18 EXPLORE ---------------- */
+(function(){
+  const N=5000,Z1=Array.from({length:N},randn),Z2=Array.from({length:N},randn);
+  const mp=$('#e18-mp'),sp=$('#e18-sp'),sc=$('#e18-sc');const mc=80.95;
+  function draw(){
+    const mP=+mp.value,sP=+sp.value,sC=+sc.value;const muG=(mc-mP)/2,sdG=Math.sqrt(0.25*sC*sC+0.25*sP*sP);
+    const G=Z1.map((z,i)=>((mc+sC*z)-(mP+sP*Z2[i]))/2);
+    const p=Phi(-muG/sdG);
+    $('#e18-mu').textContent=f(muG,4)+' cm';$('#e18-sd').textContent=f(sdG,5)+' cm';
+    $('#e18-p').textContent=(p<1e-6?'< 0.0001 %':f(100*p,p<0.001?4:2)+' %')+(p>=1e-6?`  (about 1 in ${Math.round(1/p).toLocaleString('en-CA')})`:'');
+    const lo=Math.min(-0.02,muG-4*sdG),hi=Math.max(0.1,muG+4*sdG);
+    const teal=cssv('--teal'),red=cssv('--red'),ink=cssv('--ink');
+    histPlot($('#ex18-canvas'),{data:G,lo,hi,bins:60,color:rgba(teal,.8),shadeBelow:0,shadeColor:red,
+      curves:[{f:x=>npdf(x,muG,sdG),color:ink,width:1.4}],vlines:[{x:0,color:red,width:1.5,label:'G = 0',align:'right'}],xlabel:'clearance G (cm)'});
+  }
+  [mp,sp,sc].forEach(s=>s.addEventListener('input',draw));redraws.push(draw);draw();
+})();
+
+/* ---------------- SAMPLE MEAN ---------------- */
+(function(){
+  const pops={
+    unif:{gen:()=>10*Math.random(),pdf:x=>(x>=0&&x<=10)?0.1:0,mu:5,sd:10/Math.sqrt(12)},
+    exp:{gen:()=>-2*Math.log(1-Math.random()),pdf:x=>x>=0?0.5*Math.exp(-x/2):0,mu:2,sd:2},
+    bi:{gen:()=>(Math.random()<0.5?2:8)+0.5*randn(),pdf:x=>0.5*npdf(x,2,0.5)+0.5*npdf(x,8,0.5),mu:5,sd:Math.sqrt(9.25)}
+  };
+  let key='unif',means=[];const nS=$('#xb-n');
+  function sim(){const p=pops[key],n=+nS.value;means=new Array(2000);for(let r=0;r<2000;r++){let s=0;for(let i=0;i<n;i++)s+=p.gen();means[r]=s/n;}draw();}
+  function draw(){const p=pops[key],n=+nS.value,se=p.sd/Math.sqrt(n);
+    $('#xb-pop').textContent=`μ = ${f(p.mu,2)}, σ = ${f(p.sd,3)}`;$('#xb-m').textContent=f(mean(means),3);$('#xb-s').textContent=f(Math.sqrt(variance(means)),3);$('#xb-t').textContent=`${f(p.sd,3)} / √${n} = ${f(se,3)}`;
+    const muted=cssv('--muted'),teal=cssv('--teal'),red=cssv('--red');
+    histPlot($('#xb-canvas'),{data:means,lo:-1,hi:13,bins:140,color:rgba(teal,.85),
+      curves:[{f:p.pdf,under:true,fill:rgba(muted,.22)}],vlines:[{x:p.mu,color:red,width:1.5,dash:[4,3],label:'μ'}],bands:[{a:p.mu-se,b:p.mu+se,color:red}],xlabel:'value'});
+  }
+  $$('[data-pop]').forEach(b=>b.addEventListener('click',()=>{key=b.dataset.pop;$$('[data-pop]').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));sim();}));
+  nS.addEventListener('input',sim);$('#xb-go').addEventListener('click',sim);redraws.push(draw);sim();
+})();
+
+/* ---------------- EX19 ---------------- */
+numCheck($('#q19'),{label:'SD of the case average in litres',unit:'L',example:'0.001',answer:0.0010206,tol:0.00002,
+  ok:'σ<sub>X̄</sub> = 0.005/√24 ≈ 0.001021 L. The mean stays 2.013 L.',
+  wrongs:[{v:0.005/24,tol:0.000005,fb:'That divides by n. The variance shrinks by n; the SD shrinks by √n.'},
+    {v:0.000025/24,tol:0.0000001,fb:'That is the variance of the average, σ²/n. Take its square root.'},
+    {v:0.005,tol:0.0002,fb:'That is one bottle\'s SD. Averaging 24 bottles reduces the spread.'},
+    {v:0.005*Math.sqrt(24),tol:0.0005,fb:'That multiplies by √24, which is the SD of the case total, not the average.'}],
+  generic:'Use σ<sub>X̄</sub> = σ/√n with σ = 0.005 L and n = 24.',hint:'The SD of an average of n i.i.d. values is σ/√n.'});
+(function(){
+  const nS=$('#e19-n'),rS=$('#e19-r'),s=0.005;
+  const sdr=(n,r)=>s*Math.sqrt((1+(n-1)*r)/n);
+  function draw(){const n=+nS.value,r=+rS.value;const a=s/Math.sqrt(n),b=sdr(n,r);
+    $('#e19-a').textContent=f(a,6)+' L';$('#e19-b').textContent=f(b,6)+' L';$('#e19-c').textContent=b>a?'the true SD is '+f(b/a,2)+'× larger':'none (ρ = 0)';
+    const{ctx,w,h}=fit($('#ex19-canvas'));ctx.clearRect(0,0,w,h);
+    const m={l:62,r:14,t:14,b:36};const X=v=>m.l+(v-1)/47*(w-m.l-m.r),Y=v=>h-m.b-v/0.0055*(h-m.t-m.b);
+    const muted=cssv('--muted'),red=cssv('--red'),teal=cssv('--teal'),rule=cssv('--rule'),ink=cssv('--ink');
+    ctx.font=FONT;ctx.fillStyle=muted;ctx.textAlign='right';
+    [0,0.001,0.002,0.003,0.004,0.005].forEach(v=>{ctx.strokeStyle=rule;ctx.lineWidth=1;line(ctx,m.l,Y(v),w-m.r,Y(v));ctx.fillText(f(v,3),m.l-6,Y(v)+4);});
+    ctx.textAlign='center';[1,8,16,24,32,40,48].forEach(v=>ctx.fillText(v,X(v),h-m.b+16));ctx.textAlign='right';ctx.fillText('bottles per case n',w-m.r,h-3);
+    ctx.save();ctx.translate(12,m.t+(h-m.t-m.b)/2);ctx.rotate(-Math.PI/2);ctx.textAlign='center';ctx.fillText('SD of case average (L)',0,0);ctx.restore();
+    const curve=(fn,col)=>{ctx.strokeStyle=col;ctx.lineWidth=2.2;ctx.beginPath();for(let k=1;k<=48;k+=0.25){const yy=Y(fn(k));k===1?ctx.moveTo(X(k),yy):ctx.lineTo(X(k),yy);}ctx.stroke();};
+    curve(k=>s/Math.sqrt(k),red);curve(k=>sdr(k,r),teal);
+    if(r>0){ctx.strokeStyle=teal;ctx.setLineDash([4,4]);ctx.lineWidth=1;line(ctx,m.l,Y(s*Math.sqrt(r)),w-m.r,Y(s*Math.sqrt(r)));ctx.setLineDash([]);ctx.fillStyle=teal;ctx.textAlign='right';ctx.fillText('floor σ√ρ as n grows',w-m.r,Y(s*Math.sqrt(r))-6);}
+    ctx.strokeStyle=rgba(ink,.5);ctx.setLineDash([3,3]);line(ctx,X(n),m.t,X(n),h-m.b);ctx.setLineDash([]);
+    [[a,red],[b,teal]].forEach(([v,col])=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(X(n),Y(v),5,0,7);ctx.fill();});
+  }
+  [nS,rS].forEach(x=>x.addEventListener('input',draw));redraws.push(draw);draw();
+})();
+
+/* ---------------- CHECKPOINT ---------------- */
+(function(){
+  const firsts={};const upd=()=>{$('#cp-score').textContent=`First-try score: ${Object.values(firsts).filter(Boolean).length} / 4`;};
+  const mk=(id,q)=>{q.onAnswer=(ok,first)=>{if(first){firsts[id]=ok;upd();}};mcq($(id),q);};
+  mk('#cp-a',{title:'A · Add a constant',prompt:'You add a constant <span class="m">b</span> to <span class="m">X</span>. Which of the mean, variance and SD change?',
+    options:[{t:'All three',fb:'A shift moves every value by the same amount, so distances between values (the spread) stay the same.'},
+      {t:'Only the mean',ok:true,fb:'Rule: Y = aX + b with a = 1. E[X + b] = E[X] + b, and σ<sub>Y</sub> = |1|σ<sub>X</sub>. No assumptions needed.'},
+      {t:'Only the variance and SD',fb:'It is the other way round: the centre moves and the spread does not.'},
+      {t:'None of them',fb:'The mean does change: E[X + b] = E[X] + b.'}]});
+  mk('#cp-b',{title:'B · Take a difference',prompt:'For independent <span class="m">X</span> and <span class="m">Y</span>, what is <span class="m">Var(X − Y)</span>?',
+    options:[{t:'<span class="m">σ²<sub>X</sub> − σ²<sub>Y</sub></span>',fb:'That could even be negative, which no variance can be. The coefficient −1 is squared.'},
+      {t:'<span class="m">σ²<sub>X</sub> + σ²<sub>Y</sub></span>',ok:true,fb:'Rule: Var(Σ cᵢXᵢ) = Σ cᵢ²σᵢ² with c = (1, −1). Assumption: independence, so the covariance term is zero.'},
+      {t:'<span class="m">(σ<sub>X</sub> − σ<sub>Y</sub>)²</span>',fb:'Standard deviations don\'t combine directly; work with variances.'},
+      {t:'<span class="m">σ<sub>X</sub> + σ<sub>Y</sub></span>',fb:'That adds SDs, which is only right under perfect correlation, and it isn\'t a variance.'}]});
+  mk('#cp-c',{title:'C · Average more values',prompt:'Under the same i.i.d. model, the sample size <span class="m">n</span> is quadrupled. What happens to the SD of <span class="m">X̄</span>?',
+    options:[{t:'It is divided by 4',fb:'That is what happens to the variance σ²/n. The SD is its square root.'},
+      {t:'It is halved',ok:true,fb:'σ/√(4n) = ½ · σ/√n. The mean stays μ. Assumption: i.i.d. observations.'},
+      {t:'It is unchanged',fb:'More observations do reduce the spread of the average, just slowly.'},
+      {t:'It doubles',fb:'Averaging reduces spread; it never increases it under the i.i.d. model.'}]});
+  mk('#cp-d',{title:'D · Spot the assumption',prompt:'Which of these results requires independence?',
+    options:[{t:'<span class="m">E[X + Y] = μ<sub>X</sub> + μ<sub>Y</sub></span>',fb:'Means are linear with no conditions at all. That was the point of slide 4.'},
+      {t:'<span class="m">Var(X + Y) = σ²<sub>X</sub> + σ²<sub>Y</sub></span>',ok:true,fb:'Without independence (or at least zero covariance) you need the extra term 2Cov(X, Y).'},
+      {t:'<span class="m">E[X̄] = μ</span>',fb:'This only needs each observation to have mean μ; it uses linearity of expectation.'},
+      {t:'<span class="m">σ<sub>aX+b</sub> = |a|σ<sub>X</sub></span>',fb:'Only one random variable is involved, so there is nothing to be independent of.'}]});
+})();
+
+})();
+</script>
+</body></html>

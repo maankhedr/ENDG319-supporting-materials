@@ -1,0 +1,1418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Counting Experiments Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a lab manual — one long column of "stations", each pairing a short concept panel with a live instrument (chart + controls). */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --sunk:#e3e8ee; --ink:#15202b; --muted:#566373; --line:#cfd7e0;
+  --bar:#3a64ad; --hi:#c8283e; --hi-soft:#f6dde1; --ok:#1f7a55; --warn:#a4620d;
+  --c1:#3a64ad; --c2:#c58a14; --c3:#c8283e;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c1:#6f9be3; --c2:#e2b14b; --c3:#f16a7d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c1:#6f9be3; --c2:#e2b14b; --c3:#f16a7d; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1060px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0;max-width:66ch}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hi);font-weight:600}
+.muted{color:var(--muted)}
+code,.m{font-family:var(--mono);font-size:.9em}
+a{color:var(--bar)}
+:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+
+/* header + nav */
+header.top{padding-block:40px 20px;display:grid;gap:14px}
+header.top p{font-size:1.08rem}
+nav.stations{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+nav.stations a{flex:none;text-decoration:none;color:var(--ink);font-family:var(--mono);font-size:.8rem;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+nav.stations a:hover{border-color:var(--bar)}
+
+section.station{padding-block:48px 8px;display:grid;gap:22px;scroll-margin-top:60px}
+.head{display:grid;gap:8px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:22px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:14px;min-width:0}
+.concept{display:grid;gap:12px;min-width:0}
+.concept ul{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.formula{font-family:"Times New Roman",Georgia,serif;font-size:1.25rem;background:var(--sunk);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:nowrap}
+.formula i{font-style:italic}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;margin:0 2px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.binom{display:inline-flex;align-items:center;vertical-align:middle;font-size:.95em}
+.binom>span.st{display:inline-flex;flex-direction:column;align-items:center;line-height:1.1;text-align:center;padding:0 4px;gap:2px}
+.binom>span.st>span{white-space:nowrap;display:block}
+.binom::before{content:"(";font-size:1.9em;font-weight:300}
+.binom::after{content:")";font-size:1.9em;font-weight:300}
+.why{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:8px}
+.why ol{margin:0;padding-left:1.3em;display:grid;gap:8px}
+.why li::marker{font-family:var(--mono);font-weight:600;color:var(--hi)}
+.warn{border-left:3px solid var(--hi);background:var(--hi-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.95rem}
+
+/* controls */
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 18px}
+.ctl{display:grid;gap:2px;min-width:0}
+.ctl label{font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.ctl label output{font-family:var(--mono);color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--hi)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);color:var(--ink);font:inherit;font-size:.85rem;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.btn{font:inherit;font-size:.88rem;padding:7px 14px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:var(--surface);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* readouts */
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.ro{background:var(--sunk);border-radius:8px;padding:8px 10px;min-width:0}
+.ro .k{font-size:.78rem;letter-spacing:.01em;color:var(--muted)}
+.ro .v{font-family:var(--mono);font-size:1.15rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ro.key .v{color:var(--hi)}
+
+/* charts */
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:420px;height:auto}
+svg .bar{fill:var(--bar)}
+svg .bar.hi{fill:var(--hi)}
+svg .bar.off{fill:var(--line)}
+svg .dot{fill:var(--surface);stroke:var(--hi);stroke-width:2}
+svg .dot2{fill:var(--c2);stroke:none}
+svg .ax{stroke:var(--muted);stroke-width:1}
+svg .grid{stroke:var(--line);stroke-width:1}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+svg text.lab{fill:var(--ink);font-family:var(--body);font-size:12px}
+svg .meanline{stroke:var(--ink);stroke-dasharray:4 3;stroke-width:1.2}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+/* trial chips */
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{width:28px;height:28px;border-radius:5px;display:grid;place-items:center;font-family:var(--mono);font-size:.8rem;font-weight:600;background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.chip.s{background:var(--hi);color:#fff;border-color:var(--hi)}
+.chip.f{background:var(--surface);color:var(--ink)}
+.chip.fixed{outline:2px dashed var(--ink);outline-offset:2px}
+.chip.c1{background:var(--c1);border-color:var(--c1);color:#fff}
+.chip.c2{background:var(--c2);border-color:var(--c2);color:#fff}
+.chip.c3{background:var(--c3);border-color:var(--c3);color:#fff}
+
+/* hypergeometric population */
+.pop{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;max-width:420px}
+.cell{aspect-ratio:1;border-radius:3px;background:var(--line);transition:transform .25s,opacity .25s}
+.cell.r{background:var(--hi)}
+.cell.drawn{outline:2.5px solid var(--ink);outline-offset:1px;transform:scale(.82)}
+.log{font-family:var(--mono);font-size:.8rem;background:var(--sunk);border-radius:8px;padding:10px;max-height:190px;overflow:auto;display:grid;gap:2px}
+.log .s{color:var(--hi);font-weight:600}
+
+/* decision */
+.decide{display:grid;gap:14px}
+.qstep{display:grid;gap:8px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{font:inherit;font-size:.92rem;text-align:left;padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;max-width:100%}
+.opt:hover{border-color:var(--bar)}
+.opt[aria-pressed=true]{border-color:var(--hi);box-shadow:inset 0 0 0 1px var(--hi)}
+.verdict{border:2px solid var(--hi);border-radius:10px;padding:14px 16px;display:grid;gap:6px;background:var(--surface)}
+.verdict b{font-family:var(--display);font-size:1.3rem}
+
+/* tables */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.8rem;letter-spacing:.01em;color:var(--muted);font-weight:600}
+td.f{font-family:"Times New Roman",Georgia,serif;font-size:1.05rem;white-space:nowrap}
+
+/* checkpoint */
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.check{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;align-content:start}
+.check .tag{font-family:var(--mono);font-weight:600;color:var(--hi)}
+.check .claim{font-style:italic}
+.check .fix{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:4px}
+.check .fix b{color:var(--ok)}
+
+/* multinomial heat grid */
+.heat svg{min-width:300px;max-width:440px}
+.heat rect.cellm{cursor:pointer;stroke:var(--surface);stroke-width:2}
+.heat rect.sel{stroke:var(--ink);stroke-width:3}
+.heat rect.void{fill:var(--sunk)}
+.arr{display:grid;gap:4px;max-height:220px;overflow:auto}
+
+/* geometric vs binomial */
+.vs{gap:20px}
+.vsgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:820px){.vsgrid{grid-template-columns:minmax(0,1fr)}}
+.side{display:grid;gap:10px;align-content:start;min-width:0;background:var(--sunk);border-radius:10px;padding:14px}
+.side .formula{background:var(--surface)}
+.side .chart svg{min-width:320px}
+table.kv{min-width:0;font-size:.88rem}
+table.kv th{width:30%;text-transform:none;letter-spacing:0;font-size:.85rem}
+.chip.c2b{background:var(--c2);border-color:var(--c2);color:#fff}
+.deriv{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.dstep{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.dnum{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--surface);font-family:var(--mono);font-size:.8rem;font-weight:600}
+.dbody{display:grid;gap:8px;min-width:0}
+.dform{font-size:1.02rem}
+.inv{gap:18px}
+svg .targetline{stroke:var(--hi);stroke-width:1.5;stroke-dasharray:6 4}
+svg text.targetlab{fill:var(--hi);font-weight:600}
+.sum{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;font-size:.72em;margin:0 3px}
+.sum .sg{font-size:2em;line-height:1}
+table.itable{min-width:0;font-size:.88rem}
+table.itable td{font-family:var(--mono);font-variant-numeric:tabular-nums;padding:5px 10px}
+table.itable tr.ans td{background:var(--hi-soft);font-weight:600}
+table.itable tr.past td{color:var(--muted)}
+table.itable td.flag{font-family:var(--body);color:var(--hi);font-weight:600}
+.sub{display:grid;gap:6px;border-left:2px solid var(--line);padding-left:12px}
+.sublab{font-family:var(--mono);font-size:.76rem;font-weight:600;color:var(--ink);letter-spacing:.02em}
+.hn{color:var(--c1);font-weight:700}
+.hk{color:var(--c2);font-weight:700}
+.dlive{background:var(--sunk);border-radius:8px;padding:10px 12px;font-size:.92rem;display:grid;gap:4px;font-variant-numeric:tabular-nums}
+.dlive .m{font-size:.92em}
+.dnotes{margin:0;padding-left:1.1em;display:grid;gap:6px;font-size:.92rem}
+/* slide 25 sequence: G = blue ring, NB = green ring, binomial = gold bar */
+.cseq{display:flex;flex-wrap:wrap;gap:4px 4px;padding-top:4px}
+.ccell{display:grid;grid-template-rows:18px 28px 5px 14px;justify-items:center;gap:2px;width:28px}
+.ccell .bbar{width:100%;height:5px;border-radius:2px;background:transparent}
+.ccell.inb .bbar{background:var(--c2)}
+.ccell .idx,.idx-demo{font-family:var(--mono);font-size:.66rem;color:var(--muted);line-height:14px}
+.ctag{display:inline-block;font-family:var(--mono);font-size:.62rem;font-weight:700;line-height:1;padding:3px 4px;border-radius:4px;color:#fff;vertical-align:middle}
+.ctag.g{background:var(--c1)}
+.ctag.nb{background:var(--ok)}
+.chip.mk-g{outline:3px solid var(--c1);outline-offset:1px}
+.chip.mk-nb{outline:3px solid var(--ok);outline-offset:1px}
+.chip.mini{width:20px;height:20px;font-size:.68rem;vertical-align:middle}
+.lg-bar{display:inline-block;width:20px;height:5px;border-radius:2px;background:var(--c2);vertical-align:middle}
+.clegend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.84rem;color:var(--muted);align-items:center;border-top:1px dashed var(--line);padding-top:10px}
+.clegend>span{display:inline-flex;align-items:center;gap:6px}
+.binnote{font-size:.88rem;line-height:1.5}
+table.pair{min-width:480px}
+table.pair a{color:var(--ink);text-decoration-color:var(--line);text-underline-offset:3px}
+table.pair a:hover{text-decoration-color:var(--hi)}
+.chipv{display:inline-block;font-family:var(--mono);font-size:.74rem;font-weight:600;padding:2px 8px;border-radius:999px;margin-right:6px;color:#fff}
+.chipv.ok{background:var(--ok)}.chipv.bad{background:var(--hi)}
+.why5{gap:18px}
+
+/* die example */
+.die{gap:18px}
+.dieseq{display:grid;gap:6px}
+.dchip{width:34px;height:34px;border-radius:7px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:1.55rem;line-height:1;color:var(--ink)}
+.dchip.six{background:var(--hi);border-color:var(--hi);color:#fff}
+.stage{display:grid;gap:10px;border-top:1px dashed var(--line);padding-top:14px}
+.stagehead{display:flex;align-items:center;gap:10px}
+.split2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){.split2{grid-template-columns:minmax(0,1fr)}}
+.faces{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.face{background:var(--sunk);border-radius:10px;padding:10px;display:grid;gap:6px;justify-items:center;text-align:center}
+.face.is6{outline:2px solid var(--hi);outline-offset:-2px}
+.face .glyph{font-size:2rem;line-height:1}
+.face .cnt{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:1.1rem;font-weight:600}
+.face .cnt button{width:26px;height:26px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:1rem;cursor:pointer;line-height:1}
+.face .cnt button:disabled{opacity:.35;cursor:default}
+.face .bp{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.face .bp b{color:var(--ink)}
+.sumbar{font-size:.92rem;padding:8px 12px;border-radius:8px;background:var(--sunk)}
+.sumbar.bad{background:var(--hi-soft)}
+/* Lecture 7 callback */
+.l7{gap:20px;border-color:var(--hi)}
+.l7h{font-size:1.35rem}
+.l7grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+@media (max-width:820px){.l7grid{grid-template-columns:minmax(0,1fr)}}
+.bulbs{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;max-width:440px}
+.bulb{aspect-ratio:3/4;border-radius:50% 50% 30% 30%;display:grid;place-items:center;font-family:var(--mono);font-size:.72rem;font-weight:600;background:var(--sunk);color:var(--ink);border:1px solid var(--line);transition:transform .2s}
+.bulb.bo{background:var(--hi);color:#fff;border-color:var(--hi)}
+.bulb.pick{outline:3px solid var(--ink);outline-offset:2px;transform:translateY(-3px)}
+table.btable,table.map{min-width:0}
+table.btable tr.on td{background:var(--hi-soft)}
+.gen{display:grid;gap:6px}
+.gen .arrow{font-family:var(--mono);font-size:.8rem;color:var(--muted);text-align:center}
+.tN{color:var(--c1);font-weight:700}.tR{color:var(--hi);font-weight:700}.tNR{color:var(--muted);font-weight:700}.tn{color:var(--c2);font-weight:700}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">ENDG 319 · Lecture 10 · interactive companion</span>
+  <h1>More discrete distributions, one experiment at a time</h1>
+  <p class="muted">Poisson, hypergeometric, geometric, negative binomial and multinomial. Every chart below is live. Move the sliders and watch how the experiment's rules shape the distribution.</p>
+  <div class="warn"><b>The lecture's main idea:</b> "success" is only a label. What decides the distribution is how the experiment is run: what is fixed, what is counted, and what ends it.</div>
+</header>
+
+<nav class="stations" aria-label="Sections">
+  <a href="#choose">Choose a model</a>
+  <a href="#poisson">Poisson</a>
+  <a href="#approx">Bin → Poisson</a>
+  <a href="#hyper">Hypergeometric</a>
+  <a href="#geom">Geometric</a>
+  <a href="#nb">Negative binomial</a>
+  <a href="#compare">Fixed vs stopping</a>
+  <a href="#replacement">Replacement?</a>
+  <a href="#multi">Multinomial</a>
+  <a href="#formulas">Formulas</a>
+  <a href="#check">Concept check</a>
+</nav>
+
+<!-- ============ CHOOSE ============ -->
+<section class="station" id="choose">
+  <div class="head">
+    <span class="eyebrow">Start here</span>
+    <h2>Which model fits the experiment?</h2>
+    <p class="muted">Answer the questions about how the data are generated. The model follows from the answers, not from the value of p.</p>
+  </div>
+  <div class="panel decide" id="decide"></div>
+</section>
+
+<!-- ============ POISSON ============ -->
+<section class="station" id="poisson">
+  <div class="head">
+    <span class="eyebrow">Poisson · slides 4–9</span>
+    <h2>Counting events in an opportunity</h2>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <p>X counts events in a fixed <b>opportunity</b>: a span of time, a length of wire, an area, or a volume of liquid. Counting in an interval does not make a count Poisson automatically. It is a modelling assumption.</p>
+      <div class="formula">P(X = <i>x</i>) = <i>e</i><sup>−λ</sup> <span class="frac"><span>λ<sup><i>x</i></sup></span><span><i>x</i>!</span></span>, &nbsp; <i>x</i> = 0, 1, 2, …</div>
+      <ul>
+        <li><b>λ is a mean count</b>, not a probability. It can be larger than 1.</li>
+        <li>Mean = variance = λ, and SD = √λ.</li>
+        <li><b>Scale λ to the opportunity:</b> λ = (events per unit) × (number of units).</li>
+      </ul>
+      <div class="why">
+        <h3>Why the Poisson matters</h3>
+        <ol>
+          <li><b>Simplicity.</b> It has one parameter, λ, instead of two (n and p). Each term is easy to compute by hand, and the mean and variance are both λ.</li>
+          <li><b>Insight.</b> When events are rare, only the average count np matters, not n and p separately. The <a href="#approx">Bin → Poisson panel</a> below shows this.</li>
+          <li><b>Modelling when n is unknown.</b> For customer arrivals or radioactive decays there is no meaningful "number of trials", only a rate. Here the Poisson is a model in its own right, not just an approximation. In practice this is the most important reason.</li>
+        </ol>
+      </div>
+      <div class="warn"><b>Three checks.</b> 1. What is the opportunity? 2. What is λ for that whole opportunity? 3. For "exactly x", plug in that x, never the mean.</div>
+      <p class="muted" style="font-size:.9rem">Preset: Example 3. Particles at 6 per mL, 3 mL withdrawn, exactly 15 particles.</p>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="pRate">Rate per unit <output id="pRateO"></output></label><input type="range" id="pRate" min="0.5" max="10" step="0.5" value="6"></div>
+        <div class="ctl"><label for="pUnits">Units in the opportunity <output id="pUnitsO"></output></label><input type="range" id="pUnits" min="0.5" max="5" step="0.5" value="3"></div>
+        <div class="ctl"><label for="pX">Count x <output id="pXO"></output></label><input type="range" id="pX" min="0" max="60" step="1" value="15"></div>
+      </div>
+      <div class="row"><span class="muted" style="font-size:.85rem">Event:</span>
+        <div class="seg" id="pEvent" role="group" aria-label="Event type">
+          <button data-v="eq" aria-pressed="true">X = x</button><button data-v="le" aria-pressed="false">X ≤ x</button><button data-v="ge" aria-pressed="false">X ≥ x</button>
+        </div></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">λ = rate × units</div><div class="v" id="pLam"></div></div>
+        <div class="ro key"><div class="k" id="pProbK">P(X = x)</div><div class="v" id="pProb"></div></div>
+        <div class="ro"><div class="k">Mean = Var</div><div class="v" id="pMV"></div></div>
+        <div class="ro"><div class="k">SD = √λ</div><div class="v" id="pSD"></div></div>
+      </div>
+      <div class="chart" id="pChart"></div>
+      <div class="legend"><span><span class="sw" style="background:var(--hi)"></span>event</span><span><span class="sw" style="background:var(--bar)"></span>other counts</span><span>- - - mean λ</span></div>
+      <div class="warn" id="pWrong"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APPROX ============ -->
+<section class="station" id="approx">
+  <div class="head">
+    <span class="eyebrow">Poisson · slide 3</span>
+    <h2>Where Poisson comes from: many trials, rare successes</h2>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <p>Start with Bin(<i>n</i>, <i>p</i>). Keep the mean count fixed at λ = <i>np</i> while <i>n</i> grows and <i>p</i> shrinks. The binomial probabilities approach the Poisson ones.</p>
+      <div class="formula"><span class="binom"><span class="st"><span><i>n</i></span><span><i>x</i></span></span></span><i>p</i><sup><i>x</i></sup>(1−<i>p</i>)<sup><i>n</i>−<i>x</i></sup> ≈ <i>e</i><sup>−λ</sup><span class="frac"><span>λ<sup><i>x</i></sup></span><span><i>x</i>!</span></span></div>
+      <p>This is an <b>approximation, not an identity</b>. Drag <i>n</i> from small to large and watch the gap close.</p>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="aN">Trials n <output id="aNO"></output></label><input type="range" id="aN" min="5" max="300" step="1" value="10"></div>
+        <div class="ctl"><label for="aL">Mean λ = np <output id="aLO"></output></label><input type="range" id="aL" min="0.5" max="8" step="0.5" value="3"></div>
+      </div>
+      <div class="readouts">
+        <div class="ro"><div class="k">p = λ / n</div><div class="v" id="aP"></div></div>
+        <div class="ro key"><div class="k">Largest gap |Bin − Pois|</div><div class="v" id="aGap"></div></div>
+      </div>
+      <div class="chart" id="aChart"></div>
+      <div class="legend"><span><span class="sw" style="background:var(--bar)"></span>Binomial(n, p)</span><span><span class="sw" style="background:var(--surface);border:2px solid var(--hi)"></span>Poisson(λ)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HYPER ============ -->
+<section class="station" id="hyper">
+  <div class="head">
+    <span class="eyebrow">Hypergeometric · slides 10–17</span>
+    <h2>A finite sample drawn without replacement</h2>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <p>A population of <b>N</b> items holds <b>R</b> successes and N − R failures. Draw <b>n</b> distinct items. X counts the successes in the sample: X ~ H(N, R, n).</p>
+      <div class="formula">P(X = <i>x</i>) = <span class="frac"><span><span class="binom"><span class="st"><span><i>R</i></span><span><i>x</i></span></span></span><span class="binom"><span class="st"><span><i>N</i>−<i>R</i></span><span><i>n</i>−<i>x</i></span></span></span></span><span><span class="binom"><span class="st"><span><i>N</i></span><span><i>n</i></span></span></span></span></span></div>
+      <ul>
+        <li>Choose x of the successes and n − x of the failures, then divide by all n-item samples.</li>
+        <li><b>Support:</b> max(0, R + n − N) ≤ x ≤ min(n, R).</li>
+        <li>Mean = n·R/N, the same as a binomial with p = R/N.</li>
+        <li>Variance = n·(R/N)(1 − R/N)·<b>(N − n)/(N − 1)</b>. The finite-population factor is below 1, so the spread is smaller than the binomial's.</li>
+      </ul>
+      <div class="warn"><b>Random is not independent.</b> Each draw removes an item, so the chance of a success on the next draw depends on what came before. Use the population on the right to see it happen.</div>
+    </div>
+    <div class="panel">
+      <div class="row">
+        <span class="muted" style="font-size:.85rem">Example:</span>
+        <div class="seg preset" role="group" aria-label="Example loaded in the hypergeometric panel">
+          <button data-v="bld" aria-pressed="true">Buildings · H(50, 12, 10)</button><button data-v="bulb" aria-pressed="false">Bulbs (Lecture 7) · H(10, 2, 4)</button>
+        </div>
+      </div>
+      <p class="muted" id="hStory" style="font-size:.88rem"></p>
+      <div class="controls">
+        <div class="ctl"><label for="hN">Population N <output id="hNO"></output></label><input type="range" id="hN" min="10" max="60" step="1" value="50"></div>
+        <div class="ctl"><label for="hR">Successes R <output id="hRO"></output></label><input type="range" id="hR" min="0" max="50" step="1" value="12"></div>
+        <div class="ctl"><label for="hn">Sample n <output id="hnO"></output></label><input type="range" id="hn" min="1" max="50" step="1" value="10"></div>
+        <div class="ctl"><label for="hX">Count x <output id="hXO"></output></label><input type="range" id="hX" min="0" max="50" step="1" value="3"></div>
+      </div>
+      <h3>Draw the sample yourself</h3>
+      <div class="pop" id="hPop" aria-label="Population of items; red items are successes"></div>
+      <div class="row">
+        <button class="btn" id="hDraw1">Draw one item</button>
+        <button class="btn ghost" id="hDrawAll">Draw the rest</button>
+        <button class="btn ghost" id="hReset">Put all back</button>
+      </div>
+      <div class="log" id="hLog" aria-live="polite"></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Support</div><div class="v" id="hSup"></div></div>
+        <div class="ro key"><div class="k">P(X = x)</div><div class="v" id="hProb"></div></div>
+        <div class="ro"><div class="k">Mean nR/N</div><div class="v" id="hMean"></div></div>
+        <div class="ro"><div class="k">Variance</div><div class="v" id="hVar"></div></div>
+      </div>
+      <div class="chart" id="hChart"></div>
+      <div class="legend"><span><span class="sw" style="background:var(--hi)"></span>X = x</span><span><span class="sw" style="background:var(--bar)"></span>feasible counts</span><span><span class="sw" style="background:var(--line)"></span>impossible (outside support)</span><span><span class="sw" style="background:var(--c2);border-radius:50%"></span>binomial with p = R/N (assumes replacement, so wrong here)</span><span>- - - mean nR/N</span></div>
+      <div class="binnote" id="hBinNote"></div>
+      <div id="hVarBars"></div>
+    </div>
+  </div>
+
+  <div class="panel why5">
+    <div class="head">
+      <span class="eyebrow">Binomial vs hypergeometric</span>
+      <h3 class="l7h">Why the binomial is wrong here, and when it is close enough</h3>
+    </div>
+    <div class="l7grid">
+      <div class="concept">
+        <p>The binomial needs <b>independent trials with the same p</b>. Drawing without replacement breaks independence: each draw removes an item and changes the chance for the next one. The gold dots on the chart above show what the binomial would predict anyway.</p>
+        <ul>
+          <li><b>Same centre.</b> Both have mean n·R/N, so the dots and bars balance at the same point.</li>
+          <li><b>Too wide.</b> The binomial leaves out the factor (N − n)/(N − 1). In Example 4 its variance is 1.824 instead of the correct 1.489.</li>
+          <li><b>Impossible outcomes.</b> The binomial allows 0 to n successes and ignores R. For the bulbs, Bin(4, 0.2) gives P(X = 3) = 0.0256 and P(X = 4) = 0.0016, but only 2 bulbs are burned out.</li>
+        </ul>
+        <div class="warn"><b>The 5% rule of thumb.</b> When the sample is a small fraction of the population (n/N under about 5%), each draw changes p by very little. The draws are then nearly independent, (N − n)/(N − 1) is close to 1, and the binomial is a good approximation. Both examples above are far from this: the buildings sample 20% and the bulbs 40%.</div>
+      </div>
+      <div class="concept">
+        <h3>See it converge: grow the population, keep the sample</h3>
+        <p class="muted" style="font-size:.88rem">The success fraction stays near R/N = 0.24, as in Example 4. Only the population size changes.</p>
+        <div class="controls">
+          <div class="ctl"><label for="zN">Population N <output id="zNO"></output></label><input type="range" id="zN" min="0" max="10" step="1" value="1"></div>
+          <div class="ctl"><label for="zn">Sample n <output id="znO"></output></label><input type="range" id="zn" min="2" max="15" step="1" value="10"></div>
+        </div>
+        <div class="readouts">
+          <div class="ro key"><div class="k">n / N</div><div class="v" id="zFrac"></div></div>
+          <div class="ro"><div class="k">(N − n)/(N − 1)</div><div class="v" id="zFpc"></div></div>
+          <div class="ro"><div class="k">Largest gap</div><div class="v" id="zGap"></div></div>
+        </div>
+        <div class="chart" id="zChart"></div>
+        <div class="legend"><span><span class="sw" style="background:var(--bar)"></span>hypergeometric (correct)</span><span><span class="sw" style="background:var(--c2);border-radius:50%"></span>binomial with p = R/N</span></div>
+        <div class="binnote" id="zNote"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel l7">
+    <div class="head">
+      <span class="eyebrow">Callback · Lecture 7, slides 13–14</span>
+      <h3 class="l7h">You have already done a hypergeometric problem: the burned-out bulbs</h3>
+      <p>In Lecture 7 a box held <b>10 bulbs: 8 good and 2 burned out</b>. Four were selected without replacement, and X was the number of burned-out bulbs selected. We built the PMF by counting subsets, without naming any distribution. That count is the hypergeometric PMF.</p>
+    </div>
+
+    <div class="l7grid">
+      <div class="concept">
+        <h3>Step 1 · Count it the Lecture 7 way</h3>
+        <div class="row"><span class="muted" style="font-size:.85rem">Pick a value of x:</span>
+          <div class="seg" id="bX" role="group" aria-label="Number of burned-out bulbs selected">
+            <button data-v="0" aria-pressed="false">x = 0</button><button data-v="1" aria-pressed="true">x = 1</button><button data-v="2" aria-pressed="false">x = 2</button>
+          </div></div>
+        <div class="bulbs" id="bBulbs" aria-label="Ten bulbs; outlined bulbs are one example selection"></div>
+        <p class="muted" style="font-size:.85rem">Outlined bulbs show one example selection with this x. <button class="btn ghost" id="bShuffle" style="padding:3px 10px;font-size:.8rem">Show another</button></p>
+        <div class="formula" id="bCalc" style="font-size:1.05rem"></div>
+        <div class="tbl"><table class="btable">
+          <thead><tr><th>x burned out</th><th>4 − x good</th><th>Favourable subsets</th><th>p(x)</th></tr></thead>
+          <tbody id="bRows"></tbody>
+          <tfoot><tr><td colspan="2"><b>Total</b></td><td class="m"><b>210 = C(10, 4)</b></td><td class="m"><b>1</b></td></tr></tfoot>
+        </table></div>
+        <p class="muted" style="font-size:.88rem">Row x = 0 is Lecture 5's Example 8: P(all four bulbs good) = C(8,4)/C(10,4) = 70/210 = 1/3.</p>
+      </div>
+
+      <div class="concept">
+        <h3>Step 2 · Name each number by its role</h3>
+        <p>Replace each specific number with what it means in the experiment. Nothing about the counting argument changes.</p>
+        <div class="tbl"><table class="map">
+          <thead><tr><th>Bulb example</th><th>Role in the experiment</th><th>General symbol</th></tr></thead>
+          <tbody>
+            <tr><td class="m">10</td><td>Bulbs in the box (population size)</td><td class="f"><i>N</i></td></tr>
+            <tr><td class="m">2</td><td>Burned-out bulbs, the items being counted ("successes")</td><td class="f"><i>R</i></td></tr>
+            <tr><td class="m">8</td><td>Good bulbs ("failures")</td><td class="f"><i>N</i> − <i>R</i></td></tr>
+            <tr><td class="m">4</td><td>Bulbs selected (sample size)</td><td class="f"><i>n</i></td></tr>
+            <tr><td class="m">x</td><td>Burned-out bulbs in the selection</td><td class="f"><i>x</i></td></tr>
+            <tr><td class="m">4 − x</td><td>Good bulbs in the selection</td><td class="f"><i>n</i> − <i>x</i></td></tr>
+          </tbody></table></div>
+        <h3>Step 3 · The same formula, generalized</h3>
+        <div class="gen">
+          <div class="formula" style="font-size:1.1rem">p(<i>x</i>) = <span class="frac"><span><span class="binom"><span class="st"><span><span class="tR">2</span></span><span><i>x</i></span></span></span><span class="binom"><span class="st"><span><span class="tNR">8</span></span><span><span class="tn">4</span>−<i>x</i></span></span></span></span><span><span class="binom"><span class="st"><span><span class="tN">10</span></span><span><span class="tn">4</span></span></span></span></span></span></div>
+          <div class="arrow" aria-hidden="true">↓ replace numbers with roles</div>
+          <div class="formula" style="font-size:1.1rem">p(<i>x</i>) = <span class="frac"><span><span class="binom"><span class="st"><span><span class="tR"><i>R</i></span></span><span><i>x</i></span></span></span><span class="binom"><span class="st"><span><span class="tNR"><i>N</i>−<i>R</i></span></span><span><span class="tn"><i>n</i></span>−<i>x</i></span></span></span></span><span><span class="binom"><span class="st"><span><span class="tN"><i>N</i></span></span><span><span class="tn"><i>n</i></span></span></span></span></span></span> &nbsp;⇒&nbsp; X ~ H(<span class="tN">10</span>, <span class="tR">2</span>, <span class="tn">4</span>)</div>
+        </div>
+        <div class="legend"><span><span class="sw" style="background:var(--c1)"></span>N population</span><span><span class="sw" style="background:var(--hi)"></span>R successes</span><span><span class="sw" style="background:var(--muted)"></span>N − R failures</span><span><span class="sw" style="background:var(--c2)"></span>n sample size</span></div>
+      </div>
+    </div>
+
+    <h3>Step 4 · Check the Lecture 10 rules against what we found in Lecture 7</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Lecture 10 rule</th><th>General form</th><th>Bulbs: H(10, 2, 4)</th><th>Matches Lecture 7?</th></tr></thead>
+      <tbody>
+        <tr><td>Support</td><td class="f">max(0, <i>R</i>+<i>n</i>−<i>N</i>) ≤ <i>x</i> ≤ min(<i>n</i>, <i>R</i>)</td><td class="m">max(0, −4) = 0 to min(4, 2) = 2</td><td>Yes: only x = 0, 1, 2. You cannot pick 3 burned-out bulbs when only 2 exist.</td></tr>
+        <tr><td>Mean</td><td class="f"><i>n</i> · <i>R</i>/<i>N</i></td><td class="m">4 × 2/10 = 0.8</td><td>Yes: 0·(1/3) + 1·(8/15) + 2·(2/15) = 12/15 = 0.8</td></tr>
+        <tr><td>Variance</td><td class="f"><i>n</i>(<i>R</i>/<i>N</i>)(1−<i>R</i>/<i>N</i>)(<i>N</i>−<i>n</i>)/(<i>N</i>−1)</td><td class="m">4(0.2)(0.8)(6/9) ≈ 0.4267</td><td>Yes: E[X²] − μ² = 16/15 − 0.64 ≈ 0.4267</td></tr>
+        <tr><td>Dependence</td><td class="f">P(<i>S</i>₂ | <i>S</i>₁) = (<i>R</i>−1)/(<i>N</i>−1)</td><td class="m">P(2nd burned out | 1st burned out) = 1/9</td><td>Not 2/10: removing a bulb changes the box, as in the Lecture 6 resistor draws.</td></tr>
+      </tbody></table></div>
+    <div class="row">
+      <span class="muted" style="font-size:.88rem">Example shown in the panel above:</span>
+      <div class="seg preset" role="group" aria-label="Example loaded in the hypergeometric panel">
+        <button data-v="bld" aria-pressed="true">Buildings · H(50, 12, 10)</button><button data-v="bulb" aria-pressed="false">Bulbs · H(10, 2, 4)</button>
+      </div>
+      <span class="muted" style="font-size:.88rem">Switch to the bulbs to draw them one at a time and see the PMF. Switch back to restore Example 4.</span>
+    </div>
+    <div class="warn"><b>The takeaway:</b> the hypergeometric formula is not a new idea. It is the Lecture 7 counting argument (choose the successes, choose the failures, divide by all samples) written once for any N, R and n.</div>
+  </div>
+</section>
+
+<!-- ============ GEOM ============ -->
+<section class="station" id="geom">
+  <div class="head">
+    <span class="eyebrow">Geometric · slides 18–21</span>
+    <h2>Stop at the first success</h2>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <p>Run independent trials with the same success probability p. X is the number of trials <b>up to and including</b> the first success. The number of trials is random.</p>
+      <div class="chips" aria-hidden="true"><span class="chip f">F</span><span class="chip f">F</span><span class="chip">…</span><span class="chip f">F</span><span class="chip s">S</span></div>
+      <div class="formula">P(X = <i>x</i>) = (1 − <i>p</i>)<sup><i>x</i>−1</sup> <i>p</i>, &nbsp; <i>x</i> = 1, 2, 3, …</div>
+      <ul>
+        <li>x − 1 failures, then one success. Writing (1 − p)<sup>x</sup> would count one failure too many.</li>
+        <li>Mean = 1/p. Variance = (1 − p)/p².</li>
+        <li>The support starts at 1, because at least one trial is needed.</li>
+      </ul>
+      <p class="muted" style="font-size:.9rem">Preset: Example 5. 20% of invoices qualify for the discount, and we audit until the first one that qualifies. Mean = 5 audits, variance = 20. A mean of 5 does not mean the 5th invoice is the first to qualify.</p>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="gP">Success probability p <output id="gPO"></output></label><input type="range" id="gP" min="0.05" max="0.9" step="0.05" value="0.2"></div>
+      </div>
+      <div class="row">
+        <button class="btn" id="gOne">Audit until a discount</button>
+        <button class="btn ghost" id="gMany">Repeat 1,000 times</button>
+        <button class="btn ghost" id="gClear">Clear</button>
+      </div>
+      <div class="chips" id="gStrip" aria-live="polite"></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Mean 1/p</div><div class="v" id="gMean"></div></div>
+        <div class="ro"><div class="k">Variance</div><div class="v" id="gVar"></div></div>
+        <div class="ro key"><div class="k">Runs simulated</div><div class="v" id="gRuns"></div></div>
+        <div class="ro"><div class="k">Average X so far</div><div class="v" id="gAvg"></div></div>
+      </div>
+      <div class="chart" id="gChart"></div>
+      <div class="legend"><span><span class="sw" style="background:var(--bar)"></span>PMF</span><span><span class="sw" style="background:var(--c2);border-radius:50%"></span>simulated share</span><span>- - - mean 1/p</span></div>
+    </div>
+  </div>
+
+  <div class="panel vs">
+    <div class="head">
+      <span class="eyebrow">Same trials, different question</span>
+      <h3 class="l7h">The invoice audit as a geometric problem vs a binomial problem</h3>
+      <p>Both use the same invoices: independent, each qualifying for the discount with probability p. What changes is the stopping rule, and so what X counts. The two models swap what is fixed and what is random.</p>
+    </div>
+    <div class="controls">
+      <div class="ctl"><label for="vP">Discount probability p <output id="vPO"></output></label><input type="range" id="vP" min="0.05" max="0.9" step="0.05" value="0.2"></div>
+      <div class="ctl"><label for="vN">Binomial: invoices audited n <output id="vNO"></output></label><input type="range" id="vN" min="2" max="15" step="1" value="5"></div>
+    </div>
+    <div class="vsgrid">
+      <div class="side">
+        <span class="eyebrow" style="color:var(--bar)">Geometric · X ~ Geom(<span class="pv"></span>)</span>
+        <p><b>Question:</b> audit invoices one by one <b>until the first one qualifies</b>. How many audits does it take?</p>
+        <div class="tbl"><table class="kv"><tbody>
+          <tr><th>Fixed</th><td>Number of successes: 1</td></tr>
+          <tr><th>Random</th><td>Number of audits</td></tr>
+          <tr><th>X counts</th><td>Audits up to and including the first discount</td></tr>
+          <tr><th>Support</th><td class="m">1, 2, 3, … (no upper limit)</td></tr>
+        </tbody></table></div>
+        <div class="ctl"><label for="vGx">X = audits until the first discount <output id="vGxO"></output></label><input type="range" id="vGx" min="1" max="30" step="1" value="1"></div>
+        <div class="formula" id="vGcalc" style="font-size:1.02rem"></div>
+        <p class="muted" style="font-size:.85rem" id="vGseqH"></p>
+        <div class="arr" id="vGseq"></div>
+        <div class="chart" id="vGchart"></div>
+      </div>
+      <div class="side">
+        <span class="eyebrow" style="color:var(--c2)">Binomial · X ~ Bin(<span class="nv"></span>, <span class="pv"></span>)</span>
+        <p><b>Question:</b> audit <b>exactly <span class="nv"></span> invoices</b>. How many of them qualify?</p>
+        <div class="tbl"><table class="kv"><tbody>
+          <tr><th>Fixed</th><td>Number of audits: n = <span class="nv"></span></td></tr>
+          <tr><th>Random</th><td>Number of discounts</td></tr>
+          <tr><th>X counts</th><td>Qualifying invoices among the <span class="nv"></span></td></tr>
+          <tr><th>Support</th><td class="m">0, 1, …, <span class="nv"></span></td></tr>
+        </tbody></table></div>
+        <div class="ctl"><label for="vBx">X = discounts among the <span class="nv"></span> audits <output id="vBxO"></output></label><input type="range" id="vBx" min="0" max="5" step="1" value="1"></div>
+        <div class="formula" id="vBcalc" style="font-size:1.02rem"></div>
+        <p class="muted" style="font-size:.85rem" id="vBseqH"></p>
+        <div class="arr" id="vBseq"></div>
+        <div class="chart" id="vBchart"></div>
+      </div>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th></th><th>Geometric</th><th>Binomial</th></tr></thead>
+      <tbody id="vTable"></tbody>
+    </table></div>
+    <div class="warn" id="vBridge"></div>
+  </div>
+</section>
+
+<!-- ============ NB ============ -->
+<section class="station" id="nb">
+  <div class="head">
+    <span class="eyebrow">Negative binomial · slides 22–24</span>
+    <h2>Stop at the r-th success</h2>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <p>The same trials as before, but now you stop at success number <b>r</b>. r is fixed in advance. X, the total number of trials, is random: X ~ NB(r, p), with x = r, r + 1, …</p>
+      <div class="formula">P(X = <i>x</i>) = <span class="binom"><span class="st"><span><i>x</i> − 1</span><span><i>r</i> − 1</span></span></span> <i>p</i><sup><i>r</i></sup>(1 − <i>p</i>)<sup><i>x</i>−<i>r</i></sup></div>
+      <div class="deriv">
+        <h3>Where the formula comes from</h3>
+        <p>X = x means two things happen together. Each piece covers different trials.</p>
+        <div class="dstep">
+          <span class="dnum">1</span>
+          <div class="dbody">
+            <p><b>Exactly r − 1 successes in the first x − 1 trials</b>, in any order. This is a binomial question: a fixed number of independent trials, counting successes.</p>
+            <div class="sub">
+              <span class="sublab">1a · Start from the binomial PMF</span>
+              <p class="muted" style="font-size:.86rem">For <span class="hn"><i>n</i></span> trials, the probability of exactly <span class="hk"><i>k</i></span> successes. (We write <i>k</i> instead of the usual <i>x</i>, because <i>x</i> already means the total number of trials here.)</p>
+              <div class="formula dform">P(<i>k</i> successes) = <span class="binom"><span class="st"><span class="hn"><i>n</i></span><span class="hk"><i>k</i></span></span></span> <i>p</i><sup><span class="hk"><i>k</i></span></sup>(1 − <i>p</i>)<sup><span class="hn"><i>n</i></span>−<span class="hk"><i>k</i></span></sup></div>
+            </div>
+            <div class="sub">
+              <span class="sublab">1b · Substitute <span class="hn"><i>n</i></span> = <span class="hn"><i>x</i> − 1</span> and <span class="hk"><i>k</i></span> = <span class="hk"><i>r</i> − 1</span></span>
+              <p class="muted" style="font-size:.86rem">The trials before the last one number x − 1, and they must hold r − 1 successes.</p>
+              <div class="formula dform"><span class="binom"><span class="st"><span class="hn"><i>x</i> − 1</span><span class="hk"><i>r</i> − 1</span></span></span> <i>p</i><sup><span class="hk"><i>r</i>−1</span></sup>(1 − <i>p</i>)<sup>(<span class="hn"><i>x</i>−1</span>)−(<span class="hk"><i>r</i>−1</span>)</sup></div>
+            </div>
+            <div class="sub">
+              <span class="sublab">1c · Simplify the failure exponent</span>
+              <p class="muted" style="font-size:.86rem">(x − 1) − (r − 1) = x − 1 − r + 1 = x − r. This is the number of failures among the first x − 1 trials.</p>
+              <div class="formula dform"><span class="binom"><span class="st"><span><i>x</i> − 1</span><span><i>r</i> − 1</span></span></span> <i>p</i><sup><i>r</i>−1</sup>(1 − <i>p</i>)<sup><i>x</i>−<i>r</i></sup></div>
+            </div>
+          </div>
+        </div>
+        <div class="dstep">
+          <span class="dnum">2</span>
+          <div class="dbody">
+            <p><b>Trial x is a success</b>, the r-th one. Its probability is <i>p</i>.</p>
+          </div>
+        </div>
+        <div class="dstep">
+          <span class="dnum">3</span>
+          <div class="dbody">
+            <p><b>Multiply.</b> The two pieces involve different trials, and the trials are independent, so P(both) = P(step 1) × P(step 2):</p>
+            <div class="formula dform"><span class="binom"><span class="st"><span><i>x</i> − 1</span><span><i>r</i> − 1</span></span></span> <i>p</i><sup><i>r</i>−1</sup>(1 − <i>p</i>)<sup><i>x</i>−<i>r</i></sup> × <i>p</i> = <span class="binom"><span class="st"><span><i>x</i> − 1</span><span><i>r</i> − 1</span></span></span> <i>p</i><sup><i>r</i></sup>(1 − <i>p</i>)<sup><i>x</i>−<i>r</i></sup></div>
+          </div>
+        </div>
+        <div class="dlive" id="nDeriv" aria-live="polite"></div>
+        <ul class="dnotes">
+          <li><b>Why not C(x, r)?</b> It would choose r success positions from all x trials, so the r-th success could land before trial x. Fixing trial x as a success and arranging only the first x − 1 rules that out.</li>
+          <li><b>Why independence matters.</b> The multiplication in step 3 needs independent trials. Drawing without replacement from a small population breaks it, and the formula no longer applies.</li>
+          <li><b>Special case r = 1.</b> C(x − 1, 0) = 1, which leaves (1 − p)<sup>x−1</sup>p: the geometric PMF.</li>
+        </ul>
+      </div>
+      <ul>
+        <li><b>Trial x must be the r-th success.</b> So the first x − 1 trials hold exactly r − 1 successes, in any order.</li>
+        <li>X is the sum of r independent geometric waits, so mean = r/p and variance = r(1 − p)/p².</li>
+        <li>With r = 1 everything reduces to the geometric.</li>
+      </ul>
+      <div class="warn">Using C(x, r) also counts sequences where the r-th success happened <i>before</i> trial x. The panel lists the valid sequences and counts the ones C(x, r) would wrongly add.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="nR">Target successes r <output id="nRO"></output></label><input type="range" id="nR" min="1" max="6" step="1" value="3"></div>
+        <div class="ctl"><label for="nP">Success probability p <output id="nPO"></output></label><input type="range" id="nP" min="0.1" max="0.9" step="0.05" value="0.4"></div>
+        <div class="ctl"><label for="nX">Total trials x <output id="nXO"></output></label><input type="range" id="nX" min="1" max="20" step="1" value="5"></div>
+      </div>
+      <div class="readouts">
+        <div class="ro key"><div class="k">P(X = x)</div><div class="v" id="nProb"></div></div>
+        <div class="ro"><div class="k">C(x−1, r−1) valid</div><div class="v" id="nCnt"></div></div>
+        <div class="ro"><div class="k">C(x, r) wrong</div><div class="v" id="nBad"></div></div>
+        <div class="ro"><div class="k">Mean · Var</div><div class="v" id="nMV"></div></div>
+      </div>
+      <h3>Valid sequences for X = <span id="nXh"></span></h3>
+      <p class="muted" style="font-size:.85rem">The last trial (dashed) is fixed as the r-th success. Only the first x − 1 positions are rearranged.</p>
+      <div class="arr" id="nArr"></div>
+      <div class="chart" id="nChart"></div>
+    </div>
+  </div>
+
+  <div class="panel inv">
+    <div class="head">
+      <span class="eyebrow">The reverse question</span>
+      <h3 class="l7h">Given a probability, find x: how many trials should we plan for?</h3>
+      <p>The panel above fixes x and asks for a probability. In practice the question often runs the other way: <i>how many trials must we budget so that the r-th success has happened with at least a given probability?</i> For example, how many invoices to schedule for audit so that we are 90% sure of finding 3 that qualify.</p>
+    </div>
+    <div class="l7grid">
+      <div class="concept">
+        <div class="controls">
+          <div class="ctl"><label for="iT">Target probability <output id="iTO"></output></label><input type="range" id="iT" min="0.5" max="0.99" step="0.01" value="0.9"></div>
+        </div>
+        <p class="muted" style="font-size:.86rem">Uses r and p from the sliders above: <b>r = <span id="iR"></span></b>, <b>p = <span id="iP"></span></b>.</p>
+        <div class="sub">
+          <span class="sublab">1 · Turn "within x trials" into a CDF</span>
+          <p style="font-size:.92rem">"The r-th success happens by trial x" means X ≤ x, so we need the cumulative probability, not a single PMF value:</p>
+          <div class="formula dform">P(X ≤ <i>x</i>) = <span class="sum"><span><i>x</i></span><span class="sg">Σ</span><span><i>k</i>=<i>r</i></span></span> <span class="binom"><span class="st"><span><i>k</i> − 1</span><span><i>r</i> − 1</span></span></span> <i>p</i><sup><i>r</i></sup>(1 − <i>p</i>)<sup><i>k</i>−<i>r</i></sup></div>
+        </div>
+        <div class="sub">
+          <span class="sublab">2 · Add terms until the total reaches the target</span>
+          <p style="font-size:.92rem">Start at x = r, the smallest possible value, and keep adding PMF values. The answer is the <b>smallest x</b> with P(X ≤ x) ≥ target. The table runs to x = 20; move the target slider to see which row it selects.</p>
+          <div class="tbl"><table class="itable"><thead><tr><th>x</th><th>P(X = x)</th><th>P(X ≤ x)</th><th></th></tr></thead><tbody id="iRows"></tbody></table></div>
+        </div>
+      </div>
+      <div class="concept">
+        <div class="readouts">
+          <div class="ro key"><div class="k">Plan for x =</div><div class="v" id="iAns"></div></div>
+          <div class="ro"><div class="k">P(X ≤ x)</div><div class="v" id="iAt"></div></div>
+          <div class="ro"><div class="k">P(X ≤ x − 1)</div><div class="v" id="iBelow"></div></div>
+        </div>
+        <div class="chart" id="iChart"></div>
+        <div class="legend"><span><span class="sw" style="background:var(--bar)"></span>P(X ≤ x), still below target</span><span><span class="sw" style="background:var(--hi)"></span>first x that reaches the target</span><span><span class="sw" style="background:var(--line)"></span>beyond the answer</span></div>
+        <div class="sub">
+          <span class="sublab">3 · Check with the binomial</span>
+          <p style="font-size:.92rem" id="iCheck"></p>
+        </div>
+        <div class="warn" id="iRead"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPARE ============ -->
+<section class="station" id="compare">
+  <div class="head">
+    <span class="eyebrow">Slide 25</span>
+    <h2>Fixed trials versus a stopping rule</h2>
+    <p class="muted">All three use the same independent trials with a common p. The difference is what ends the experiment. Run one sequence and read it three ways.</p>
+  </div>
+  <div class="panel">
+    <div class="controls">
+      <div class="ctl"><label for="cP">p <output id="cPO"></output></label><input type="range" id="cP" min="0.1" max="0.8" step="0.05" value="0.3"></div>
+      <div class="ctl"><label for="cN">Binomial: fixed n <output id="cNO"></output></label><input type="range" id="cN" min="3" max="15" step="1" value="8"></div>
+      <div class="ctl"><label for="cR">NB: target r <output id="cRO"></output></label><input type="range" id="cR" min="2" max="5" step="1" value="3"></div>
+    </div>
+    <div class="row"><button class="btn" id="cRun">Generate a sequence</button></div>
+    <div class="cseq" id="cStrip" aria-label="Generated trial sequence"></div>
+    <div class="clegend" aria-label="How to read the sequence">
+      <span><span class="chip s mini">S</span> success</span>
+      <span><span class="chip f mini">F</span> failure</span>
+      <span><span class="lg-bar"></span> trial counted by the <b>binomial</b> (first n trials)</span>
+      <span><span class="chip s mini mk-g">S</span><span class="ctag g">G</span> where the <b>geometric</b> stops (1st success)</span>
+      <span><span class="chip s mini mk-nb">S</span><span class="ctag nb">NB</span> where the <b>negative binomial</b> stops (r-th success)</span>
+      <span><span class="idx-demo">7</span> trial number</span>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Model</th><th>What is fixed</th><th>What X counts</th><th>Possible X</th><th>X for this sequence</th></tr></thead>
+      <tbody>
+        <tr><td><span class="lg-bar"></span> <b>Binomial</b></td><td>n trials</td><td>Successes in n trials</td><td class="m">0, …, n</td><td class="m" id="cB"></td></tr>
+        <tr><td><span class="ctag g">G</span> <b>Geometric</b></td><td>First success</td><td>Trials through that success</td><td class="m">1, 2, …</td><td class="m" id="cG"></td></tr>
+        <tr><td><span class="ctag nb">NB</span> <b>Negative binomial</b></td><td>r-th success</td><td>Trials through that success</td><td class="m">r, r + 1, …</td><td class="m" id="cNb"></td></tr>
+      </tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ REPLACEMENT ============ -->
+<section class="station" id="replacement">
+  <div class="head">
+    <span class="eyebrow">Connecting the models</span>
+    <h2>Do these models assume sampling with replacement?</h2>
+    <p class="muted">Not exactly. The binomial, geometric, negative binomial and multinomial assume <b>independent trials with the same probabilities</b>. Sampling with replacement is one way to get that, but it is not the assumption itself. These models describe a stream of trials and do not refer to a population at all. Replacement only matters when the trials are draws from a finite pool.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <h3>Three settings where independent trials hold</h3>
+      <div class="dstep"><span class="dnum">1</span><div class="dbody"><p><b>A process with no pool to deplete.</b> Coin flips, a machine producing parts, network packets, free throws. Nothing is used up, so replacement is not a question.</p></div></div>
+      <div class="dstep"><span class="dnum">2</span><div class="dbody"><p><b>Draws from a finite pool, with replacement.</b> Returning each item restores the pool, so p stays constant and the draws are independent.</p></div></div>
+      <div class="dstep"><span class="dnum">3</span><div class="dbody"><p><b>Draws from a pool much larger than the sample.</b> Removing a few items barely changes p, so the model is a good approximation. This is why Example 5 specifies "a large industrial firm": auditing a few invoices out of thousands leaves the 20% essentially unchanged.</p></div></div>
+      <div class="warn">If you wait for successes while drawing <b>without replacement from a small pool</b>, such as the 10-bulb box, the geometric and negative binomial do not apply. The correct model is the <b>negative hypergeometric</b>, which is not covered in this lecture.</div>
+    </div>
+    <div class="panel">
+      <h3>Each model has a without-replacement counterpart</h3>
+      <div class="tbl"><table class="pair">
+        <thead><tr><th>What X counts</th><th>Independent trials (with replacement)</th><th>Without replacement, finite population</th></tr></thead>
+        <tbody>
+          <tr><td>Successes in a fixed number of draws</td><td><a href="#compare"><b>Binomial</b></a></td><td><a href="#hyper"><b>Hypergeometric</b></a></td></tr>
+          <tr><td>Draws until the 1st success</td><td><a href="#geom"><b>Geometric</b></a></td><td>Negative hypergeometric</td></tr>
+          <tr><td>Draws until the r-th success</td><td><a href="#nb"><b>Negative binomial</b></a></td><td>Negative hypergeometric</td></tr>
+          <tr><td>Counts in k categories from a fixed number of draws</td><td><a href="#multi"><b>Multinomial</b></a></td><td>Multivariate hypergeometric</td></tr>
+        </tbody></table></div>
+      <p class="muted" style="font-size:.88rem">Only the bolded models are covered in this lecture. The others are named so students recognize when a problem falls outside them.</p>
+      <div class="warn"><b>The same bridge in every row.</b> When the sample is a small fraction of the population (under about 5%), the without-replacement model is close to the independent-trials one. This is the reason (N − n)/(N − 1) is near 1 in that case. The <a href="#hyper">convergence demo in the hypergeometric section</a> shows it for the first row.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MULTI ============ -->
+<section class="station" id="multi">
+  <div class="head">
+    <span class="eyebrow">Multinomial · slides 26–30</span>
+    <h2>Each trial lands in one of k categories</h2>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <p>n independent trials. Each lands in exactly one of k categories with probabilities p₁, …, p<sub>k</sub> that add to 1. The result is a <b>vector</b> of counts that must add to n.</p>
+      <div class="formula">P(X₁=<i>x</i>₁, …, X<sub><i>k</i></sub>=<i>x</i><sub><i>k</i></sub>) = <span class="frac"><span><i>n</i>!</span><span><i>x</i>₁!⋯<i>x</i><sub><i>k</i></sub>!</span></span> <i>p</i>₁<sup><i>x</i>₁</sup>⋯<i>p</i><sub><i>k</i></sub><sup><i>x</i><sub><i>k</i></sub></sup></div>
+      <div class="deriv">
+        <h3>Where the coefficient comes from</h3>
+        <p style="font-size:.9rem">The fraction counts the <b>distinct sequences</b> that give these totals. It does this in two moves: count every ordering, then remove the duplicates. The numbers follow the cell selected on the right.</p>
+        <div class="dstep"><span class="dnum">1</span><div class="dbody">
+          <p><b><i>n</i>! counts every ordering, treating each item as distinct.</b> <span id="mW1"></span></p>
+        </div></div>
+        <div class="dstep"><span class="dnum">2</span><div class="dbody">
+          <p><b>Dividing by <i>x</i>₁! ⋯ <i>x</i><sub><i>k</i></sub>! removes orderings that look the same.</b> Items in the same category are interchangeable, so shuffling them among themselves gives the same sequence. <span id="mW2"></span></p>
+        </div></div>
+        <div class="dstep"><span class="dnum">3</span><div class="dbody">
+          <p><b>Multiply by the probability of one sequence.</b> The trials are independent, so every sequence with these counts has the same probability <i>p</i>₁<sup><i>x</i>₁</sup>⋯<i>p</i><sub><i>k</i></sub><sup><i>x</i><sub><i>k</i></sub></sup>. <span id="mW3"></span></p>
+        </div></div>
+        <ul class="dnotes">
+          <li><b>With k = 2 categories,</b> <i>n</i>!/(<i>x</i>!(<i>n</i> − <i>x</i>)!) is exactly C(<i>n</i>, <i>x</i>). The binomial coefficient is the special case, built on the same logic.</li>
+          <li><b>The same count, one category at a time:</b> <span id="mW4"></span></li>
+          <li><b>Zero-count categories are harmless.</b> 0! = 1 and <i>p</i><sup>0</sup> = 1, so they change nothing but still belong in the formula.</li>
+        </ul>
+      </div>
+      <ul>
+        <li>The fraction counts the orderings that produce the same totals.</li>
+        <li>Each count alone is binomial: X<sub>i</sub> ~ Bin(n, p<sub>i</sub>).</li>
+        <li><b>The counts are not independent.</b> They must sum to n, so once k − 1 counts are known the last one is fixed. Multiplying the binomial marginals gives the wrong joint probability.</li>
+        <li>Zero-count categories still belong in the formula (0! = 1, p⁰ = 1).</li>
+      </ul>
+      <p class="muted" style="font-size:.9rem">Preset: Example 6. Items are conforming (0.70), downgraded (0.20) or rejected (0.10). Four are inspected. The event "3 conforming, 1 rejected" is (3, 0, 1).</p>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="mN">Trials n <output id="mNO"></output></label><input type="range" id="mN" min="2" max="8" step="1" value="4"></div>
+        <div class="ctl"><label for="mP1">p₁ conforming <output id="mP1O"></output></label><input type="range" id="mP1" min="0" max="1" step="0.05" value="0.7"></div>
+        <div class="ctl"><label for="mP2">p₂ downgraded <output id="mP2O"></output></label><input type="range" id="mP2" min="0" max="1" step="0.05" value="0.2"></div>
+        <div class="ctl"><label>p₃ rejected (= 1 − p₁ − p₂) <output id="mP3O"></output></label></div>
+      </div>
+      <h3>Joint PMF: click a cell to pick (x₁, x₂, x₃)</h3>
+      <p class="muted" style="font-size:.85rem">Rows are x₁ and columns are x₂. Then x₃ = n − x₁ − x₂ is forced. Grey cells are impossible because the counts would exceed n.</p>
+      <div class="chart heat" id="mHeat"></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Selected</div><div class="v" id="mSel"></div></div>
+        <div class="ro key"><div class="k">Joint P (multinomial)</div><div class="v" id="mProb"></div></div>
+        <div class="ro"><div class="k">Product of marginals ✗</div><div class="v" id="mWrong"></div></div>
+      </div>
+      <div class="formula" id="mCalc" style="font-size:1.05rem"></div>
+      <h3 id="mArrH"></h3>
+      <div class="arr" id="mArr"></div>
+    </div>
+  </div>
+
+  <div class="panel die">
+    <div class="head">
+      <span class="eyebrow">Second example · from binomial to multinomial</span>
+      <h3 class="l7h">Tossing a die: one binomial, six binomials, one multinomial</h3>
+      <p>Toss a fair die <i>n</i> times. We build up in three stages: first track only the sixes, then track every face with its own binomial, then combine the six counts into one multinomial.</p>
+    </div>
+    <div class="row" style="gap:16px">
+      <div class="ctl" style="min-width:200px;flex:1;max-width:320px"><label for="dN">Number of tosses n <output id="dNO"></output></label><input type="range" id="dN" min="1" max="10" step="1" value="6"></div>
+      <button class="btn" id="dRoll">Toss the die n times</button>
+    </div>
+    <div class="dieseq"><span class="muted" id="dSeqLab" style="font-size:.85rem"></span><div class="chips" id="dSeq"></div></div>
+
+    <div class="stage">
+      <div class="stagehead"><span class="dnum">1</span><h3>One binomial: count only the sixes</h3></div>
+      <div class="split2">
+        <div class="dbody">
+          <p>Call a toss a success if it shows <b>6</b>. Each toss is independent with p = 1/6, so the number of sixes is X₆ ~ Bin(n, 1/6). The other five faces are lumped together as "not a six".</p>
+          <div class="formula dform" id="dS1"></div>
+        </div>
+        <div><div class="chart" id="dS1chart"></div></div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stagehead"><span class="dnum">2</span><h3>Six binomials: one for each face</h3></div>
+      <p>Nothing is special about 6. Do the same for every face: X₁ counts ones, X₂ counts twos, and so on. Each one alone is Bin(n, 1/6). Use + and − to set the counts, or toss again.</p>
+      <div class="faces" id="dFaces"></div>
+      <div class="sumbar" id="dSum"></div>
+    </div>
+
+    <div class="stage">
+      <div class="stagehead"><span class="dnum">3</span><h3>Combine them: the multinomial</h3></div>
+      <div class="split2">
+        <div class="dbody">
+          <p>The six counts describe one experiment, so they must be handled together. The multinomial gives the probability of the whole vector (x₁, …, x₆) at once:</p>
+          <div class="formula dform" id="dS3"></div>
+          <p class="muted" style="font-size:.86rem" id="dS3note"></p>
+        </div>
+        <div class="dbody">
+          <div class="readouts">
+            <div class="ro key"><div class="k">Multinomial (correct)</div><div class="v" id="dMul"></div></div>
+            <div class="ro"><div class="k">Product of the six binomials ✗</div><div class="v" id="dProd"></div></div>
+          </div>
+          <div class="warn" id="dWhy"></div>
+        </div>
+      </div>
+      <div class="sub" style="margin-top:6px">
+        <span class="sublab">Back to stage 1 · merge faces 1–5 into "not a six"</span>
+        <p style="font-size:.9rem" id="dBack"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORMULAS ============ -->
+<section class="station" id="formulas">
+  <div class="head">
+    <span class="eyebrow">Slides 31–32</span>
+    <h2>Model selection and moment formulas</h2>
+  </div>
+  <div class="panel tbl"><table>
+    <thead><tr><th>Experiment</th><th>Random quantity</th><th>Model</th><th>Mean</th><th>Variance</th></tr></thead>
+    <tbody>
+      <tr><td>n independent binary trials, same p</td><td>Success count</td><td><b>Binomial</b></td><td class="f"><i>np</i></td><td class="f"><i>np</i>(1−<i>p</i>)</td></tr>
+      <tr><td>Count in a fixed time or space opportunity</td><td>Event count</td><td><b>Poisson(λ)</b></td><td class="f">λ</td><td class="f">λ</td></tr>
+      <tr><td>n items from a finite population, no replacement</td><td>Sample success count</td><td><b>H(N, R, n)</b></td><td class="f"><i>nR</i>/<i>N</i></td><td class="f"><i>n</i>(<i>R</i>/<i>N</i>)(1−<i>R</i>/<i>N</i>)(<i>N</i>−<i>n</i>)/(<i>N</i>−1)</td></tr>
+      <tr><td>Independent trials until the first success</td><td>Total trial count</td><td><b>Geom(p)</b></td><td class="f">1/<i>p</i></td><td class="f">(1−<i>p</i>)/<i>p</i>²</td></tr>
+      <tr><td>Independent trials until success r</td><td>Total trial count</td><td><b>NB(r, p)</b></td><td class="f"><i>r</i>/<i>p</i></td><td class="f"><i>r</i>(1−<i>p</i>)/<i>p</i>²</td></tr>
+      <tr><td>n independent trials with k categories</td><td>Vector of category counts</td><td><b>Multinomial</b></td><td class="f"><i>np<sub>i</sub></i> each</td><td class="f"><i>np<sub>i</sub></i>(1−<i>p<sub>i</sub></i>) each</td></tr>
+    </tbody></table>
+    <p class="muted" style="font-size:.88rem">The multinomial row uses the binomial marginals. The category counts are still dependent.</p>
+  </div>
+  <div class="panel">
+    <h3>Common mistakes (slide 33)</h3>
+    <div class="tbl"><table><tbody>
+      <tr><td><b>Poisson</b></td><td>Using a per-unit rate as λ instead of the mean for the whole opportunity.</td></tr>
+      <tr><td><b>Hypergeometric</b></td><td>Treating draws without replacement as independent, or ignoring the support.</td></tr>
+      <tr><td><b>Geometric</b></td><td>Counting only the failures, although X includes the final successful trial.</td></tr>
+      <tr><td><b>Negative binomial</b></td><td>Using C(x, r) instead of fixing success r at trial x.</td></tr>
+      <tr><td><b>Multinomial</b></td><td>Dropping a zero-count category, or assuming the category counts are independent.</td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ CHECK ============ -->
+<section class="station" id="check">
+  <div class="head">
+    <span class="eyebrow">Slides 34–35</span>
+    <h2>Concept check: find and repair each claim</h2>
+    <p class="muted">Each claim is wrong. Name the violated definition or assumption before revealing the repair.</p>
+  </div>
+  <div class="checks" id="checks"></div>
+  <div class="warn"><b>Workflow:</b> define X → check assumptions → identify parameters and support → calculate.</div>
+</section>
+
+<footer>Built from ENDG 319 Lecture 10 slides (Fall 2026). All values are computed in the page; the presets reproduce the lecture examples: 0.0786, 0.2703, Geom(0.20), and 0.1372.</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const NS="http://www.w3.org/2000/svg";
+/* ---------- math ---------- */
+const LF=[0];for(let i=1;i<=5000;i++)LF[i]=LF[i-1]+Math.log(i);
+const lnC=(n,k)=>(k<0||k>n||n<0)?-Infinity:LF[n]-LF[k]-LF[n-k];
+const C=(n,k)=>Math.round(Math.exp(lnC(n,k)));
+const pois=(x,l)=>x<0?0:Math.exp(-l+x*Math.log(l)-LF[x]);
+const binom=(x,n,p)=>{if(x<0||x>n)return 0;if(p<=0)return x===0?1:0;if(p>=1)return x===n?1:0;return Math.exp(lnC(n,x)+x*Math.log(p)+(n-x)*Math.log(1-p));};
+const hyp=(x,N,R,n)=>{const v=lnC(R,x)+lnC(N-R,n-x)-lnC(N,n);return isFinite(v)?Math.exp(v):0;};
+const geo=(x,p)=>x<1?0:Math.pow(1-p,x-1)*p;
+const nbp=(x,r,p)=>x<r?0:Math.exp(lnC(x-1,r-1))*Math.pow(p,r)*Math.pow(1-p,x-r);
+const f4=v=>v.toFixed(4);
+const pct=v=>(v*100).toFixed(2)+"%";
+const fmtSmall=v=>v===0?"0":(v<1e-4?v.toExponential(2):f4(v));
+
+/* ---------- bar chart ---------- */
+function niceMax(m){if(m<=0)return 1;const e=Math.pow(10,Math.floor(Math.log10(m)));for(const s of[1,1.2,1.5,2,2.5,3,4,5,6,8,10])if(s*e>=m*1.02)return s*e;return 10*e;}
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function barChart(host,xs,ys,o){
+  o=o||{};const W=640,H=250,m={l:52,r:14,t:14,b:42};
+  const pw=W-m.l-m.r,ph=H-m.t-m.b;
+  const all=ys.concat(o.overlay||[]);const ymax=niceMax(Math.max.apply(null,all));
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":o.label||"Probability mass function"});
+  const step=pw/xs.length,bw=Math.max(1.5,step*0.74);
+  const X=i=>m.l+step*i+step/2,Y=v=>m.t+ph-(v/ymax)*ph;
+  for(let k=0;k<=4;k++){const v=ymax*k/4,y=Y(v);el("line",{x1:m.l,x2:W-m.r,y1:y,y2:y,class:k?"grid":"ax"},svg);const t=el("text",{x:m.l-6,y:y+4,"text-anchor":"end"},svg);t.textContent=+v.toFixed(3);}
+  const every=Math.max(1,Math.ceil(xs.length/16));
+  xs.forEach((x,i)=>{const v=ys[i];const cls="bar"+(o.isOff&&o.isOff(x)?" off":(o.isHi&&o.isHi(x)?" hi":""));
+    const h=Math.max(v>0?0.8:0,(v/ymax)*ph);const r=el("rect",{x:X(i)-bw/2,y:m.t+ph-h,width:bw,height:h,class:cls},svg);
+    el("title",{},r).textContent=`x = ${x}: ${fmtSmall(v)}`;
+    if(i%every===0||x===o.mark){const t=el("text",{x:X(i),y:H-m.b+15,"text-anchor":"middle"},svg);t.textContent=x;if(x===o.mark)t.setAttribute("style","fill:var(--hi);font-weight:600");}
+  });
+  if(o.overlay)o.overlay.forEach((v,i)=>{if(v==null)return;el("circle",{cx:X(i),cy:Y(v),r:Math.min(4,step*0.3+1.2),class:o.overlayClass||"dot"},svg);});
+  if(o.mean!=null){const i=xs.indexOf(Math.floor(o.mean));if(i>=0){const x=X(i)+(o.mean-Math.floor(o.mean))*step;el("line",{x1:x,x2:x,y1:m.t,y2:m.t+ph,class:"meanline"},svg);const t=el("text",{x:x+4,y:m.t+10},svg);t.textContent="mean "+(+o.mean.toFixed(2));}}
+  if(o.hline!=null){const y=Y(o.hline);el("line",{x1:m.l,x2:W-m.r,y1:y,y2:y,class:"targetline"},svg);const t=el("text",{x:W-m.r-4,y:y-5,"text-anchor":"end",class:"targetlab"},svg);t.textContent=o.hlabel||("target "+o.hline);}
+  const xl=el("text",{x:m.l+pw/2,y:H-6,"text-anchor":"middle",class:"lab"},svg);xl.textContent=o.xlab||"x";
+  const yl=el("text",{x:14,y:m.t+ph/2,"text-anchor":"middle",class:"lab",transform:`rotate(-90 14 ${m.t+ph/2})`},svg);yl.textContent=o.ylab||"P(X = x)";
+  host.replaceChildren(svg);
+}
+const range=(a,b)=>{const r=[];for(let i=a;i<=b;i++)r.push(i);return r;};
+function bindOut(id,fmt){const i=$(id),o=$(id+"O");const u=()=>{o.textContent=fmt?fmt(+i.value):i.value;};i.addEventListener("input",u);u();}
+function seg(id,cb){const g=$(id);g.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;g.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));cb(b.dataset.v);});}
+
+/* ---------- decision helper ---------- */
+const tree={
+  q:"What does the random quantity count?",
+  opts:[
+    {t:"Events in a span of time, length, area or volume",res:"poisson"},
+    {t:"Successes among n items drawn from a finite population",next:{q:"Are items drawn without replacement, so the population changes?",opts:[{t:"Yes, without replacement",res:"hyper"},{t:"No, with replacement (or population effectively infinite)",res:"binomial"}]}},
+    {t:"Trials until something happens",next:{q:"When does the experiment stop?",opts:[{t:"At the first success",res:"geom"},{t:"At the r-th success (r > 1)",res:"nb"}]}},
+    {t:"Outcomes across a fixed number n of independent trials",next:{q:"How many outcome categories does each trial have?",opts:[{t:"Two (success / failure)",res:"binomial"},{t:"Three or more",res:"multi"}]}}
+  ]};
+const results={
+  poisson:["Poisson(λ)","Scale λ to the whole opportunity: λ = rate × units.","#poisson"],
+  hyper:["Hypergeometric H(N, R, n)","Draws are dependent. Check the support before calculating.","#hyper"],
+  binomial:["Binomial(n, p)","Fixed n independent trials with the same p. Covered in the previous lecture.","#compare"],
+  geom:["Geometric(p)","X counts trials through the first success, including it.","#geom"],
+  nb:["Negative binomial NB(r, p)","Trial x must be the r-th success: use C(x − 1, r − 1).","#nb"],
+  multi:["Multinomial MN(n, p₁, …, p_k)","Counts add to n, so they are not independent.","#multi"]};
+function renderDecide(path){
+  const host=$("decide");host.replaceChildren();let node=tree;
+  for(let d=0;;d++){
+    const step=document.createElement("div");step.className="qstep";
+    step.innerHTML=`<h3>${node.q}</h3>`;const opts=document.createElement("div");opts.className="opts";
+    node.opts.forEach((o,i)=>{const b=document.createElement("button");b.className="opt";b.textContent=o.t;b.setAttribute("aria-pressed",path[d]===i);
+      b.onclick=()=>renderDecide(path.slice(0,d).concat(i));opts.appendChild(b);});
+    step.appendChild(opts);host.appendChild(step);
+    if(path[d]==null)break;const ch=node.opts[path[d]];
+    if(ch.res){const r=results[ch.res];const v=document.createElement("div");v.className="verdict";
+      v.innerHTML=`<span class="eyebrow">Model</span><b>${r[0]}</b><span>${r[1]}</span><a href="${r[2]}">Go to this section →</a>`;host.appendChild(v);break;}
+    node=ch.next;
+  }
+}
+renderDecide([]);
+
+/* ---------- Poisson ---------- */
+let pEvt="eq";
+["pRate","pUnits","pX"].forEach(id=>bindOut(id));
+function pDraw(){
+  const rate=+$("pRate").value,u=+$("pUnits").value,x=+$("pX").value,l=rate*u;
+  const hi=Math.max(12,Math.ceil(l+4.5*Math.sqrt(l)+3),x+3);const xs=range(0,hi);
+  const ys=xs.map(k=>pois(k,l));
+  const test=k=>pEvt==="eq"?k===x:pEvt==="le"?k<=x:k>=x;
+  let prob=0;if(pEvt==="ge"){let s=0;for(let k=0;k<x;k++)s+=pois(k,l);prob=1-s;}else xs.forEach((k,i)=>{if(test(k))prob+=ys[i];});
+  if(pEvt==="le"&&x>hi)prob=1;
+  $("pLam").textContent=`${rate} × ${u} = ${+l.toFixed(2)}`;
+  $("pProbK").textContent=pEvt==="eq"?`P(X = ${x})`:pEvt==="le"?`P(X ≤ ${x})`:`P(X ≥ ${x})`;
+  $("pProb").textContent=`${fmtSmall(prob)}`;
+  $("pMV").textContent=+l.toFixed(2);$("pSD").textContent=Math.sqrt(l).toFixed(3);
+  barChart($("pChart"),xs,ys,{isHi:test,mean:l,mark:x,xlab:"count x in the opportunity"});
+  if(u!==1){const w=pois(x,rate);$("pWrong").innerHTML=`<b>Common mistake:</b> using λ = ${rate} (one unit) gives P(X = ${x}) = ${fmtSmall(w)}, which describes a 1-unit opportunity, not the ${u}-unit one asked for. The correct value uses λ = ${+l.toFixed(2)}: ${fmtSmall(pois(x,l))}.`;$("pWrong").hidden=false;}
+  else $("pWrong").hidden=true;
+}
+["pRate","pUnits","pX"].forEach(id=>$(id).addEventListener("input",pDraw));
+seg("pEvent",v=>{pEvt=v;pDraw();});pDraw();
+
+/* ---------- Approx ---------- */
+bindOut("aN");bindOut("aL");
+function aDraw(){
+  const n=+$("aN").value,l=+$("aL").value,p=Math.min(1,l/n);
+  const hi=Math.min(n,Math.max(10,Math.ceil(l+4*Math.sqrt(l)+3)));const xs=range(0,hi);
+  const b=xs.map(k=>binom(k,n,p)),q=xs.map(k=>pois(k,l));
+  let gap=0;xs.forEach((k,i)=>gap=Math.max(gap,Math.abs(b[i]-q[i])));
+  $("aP").textContent=p.toFixed(4);$("aGap").textContent=gap.toFixed(4);
+  barChart($("aChart"),xs,b,{overlay:q,xlab:"count x"});
+}
+["aN","aL"].forEach(id=>$(id).addEventListener("input",aDraw));aDraw();
+
+/* ---------- Hypergeometric ---------- */
+let hState={drawn:[],order:[]};
+function hClamp(){
+  const N=+$("hN").value;$("hR").max=N;$("hn").max=N;
+  if(+$("hR").value>N)$("hR").value=N;if(+$("hn").value>N)$("hn").value=N;
+  const n=+$("hn").value;$("hX").max=n;if(+$("hX").value>n)$("hX").value=n;
+  ["hN","hR","hn","hX"].forEach(id=>$(id+"O").textContent=$(id).value);
+}
+function hResetDraws(){hState.drawn=[];$("hLog").innerHTML='<span class="muted">No items drawn yet. Draw one at a time to see the success probability change.</span>';hPop();hButtons();}
+function hPop(){
+  const N=+$("hN").value,R=+$("hR").value,host=$("hPop");host.replaceChildren();
+  for(let i=0;i<N;i++){const d=document.createElement("div");d.className="cell"+(i<R?" r":"")+(hState.drawn.includes(i)?" drawn":"");d.title=i<R?"success":"failure";host.appendChild(d);}
+}
+function hButtons(){const n=+$("hn").value;const done=hState.drawn.length>=n;$("hDraw1").disabled=done;$("hDrawAll").disabled=done;}
+function hDrawOne(){
+  const N=+$("hN").value,R=+$("hR").value,n=+$("hn").value;if(hState.drawn.length>=n)return;
+  const left=[];for(let i=0;i<N;i++)if(!hState.drawn.includes(i))left.push(i);
+  const rLeft=left.filter(i=>i<R).length;const pick=left[Math.floor(Math.random()*left.length)];
+  if(hState.drawn.length===0)$("hLog").replaceChildren();
+  hState.drawn.push(pick);const isS=pick<R;
+  const line=document.createElement("div");
+  line.innerHTML=`Draw ${hState.drawn.length}: P(success) = ${rLeft}/${left.length} = ${(rLeft/left.length).toFixed(3)} → <span class="${isS?"s":""}">${isS?"success":"failure"}</span>`;
+  $("hLog").appendChild(line);
+  if(hState.drawn.length===n){const s=hState.drawn.filter(i=>i<R).length;const t=document.createElement("div");t.innerHTML=`<b>Sample complete: X = ${s}</b>`;$("hLog").appendChild(t);}
+  $("hLog").scrollTop=1e6;hPop();hButtons();
+}
+function hDraw(){
+  const N=+$("hN").value,R=+$("hR").value,n=+$("hn").value,x=+$("hX").value;
+  const lo=Math.max(0,R+n-N),hi=Math.min(n,R);
+  const xs=range(0,n),ys=xs.map(k=>hyp(k,N,R,n)),bi=xs.map(k=>binom(k,n,R/N));
+  let gap=0,imp=0;xs.forEach((k,i)=>{gap=Math.max(gap,Math.abs(ys[i]-bi[i]));if(k<lo||k>hi)imp+=bi[i];});
+  const frac=n/N;
+  $("hBinNote").innerHTML=`<span class="chipv ${frac<=0.05?"ok":"bad"}">${frac<=0.05?"Close approximation":"Binomial is off"}</span>
+    Sampling fraction n/N = ${n}/${N} = <b>${(frac*100).toFixed(1)}%</b>. Largest gap between dots and bars: <b>${gap.toFixed(4)}</b>.`+
+    (imp>0.00005?` The binomial puts <b>${imp.toFixed(4)}</b> probability on counts that cannot happen.`:"")+
+    (frac<=0.05?" Under 5%, removing items barely changes p, so the draws are nearly independent.":" Above 5%, each draw changes the population enough that the binomial misstates the spread.");
+  const mean=n*R/N,vb=n*(R/N)*(1-R/N),fpc=N>1?(N-n)/(N-1):1,v=vb*fpc;
+  $("hSup").textContent=`${lo} … ${hi}`;
+  $("hProb").textContent=(x<lo||x>hi)?"0 (impossible)":f4(hyp(x,N,R,n));
+  $("hMean").textContent=+mean.toFixed(4);$("hVar").textContent=v.toFixed(4);
+  barChart($("hChart"),xs,ys,{isHi:k=>k===x,isOff:k=>k<lo||k>hi,overlay:bi,overlayClass:"dot2",mean:mean,mark:x,xlab:"successes x in the sample"});
+  const W=Math.max(vb,0.0001);
+  $("hVarBars").innerHTML=`<div style="display:grid;gap:6px;font-size:.85rem">
+   <div><span class="muted">Binomial variance n(R/N)(1−R/N) = ${vb.toFixed(4)}</span><div style="height:10px;background:var(--c2);border-radius:3px;width:100%"></div></div>
+   <div><span>× finite-population factor (N−n)/(N−1) = ${fpc.toFixed(4)} → <b>hypergeometric variance ${v.toFixed(4)}</b></span><div style="height:10px;background:var(--hi);border-radius:3px;width:${(v/W*100).toFixed(1)}%"></div></div></div>`;
+}
+["hN","hR","hn","hX"].forEach(id=>$(id).addEventListener("input",()=>{hClamp();hDraw();if(id!=="hX")hResetDraws();}));
+$("hDraw1").onclick=hDrawOne;
+$("hDrawAll").onclick=()=>{const n=+$("hn").value;while(hState.drawn.length<n)hDrawOne();};
+$("hReset").onclick=hResetDraws;
+hClamp();hDraw();hResetDraws();
+
+/* ---------- 5% convergence demo ---------- */
+const zNs=[20,50,100,150,200,300,500,750,1000,2000,4000];
+function zDraw(){
+  const N=zNs[+$("zN").value],n=+$("zn").value,R=Math.round(0.24*N),p=R/N;
+  $("zNO").textContent=N.toLocaleString();$("znO").textContent=n;
+  const lo=Math.max(0,R+n-N),hi=Math.min(n,R);
+  const xs=range(0,n),ys=xs.map(k=>hyp(k,N,R,n)),bi=xs.map(k=>binom(k,n,p));
+  let gap=0;xs.forEach((k,i)=>gap=Math.max(gap,Math.abs(ys[i]-bi[i])));
+  const frac=n/N,fpc=(N-n)/(N-1);
+  $("zFrac").textContent=(frac*100).toFixed(1)+"%";$("zFpc").textContent=fpc.toFixed(4);$("zGap").textContent=gap.toFixed(4);
+  barChart($("zChart"),xs,ys,{isOff:k=>k<lo||k>hi,overlay:bi,overlayClass:"dot2",mean:n*p,xlab:`successes in the sample (R = ${R} of N = ${N.toLocaleString()})`});
+  $("zNote").innerHTML=`<span class="chipv ${frac<=0.05?"ok":"bad"}">${frac<=0.05?"Under 5%":"Over 5%"}</span>`+
+    (frac<=0.05?`Dots sit on the bars. Variance shrinks by only ${((1-fpc)*100).toFixed(1)}%, so treating the draws as independent costs almost nothing.`
+               :`Dots and bars still differ. The correction factor removes ${((1-fpc)*100).toFixed(1)}% of the binomial variance.`);
+}
+["zN","zn"].forEach(id=>$(id).addEventListener("input",zDraw));zDraw();
+
+/* ---------- Lecture 7 bulb callback ---------- */
+let bx=1;
+const bNames=["G1","G2","G3","G4","G5","G6","G7","G8","B1","B2"];
+function pickSample(arr,k){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,k);}
+function bDraw(){
+  const picks=new Set(pickSample(range(8,9),bx).concat(pickSample(range(0,7),4-bx)));
+  const host=$("bBulbs");host.replaceChildren();
+  bNames.forEach((nm,i)=>{const d=document.createElement("div");d.className="bulb"+(i>=8?" bo":"")+(picks.has(i)?" pick":"");d.textContent=nm;d.title=(i>=8?"burned out":"good")+(picks.has(i)?", selected":"");host.appendChild(d);});
+  const a=C(2,bx),b=C(8,4-bx);
+  $("bCalc").innerHTML=`p(${bx}) = <span class="frac"><span><span class="binom"><span class="st"><span><span class="tR">2</span></span><span>${bx}</span></span></span><span class="binom"><span class="st"><span><span class="tNR">8</span></span><span>${4-bx}</span></span></span></span><span><span class="binom"><span class="st"><span><span class="tN">10</span></span><span><span class="tn">4</span></span></span></span></span></span> = <span class="frac"><span>${a} × ${b}</span><span>210</span></span> = ${a*b}/210 ≈ <b>${(a*b/210).toFixed(4)}</b>`;
+  const rows=$("bRows");rows.replaceChildren();
+  const fr=["1/3","8/15","2/15"];
+  [0,1,2].forEach(x=>{const tr=document.createElement("tr");if(x===bx)tr.className="on";const ax=C(2,x),bb=C(8,4-x);
+    tr.innerHTML=`<td class="m">${x}</td><td class="m">${4-x}</td><td class="m">C(2,${x})·C(8,${4-x}) = ${ax} × ${bb} = ${ax*bb}</td><td class="m">${fr[x]} ≈ ${(ax*bb/210).toFixed(3)}</td>`;rows.appendChild(tr);});
+}
+seg("bX",v=>{bx=+v;bDraw();});
+$("bShuffle").onclick=bDraw;
+bDraw();
+
+/* ---------- hypergeometric example toggle ---------- */
+const hPresets={
+  bld:{N:50,R:12,n:10,x:3,story:"Example 4: 50 buildings, 12 with electrical code violations, 10 inspected. Red = violation."},
+  bulb:{N:10,R:2,n:4,x:1,story:"Lecture 7: 10 bulbs, 2 burned out, 4 selected. Red = burned out."}};
+function markPreset(v){document.querySelectorAll(".seg.preset button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));
+  $("hStory").textContent=v?hPresets[v].story:"Custom values. Pick an example above to restore it.";}
+function setPreset(v,scroll){const p=hPresets[v];
+  $("hN").value=p.N;hClamp();$("hR").value=p.R;$("hn").value=p.n;hClamp();$("hX").value=p.x;hClamp();
+  hDraw();hResetDraws();markPreset(v);
+  if(scroll)$("hyper").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});}
+document.querySelectorAll(".seg.preset").forEach(g=>g.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  setPreset(b.dataset.v,!!g.closest(".l7"));}));
+["hN","hR","hn","hX"].forEach(id=>$(id).addEventListener("input",()=>{
+  const cur={N:+$("hN").value,R:+$("hR").value,n:+$("hn").value,x:+$("hX").value};
+  const hit=Object.keys(hPresets).find(k=>{const p=hPresets[k];return p.N===cur.N&&p.R===cur.R&&p.n===cur.n;});
+  markPreset(hit||null);}));
+markPreset("bld");
+
+/* ---------- Geometric ---------- */
+let gSims=[];
+bindOut("gP");
+function gDraw(){
+  const p=+$("gP").value;const mean=1/p;
+  const hi=Math.max(8,Math.ceil(mean+3.2*Math.sqrt((1-p)/(p*p))+2));const xs=range(1,hi);
+  const ys=xs.map(k=>geo(k,p));
+  let ov=null;if(gSims.length){const c=new Array(xs.length).fill(0);gSims.forEach(v=>{if(v<=hi)c[v-1]++;});ov=c.map(v=>v/gSims.length);}
+  $("gMean").textContent=+mean.toFixed(3);$("gVar").textContent=+((1-p)/(p*p)).toFixed(3);
+  $("gRuns").textContent=gSims.length.toLocaleString();
+  $("gAvg").textContent=gSims.length?(gSims.reduce((a,b)=>a+b,0)/gSims.length).toFixed(3):"—";
+  barChart($("gChart"),xs,ys,{overlay:ov,overlayClass:"dot2",mean:mean,xlab:"trials until the first success (x)"});
+}
+function gRun(p){let k=1;while(Math.random()>=p&&k<500)k++;return k;}
+$("gOne").onclick=()=>{const p=+$("gP").value;const k=gRun(p);gSims.push(k);
+  const s=$("gStrip");s.replaceChildren();const shown=Math.min(k,40);
+  if(k>40){const c=document.createElement("span");c.className="chip";c.textContent="…";s.appendChild(c);}
+  for(let i=k-shown+1;i<=k;i++){const c=document.createElement("span");c.className="chip "+(i===k?"s":"f");c.textContent=i===k?"S":"F";c.title="trial "+i;s.appendChild(c);}
+  const lab=document.createElement("span");lab.style.cssText="align-self:center;margin-left:8px;font-family:var(--mono)";lab.textContent=`X = ${k}`;s.appendChild(lab);gDraw();};
+$("gMany").onclick=()=>{const p=+$("gP").value;for(let i=0;i<1000;i++)gSims.push(gRun(p));gDraw();};
+$("gClear").onclick=()=>{gSims=[];$("gStrip").replaceChildren();gDraw();};
+$("gP").addEventListener("input",()=>{gSims=[];$("gStrip").replaceChildren();gDraw();});gDraw();
+
+/* ---------- Geometric vs binomial ---------- */
+["vP","vN","vGx","vBx"].forEach(id=>bindOut(id));
+function chipRow(bits,lastFixed){const row=document.createElement("div");row.className="chips";
+  bits.forEach((s,i)=>{const c=document.createElement("span");c.className="chip "+(s?"s":"f")+(lastFixed&&i===bits.length-1?" fixed":"");c.textContent=s?"S":"F";row.appendChild(c);});return row;}
+function vDraw(){
+  const p=+$("vP").value,n=+$("vN").value,q=1-p;
+  $("vBx").max=n;if(+$("vBx").value>n)$("vBx").value=n;
+  $("vGxO").textContent=$("vGx").value;$("vBxO").textContent=$("vBx").value;
+  const x=+$("vGx").value,xb=+$("vBx").value;
+  document.querySelectorAll(".pv").forEach(e=>e.textContent=p.toFixed(2));
+  document.querySelectorAll(".nv").forEach(e=>e.textContent=n);
+  const g=geo(x,p),b=binom(xb,n,p),k=C(n,xb);
+  // geometric side
+  $("vGcalc").innerHTML=`P(X = ${x}) = (1 − ${p.toFixed(2)})<sup>${x-1}</sup>(${p.toFixed(2)}) = <b>${f4(g)}</b>`;
+  $("vGseqH").textContent=`X = ${x} means exactly one sequence: ${x-1} failure${x-1===1?"":"s"}, then the first success on audit ${x}.`;
+  const gs=$("vGseq");gs.replaceChildren();gs.appendChild(chipRow(range(1,x).map(i=>i===x),true));
+  const gh=Math.max(10,Math.ceil(1/p+3*Math.sqrt(q)/p+2),x+1);
+  barChart($("vGchart"),range(1,gh),range(1,gh).map(i=>geo(i,p)),{isHi:i=>i===x,mark:x,mean:1/p,xlab:"audits until the first discount"});
+  // binomial side
+  const bs=$("vBseq");bs.replaceChildren();
+  $("vBcalc").innerHTML=`P(X = ${xb}) = <span class="binom"><span class="st"><span>${n}</span><span>${xb}</span></span></span>(${p.toFixed(2)})<sup>${xb}</sup>(${q.toFixed(2)})<sup>${n-xb}</sup> = ${k} × ${fmtSmall(Math.pow(p,xb)*Math.pow(q,n-xb))} = <b>${f4(b)}</b>`;
+  $("vBseqH").textContent=`X = ${xb} covers C(${n}, ${xb}) = ${k} sequence${k===1?"":"s"}: `+(xb===0?`every one of the ${n} audits fails.`:xb===n?`every audit qualifies.`:`the ${xb} success${xb===1?"":"es"} can fall on any of the ${n} audits.`);
+  combos(n,xb).slice(0,8).forEach(cmb=>bs.appendChild(chipRow(range(0,n-1).map(i=>cmb.includes(i)),false)));
+  if(k>8){const m=document.createElement("div");m.className="muted";m.style.fontSize=".85rem";m.textContent=`… and ${k-8} more.`;bs.appendChild(m);}
+  barChart($("vBchart"),range(0,n),range(0,n).map(i=>binom(i,n,p)),{isHi:i=>i===xb,mark:xb,mean:n*p,xlab:`discounts among ${n} audits`});
+  // comparison table
+  const rows=[
+    ["Question","Audit until the first discount","Audit exactly "+n+" invoices"],
+    ["Fixed / random","1 success fixed · audits random",n+" audits fixed · successes random"],
+    ["Selected X",`X = ${x}: first discount on audit ${x}`,`X = ${xb}: ${xb} discount${xb===1?"":"s"} among ${n} audits`],
+    ["P(X = x)",f4(g)+" (1 sequence)",f4(b)+` (${k} sequence${k===1?"":"s"})`],
+    ["Mean",`1/p = ${+(1/p).toFixed(3)} audits`,`np = ${+(n*p).toFixed(3)} discounts`],
+    ["Variance",`(1−p)/p² = ${+(q/(p*p)).toFixed(3)}`,`np(1−p) = ${+(n*p*q).toFixed(3)}`],
+    ["Shape","Always tallest at x = 1, then decays",`Peaks near np = ${+(n*p).toFixed(2)}`]];
+  $("vTable").innerHTML=rows.map(r=>`<tr><th>${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+  const z=Math.pow(q,n);
+  $("vBridge").innerHTML=`<b>The bridge between them.</b> "The first discount comes after audit ${n}" is the same event as "none of the first ${n} audits qualify". So P(Geom &gt; ${n}) = P(Bin(${n}, ${p.toFixed(2)}) = 0) = ${q.toFixed(2)}<sup>${n}</sup> = <b>${f4(z)}</b>.`;
+}
+["vP","vN","vGx","vBx"].forEach(id=>$(id).addEventListener("input",vDraw));vDraw();
+
+/* ---------- Negative binomial ---------- */
+["nR","nP","nX"].forEach(id=>bindOut(id));
+function combos(n,k){const out=[];const cur=[];(function rec(s){if(out.length>40)return;if(cur.length===k){out.push(cur.slice());return;}for(let i=s;i<n;i++){cur.push(i);rec(i+1);cur.pop();}})(0);return out;}
+function nDraw(){
+  const r=+$("nR").value,p=+$("nP").value;$("nX").min=r;if(+$("nX").value<r)$("nX").value=r;$("nXO").textContent=$("nX").value;
+  const x=+$("nX").value;
+  const mean=r/p,v=r*(1-p)/(p*p);const hi=Math.max(r+8,Math.ceil(mean+3.2*Math.sqrt(v)+2),x+2);
+  const xs=range(1,hi),ys=xs.map(k=>nbp(k,r,p));
+  $("nProb").textContent=f4(nbp(x,r,p));
+  const good=C(x-1,r-1),bad=C(x,r);$("nCnt").textContent=good;$("nBad").textContent=`${bad} (+${bad-good} invalid)`;
+  $("nMV").textContent=`${+mean.toFixed(2)} · ${+v.toFixed(2)}`;$("nXh").textContent=x;
+  { const s1=binom(r-1,x-1,p),pp=p.toFixed(2),qq=(1-p).toFixed(2);
+    $("nDeriv").innerHTML=`<span class="muted" style="font-size:.85rem">With the current sliders (r = ${r}, p = ${pp}, x = ${x}):</span>
+    <span><b>Step 1:</b> <span class="m">C(${x-1}, ${r-1}) · ${pp}<sup>${r-1}</sup> · ${qq}<sup>${x-r}</sup> = ${good} × ${fmtSmall(Math.pow(p,r-1)*Math.pow(1-p,x-r))} = ${f4(s1)}</span></span>
+    <span><b>Step 2:</b> <span class="m">P(trial ${x} is a success) = ${pp}</span></span>
+    <span><b>Step 3:</b> <span class="m">${f4(s1)} × ${pp} = <b>${f4(s1*p)}</b></span> &nbsp;<span class="muted">(formula directly: ${f4(nbp(x,r,p))})</span></span>`; }
+  const host=$("nArr");host.replaceChildren();const cs=combos(x-1,r-1);const lim=16;
+  cs.slice(0,lim).forEach(cmb=>{const row=document.createElement("div");row.className="chips";
+    for(let i=0;i<x;i++){const c=document.createElement("span");const s=i===x-1||cmb.includes(i);c.className="chip "+(s?"s":"f")+(i===x-1?" fixed":"");c.textContent=s?"S":"F";row.appendChild(c);}host.appendChild(row);});
+  if(good>lim){const m=document.createElement("div");m.className="muted";m.style.fontSize=".85rem";m.textContent=`… and ${good-lim} more. All ${good} share the probability p^${r}(1−p)^${x-r}.`;host.appendChild(m);}
+  if(bad>good&&r<x){const ex=document.createElement("div");ex.style.cssText="margin-top:6px;font-size:.85rem";
+    let seq="";for(let i=0;i<x;i++)seq+=i<r?"S":"F";
+    ex.innerHTML=`<span class="muted">Example C(x, r) would wrongly include:</span> <span class="m">${seq}</span> <span class="muted">(the ${r}${r===1?"st":r===2?"nd":r===3?"rd":"th"} success happens at trial ${r}, so X would be ${r}, not ${x}).</span>`;host.appendChild(ex);}
+  barChart($("nChart"),xs,ys,{isHi:k=>k===x,isOff:k=>k<r,mean:mean,mark:x,xlab:"total trials x until success r"});
+}
+["nR","nP","nX"].forEach(id=>$(id).addEventListener("input",nDraw));nDraw();
+
+/* ---------- NB reverse question: smallest x with P(X<=x) >= target ---------- */
+function cdfAt(x){const r=+$("nR").value,p=+$("nP").value;let c=0;for(let k=r;k<=x;k++)c+=nbp(k,r,p);return c;}
+function iDraw(){
+  const r=+$("nR").value,p=+$("nP").value,T=+$("iT").value;
+  $("iTO").textContent=T.toFixed(2);$("iR").textContent=r;$("iP").textContent=p.toFixed(2);
+  let cum=0,ans=null;const rows=[];
+  for(let x=r;x<=r+400;x++){const pm=nbp(x,r,p);cum+=pm;rows.push([x,pm,cum]);if(cum>=T-1e-12){ans=x;break;}}
+  const below=rows.length>1?rows[rows.length-2][2]:0;
+  $("iAns").textContent=ans;$("iAt").textContent=f4(cum);$("iBelow").textContent=ans>r?f4(below):"0 (x − 1 < r)";
+  // table: fixed rows x = r … 20; the target only moves the highlight
+  const TMAX=20;let tc=0;const trows=[];
+  for(let x=r;x<=TMAX;x++){const pm=nbp(x,r,p);tc+=pm;trows.push([x,pm,tc]);}
+  $("iRows").innerHTML=trows.map(rw=>{const cls=rw[0]===ans?"ans":(rw[0]>ans?"past":"");
+    return `<tr class="${cls}"><td>${rw[0]}</td><td>${f4(rw[1])}</td><td>${f4(rw[2])}</td><td class="flag">${rw[0]===ans?"≥ "+T.toFixed(2)+" ✓":""}</td></tr>`;}).join("")+
+    (ans>TMAX?`<tr><td colspan="4" class="flag" style="font-family:var(--body)">The target is not reached by x = ${TMAX}. The answer is x = ${ans}.</td></tr>`:"");
+  // CDF chart over the same range as the table (extended if the answer lies beyond it)
+  const hiX=Math.max(TMAX,ans);const xs=range(r,hiX);let c=0;const cdf=xs.map(x=>(c+=nbp(x,r,p)));
+  barChart($("iChart"),xs,cdf,{isHi:x=>x===ans,isOff:x=>x>ans,mark:ans,hline:T,hlabel:"target "+T.toFixed(2),xlab:"x (total trials)",ylab:"P(X ≤ x)"});
+  // binomial check: P(X<=x) = P(Bin(x,p) >= r)
+  let bge=0;for(let k=r;k<=ans;k++)bge+=binom(k,ans,p);
+  $("iCheck").innerHTML=`"The r-th success has happened by trial ${ans}" is the same event as "at least ${r} successes in the first ${ans} trials". So P(X ≤ ${ans}) = P(Bin(${ans}, ${p.toFixed(2)}) ≥ ${r}) = <b>${f4(bge)}</b>, which matches.`;
+  $("iRead").innerHTML=`<b>Reading the answer:</b> with p = ${p.toFixed(2)}, plan for <b>${ans} trials</b> to be at least ${Math.round(T*100)}% sure of reaching ${r} success${r===1?"":"es"}. ${ans>r?`Planning only ${ans-1} trials gives ${f4(below)}, which falls short. `:""}`+(ans>r/p?`The answer is above the mean r/p = ${+(r/p).toFixed(2)}. Planning for only ${Math.floor(r/p)} trials would succeed with probability ${f4(cdfAt(Math.floor(r/p)))}, so the mean alone is not a safe plan.`:`At this low target the answer does not exceed the mean r/p = ${+(r/p).toFixed(2)}. Raise the target to see the plan move past the mean.`);
+}
+["nR","nP","iT"].forEach(id=>$(id).addEventListener("input",iDraw));iDraw();
+
+/* ---------- Compare ---------- */
+["cP","cN","cR"].forEach(id=>bindOut(id));
+function cRun(){
+  const p=+$("cP").value,n=+$("cN").value,r=+$("cR").value;const seq=[];let s=0;
+  while(seq.length<n||s<r){const v=Math.random()<p;seq.push(v);if(v)s++;if(seq.length>60)break;}
+  const host=$("cStrip");host.replaceChildren();
+  const g=seq.indexOf(true)+1;let cnt=0,nbx=0;for(let i=0;i<seq.length;i++){if(seq[i])cnt++;if(cnt===r){nbx=i+1;break;}}
+  seq.forEach((v,i)=>{const t=i+1,isG=t===g,isNB=t===nbx;
+    const cell=document.createElement("div");cell.className="ccell"+(i<n?" inb":"");
+    const tag=document.createElement("span");
+    if(isG){tag.className="ctag g";tag.textContent="G";}else if(isNB){tag.className="ctag nb";tag.textContent="NB";}
+    const c=document.createElement("span");c.className="chip "+(v?"s":"f")+(isG?" mk-g":"")+(isNB?" mk-nb":"");c.textContent=v?"S":"F";
+    c.title=`trial ${t}: ${v?"success":"failure"}`+(i<n?", in the binomial's n trials":"")+(isG?", geometric stops here":"")+(isNB?`, negative binomial stops here (success ${r})`:"");
+    const bar=document.createElement("span");bar.className="bbar";
+    const idx=document.createElement("span");idx.className="idx";idx.textContent=t;
+    cell.append(tag,c,bar,idx);host.appendChild(cell);});
+  const bx=seq.slice(0,n).filter(Boolean).length;
+  $("cB").textContent=`${bx} successes in the first ${n} trials (gold bar)`;
+  $("cG").textContent=g?`${g} (blue G: stopped at trial ${g})`:"no success yet";
+  $("cNb").textContent=nbx?`${nbx} (green NB: success ${r} at trial ${nbx})`:"not reached";
+}
+$("cRun").onclick=cRun;["cP","cN","cR"].forEach(id=>$(id).addEventListener("input",cRun));cRun();
+
+/* ---------- Multinomial ---------- */
+let mSel=[3,0];
+bindOut("mN");
+function mProbs(src){
+  let p1=+$("mP1").value,p2=+$("mP2").value;
+  if(p1+p2>1){if(src==="mP1"){p2=+(1-p1).toFixed(2);$("mP2").value=p2;}else{p1=+(1-p2).toFixed(2);$("mP1").value=p1;}}
+  const p3=Math.max(0,+(1-p1-p2).toFixed(2));
+  $("mP1O").textContent=p1.toFixed(2);$("mP2O").textContent=p2.toFixed(2);$("mP3O").textContent=p3.toFixed(2);return[p1,p2,p3];
+}
+function mp(x,p,n){const x3=n-x[0]-x[1];if(x3<0)return 0;const xs=[x[0],x[1],x3];let v=LF[n];for(let i=0;i<3;i++){v-=LF[xs[i]];if(xs[i]>0){if(p[i]===0)return 0;v+=xs[i]*Math.log(p[i]);}}return Math.exp(v);}
+function mDraw(src){
+  const n=+$("mN").value,p=mProbs(src);if(mSel[0]+mSel[1]>n)mSel=[Math.min(mSel[0],n),0];
+  const cs=Math.min(48,300/(n+1)),pad=34,W=pad+cs*(n+1)+10,H=pad+cs*(n+1)+10;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Joint probability grid"});
+  let mx=0;for(let a=0;a<=n;a++)for(let b=0;a+b<=n;b++)mx=Math.max(mx,mp([a,b],p,n));
+  const t1=el("text",{x:pad+cs*(n+1)/2,y:12,"text-anchor":"middle",class:"lab"},svg);t1.textContent="x₂ downgraded →";
+  const t2=el("text",{x:10,y:pad+cs*(n+1)/2,"text-anchor":"middle",class:"lab",transform:`rotate(-90 10 ${pad+cs*(n+1)/2})`},svg);t2.textContent="x₁ conforming →";
+  for(let b=0;b<=n;b++){const t=el("text",{x:pad+cs*b+cs/2,y:pad-6,"text-anchor":"middle"},svg);t.textContent=b;}
+  for(let a=0;a<=n;a++){const t=el("text",{x:pad-6,y:pad+cs*a+cs/2+4,"text-anchor":"end"},svg);t.textContent=a;
+    for(let b=0;b<=n;b++){
+      const x=pad+cs*b,y=pad+cs*a;
+      if(a+b>n){el("rect",{x,y,width:cs,height:cs,class:"void"},svg);continue;}
+      const v=mp([a,b],p,n);const sel=a===mSel[0]&&b===mSel[1];
+      const r=el("rect",{x,y,width:cs,height:cs,class:"cellm"+(sel?" sel":""),style:`fill:var(--hi);fill-opacity:${(0.06+0.94*(mx?v/mx:0)).toFixed(3)}`,tabindex:0},svg);
+      el("title",{},r).textContent=`(${a}, ${b}, ${n-a-b}): ${fmtSmall(v)}`;
+      const pick=()=>{mSel=[a,b];mDraw();};r.addEventListener("click",pick);r.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick();}});
+      if(cs>=30){const t=el("text",{x:x+cs/2,y:y+cs/2+4,"text-anchor":"middle",style:"pointer-events:none;font-size:"+(cs>40?10:8)+"px;fill:var(--ink)"},svg);t.textContent=v<0.0005?"·":v.toFixed(3).replace(/^0/,"");}
+    }}
+  $("mHeat").replaceChildren(svg);
+  const [a,b]=mSel,c=n-a-b,v=mp(mSel,p,n);
+  const wrong=binom(a,n,p[0])*binom(b,n,p[1])*binom(c,n,p[2]);
+  $("mSel").textContent=`(${a}, ${b}, ${c})`;$("mProb").textContent=f4(v);$("mWrong").textContent=f4(wrong);
+  const coef=Math.round(Math.exp(LF[n]-LF[a]-LF[b]-LF[c]));
+  $("mCalc").innerHTML=`<span class="frac"><span>${n}!</span><span>${a}! ${b}! ${c}!</span></span>(${p[0].toFixed(2)})<sup>${a}</sup>(${p[1].toFixed(2)})<sup>${b}</sup>(${p[2].toFixed(2)})<sup>${c}</sup> = ${coef} × ${fmtSmall(v/coef)} = <b>${f4(v)}</b>`;
+  { const nf=Math.round(Math.exp(LF[n])),dup=Math.round(Math.exp(LF[a]+LF[b]+LF[c]));
+    const one=Math.pow(p[0],a)*Math.pow(p[1],b)*Math.pow(p[2],c);
+    const tag=(L,k)=>k===0?"":Array.from({length:k},(_,i)=>`${L}<sub>${i+1}</sub>`).join(", ");
+    const items=[tag("C",a),tag("D",b),tag("R",c)].filter(Boolean).join(", ");
+    $("mW1").innerHTML=`For (${a}, ${b}, ${c}), tag the ${n} items as ${items}. They can be lined up in ${n}! = <b>${nf}</b> ways.`;
+    $("mW2").innerHTML=`Each distinct sequence appears ${a}! · ${b}! · ${c}! = <b>${dup}</b> time${dup===1?"":"s"} among the ${nf}, so ${nf} / ${dup} = <b>${coef}</b> distinct sequence${coef===1?"":"s"}.`;
+    $("mW3").innerHTML=`Here that is (${p[0].toFixed(2)})<sup>${a}</sup>(${p[1].toFixed(2)})<sup>${b}</sup>(${p[2].toFixed(2)})<sup>${c}</sup> = ${fmtSmall(one)}, so P = ${coef} × ${fmtSmall(one)} = <b>${f4(v)}</b>.`;
+    $("mW4").innerHTML=`choose places for the C's, then the D's, then the R's: C(${n}, ${a}) × C(${n-a}, ${b}) × C(${c}, ${c}) = ${C(n,a)} × ${C(n-a,b)} × 1 = <b>${C(n,a)*C(n-a,b)}</b>, the same as the multinomial coefficient.`; }
+  $("mArrH").textContent=`${coef} ordering${coef===1?"":"s"} give these totals`;
+  const host=$("mArr");host.replaceChildren();
+  const base=[].concat(Array(a).fill(1),Array(b).fill(2),Array(c).fill(3));const seen=new Set();const out=[];
+  (function perm(arr,l){if(out.length>=12)return;if(l===arr.length){const k=arr.join("");if(!seen.has(k)){seen.add(k);out.push(arr.slice());}return;}
+    const used=new Set();for(let i=l;i<arr.length;i++){if(used.has(arr[i]))continue;used.add(arr[i]);[arr[l],arr[i]]=[arr[i],arr[l]];perm(arr,l+1);[arr[l],arr[i]]=[arr[i],arr[l]];}})(base.slice(),0);
+  out.forEach(s=>{const row=document.createElement("div");row.className="chips";s.forEach(k=>{const ch=document.createElement("span");ch.className="chip c"+k;ch.textContent=["","C","D","R"][k];row.appendChild(ch);});host.appendChild(row);});
+  if(coef>out.length){const m=document.createElement("div");m.className="muted";m.style.fontSize=".85rem";m.textContent=`… and ${coef-out.length} more.`;host.appendChild(m);}
+  const leg=document.createElement("div");leg.className="legend";leg.innerHTML='<span><span class="sw" style="background:var(--c1)"></span>C conforming</span><span><span class="sw" style="background:var(--c2)"></span>D downgraded</span><span><span class="sw" style="background:var(--c3)"></span>R rejected</span>';host.appendChild(leg);
+}
+$("mN").addEventListener("input",()=>mDraw());
+$("mP1").addEventListener("input",()=>mDraw("mP1"));$("mP2").addEventListener("input",()=>mDraw("mP2"));
+mDraw();
+
+/* ---------- die: binomial -> six binomials -> multinomial ---------- */
+const FACE=["","⚀","⚁","⚂","⚃","⚄","⚅"];
+let dCounts=[0,1,0,2,1,0,2],dSeqArr=[3,6,1,4,6,3],dEdited=false;
+bindOut("dN");
+function dRollNow(){const n=+$("dN").value;dSeqArr=Array.from({length:n},()=>1+Math.floor(Math.random()*6));
+  dCounts=[0,0,0,0,0,0,0];dSeqArr.forEach(f=>dCounts[f]++);dEdited=false;dDraw();}
+function dDraw(){
+  const n=+$("dN").value,sum=dCounts.slice(1).reduce((a,b)=>a+b,0),ok=sum===n,q=1/6;
+  // sequence strip
+  let seq=dSeqArr;
+  if(dEdited||seq.length!==n){seq=[];for(let f=1;f<=6;f++)for(let k=0;k<dCounts[f];k++)seq.push(f);
+    $("dSeqLab").textContent=ok?"One sequence with these counts (any reordering gives the same counts):":`Counts total ${sum}, but n = ${n}. No sequence of ${n} tosses has these counts.`;}
+  else $("dSeqLab").textContent=`The ${n} tosses, in order:`;
+  $("dSeq").innerHTML=seq.map(f=>`<span class="dchip${f===6?" six":""}" title="face ${f}">${FACE[f]}</span>`).join("");
+  // stage 1
+  const x6=dCounts[6],b6=binom(x6,n,q);
+  $("dS1").innerHTML=`P(X₆ = ${x6}) = ${B2(n,x6)}(1/6)<sup>${x6}</sup>(5/6)<sup>${n-x6}</sup> = ${C(n,x6)} × ${fmtSmall(Math.pow(q,x6)*Math.pow(1-q,n-x6))} = <b>${f4(b6)}</b>`;
+  barChart($("dS1chart"),range(0,n),range(0,n).map(k=>binom(k,n,q)),{isHi:k=>k===x6,mark:x6,mean:n*q,xlab:"number of sixes",ylab:"P(X₆ = x)"});
+  // stage 2
+  let prod=1;
+  $("dFaces").innerHTML=range(1,6).map(f=>{const bp=binom(dCounts[f],n,q);prod*=bp;
+    return `<div class="face${f===6?" is6":""}"><span class="glyph" aria-hidden="true">${FACE[f]}</span><span class="muted" style="font-size:.8rem">X<sub>${f}</sub> ~ Bin(${n}, 1/6)</span>
+      <span class="cnt"><button data-f="${f}" data-d="-1" aria-label="fewer ${f}s" ${dCounts[f]===0?"disabled":""}>−</button>${dCounts[f]}<button data-f="${f}" data-d="1" aria-label="more ${f}s" ${dCounts[f]>=n?"disabled":""}>+</button></span>
+      <span class="bp">P(X<sub>${f}</sub> = ${dCounts[f]}) = <b>${f4(bp)}</b></span></div>`;}).join("");
+  const sb=$("dSum");sb.className="sumbar"+(ok?"":" bad");
+  sb.innerHTML=`x₁ + x₂ + … + x₆ = ${dCounts.slice(1).join(" + ")} = <b>${sum}</b> `+(ok?`= n. Every toss lands on exactly one face, so the six counts <b>must</b> add to ${n}. Knowing five of them fixes the sixth: the counts are linked, not independent.`:`≠ n = ${n}. Each binomial above still gives a positive probability on its own, but together these counts are impossible.`);
+  // stage 3
+  const dup=dCounts.slice(1).reduce((a,x)=>a+LF[x],0);const coef=ok?Math.round(Math.exp(LF[n]-dup)):0;
+  const mul=ok?coef*Math.pow(q,n):0;
+  $("dS3").innerHTML=ok?`<span class="frac"><span>${n}!</span><span>${dCounts.slice(1).map(x=>x+"!").join(" ")}</span></span>(1/6)<sup>${dCounts.slice(1).join("</sup>(1/6)<sup>")}</sup> = ${coef} × (1/6)<sup>${n}</sup> = <b>${f4(mul)}</b>`
+    :`Counts add to ${sum}, not ${n}, so P = <b>0</b>`;
+  $("dS3note").innerHTML=ok?`For a fair die every face has p = 1/6, so the powers combine into (1/6)<sup>${n}</sup>. The coefficient ${coef} counts the distinct orderings of these ${n} tosses.`:"The multinomial knows the counts must sum to n. The separate binomials do not.";
+  $("dMul").textContent=ok?f4(mul):"0";$("dProd").textContent=fmtSmall(prod);
+  $("dWhy").innerHTML=ok?`<b>Why the product is wrong:</b> it treats the six counts as independent. They are not, because they must add to ${n}. The product ${fmtSmall(prod)} ${prod<mul?"understates":"misstates"} the true joint probability ${f4(mul)}.`
+    :`<b>The product of binomials gives ${fmtSmall(prod)} for an impossible outcome.</b> Only the multinomial, which handles the counts together, correctly gives 0.`;
+  // back to stage 1
+  const notSix=n-x6;
+  $("dBack").innerHTML=`Group the die into two categories, "six" (p = 1/6) and "not a six" (p = 5/6). The multinomial with k = 2 is <span class="m">${n}!/(${x6}! ${notSix}!) (1/6)<sup>${x6}</sup>(5/6)<sup>${notSix}</sup> = ${f4(b6)}</span>, exactly the stage 1 binomial. The binomial is the multinomial with two categories.`;
+}
+function B2(top,bot){return `<span class="binom"><span class="st"><span>${top}</span><span>${bot}</span></span></span>`;}
+$("dFaces").addEventListener("click",e=>{const b=e.target.closest("button[data-f]");if(!b)return;const f=+b.dataset.f,d=+b.dataset.d;
+  dCounts[f]=Math.max(0,Math.min(+$("dN").value,dCounts[f]+d));dEdited=true;dDraw();});
+$("dRoll").onclick=dRollNow;
+$("dN").addEventListener("input",()=>{dRollNow();});
+dDraw();
+
+/* ---------- Concept check ---------- */
+const checks=[
+  ["A","In Example 3, use λ = 6 because the concentration is 6 particles/mL.","λ = 6 × 3 = 18.","λ must be the expected count for the requested 3 mL volume, not for 1 mL."],
+  ["B","The building selections are independent because they are made at random.","No replacement creates dependence.","The remaining fraction of violation buildings depends on what was already selected."],
+  ["C","For NB(r, p), trial x may fail even when X = x.","Trial x must be a success.","X = x means success r occurs exactly at trial x; the first x − 1 trials hold exactly r − 1 successes."],
+  ["D","In the multinomial example, X₁, X₂ and X₃ are independent because the four trials are independent.","Trial independence is not count independence.","X₁ + X₂ + X₃ = 4 ties the three totals together."]];
+const ch=$("checks");checks.forEach(c=>{const d=document.createElement("div");d.className="check";
+  d.innerHTML=`<span class="tag">Claim ${c[0]}</span><p class="claim">${c[1]}</p><button class="btn ghost" aria-expanded="false">Reveal the repair</button><div class="fix" hidden><b>${c[2]}</b><span>${c[3]}</span></div>`;
+  const b=d.querySelector("button"),f=d.querySelector(".fix");b.onclick=()=>{f.hidden=!f.hidden;b.setAttribute("aria-expanded",!f.hidden);b.textContent=f.hidden?"Reveal the repair":"Hide the repair";};ch.appendChild(d);});
+})();
+</script>
+
+</body>
+</html>

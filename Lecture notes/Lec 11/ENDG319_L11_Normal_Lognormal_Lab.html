@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Normal &amp; Lognormal Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: the ENDG 319 lab-manual series — one long column of stations, each pairing a short concept panel with a live instrument. */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --sunk:#e3e8ee; --ink:#15202b; --muted:#566373; --line:#cfd7e0;
+  --bar:#3a64ad; --hi:#c8283e; --hi-soft:#f6dde1; --ok:#1f7a55; --warn:#a4620d;
+  --c2:#c58a14; --shade:rgba(58,100,173,.18); --shade-hi:rgba(200,40,62,.26); --shade-c2:rgba(197,138,20,.26);
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c2:#e2b14b; --shade:rgba(111,155,227,.22); --shade-hi:rgba(241,106,125,.3); --shade-c2:rgba(226,177,75,.28); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c2:#e2b14b; --shade:rgba(111,155,227,.22); --shade-hi:rgba(241,106,125,.3); --shade-c2:rgba(226,177,75,.28); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1060px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0;max-width:66ch}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hi);font-weight:600}
+.muted{color:var(--muted)}
+code,.m{font-family:var(--mono);font-size:.9em}
+:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+
+header.top{padding-block:40px 20px;display:grid;gap:14px}
+header.top p{font-size:1.08rem}
+nav.stations{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+nav.stations a{flex:none;text-decoration:none;color:var(--ink);font-family:var(--mono);font-size:.8rem;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+nav.stations a:hover{border-color:var(--bar)}
+
+section.station{padding-block:48px 8px;display:grid;gap:22px;scroll-margin-top:60px}
+.head{display:grid;gap:8px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:22px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.stack{display:grid;gap:22px}
+.stack>.concept ul{max-width:80ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:14px;min-width:0}
+.concept{display:grid;gap:12px;min-width:0}
+.concept ul{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.formula{font-family:"Times New Roman",Georgia,serif;font-size:1.22rem;background:var(--sunk);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:nowrap}
+.formula.live{font-size:1.08rem;line-height:1.9}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;margin:0 2px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.warn{border-left:3px solid var(--hi);background:var(--hi-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.95rem}
+.note{border-left:3px solid var(--bar);background:var(--sunk);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.93rem}
+.added{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--warn);border:1px solid var(--warn);border-radius:999px;padding:1px 8px;justify-self:start}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 18px}
+.ctl{display:grid;gap:2px;min-width:0}
+.ctl label{font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.ctl label output{font-family:var(--mono);color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--hi)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);color:var(--ink);font:inherit;font-size:.85rem;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.btn{font:inherit;font-size:.88rem;padding:7px 14px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:var(--surface);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--bar)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.ro{background:var(--sunk);border-radius:8px;padding:8px 10px;min-width:0}
+.ro .k{font-size:.78rem;color:var(--muted)}
+.ro .v{font-family:var(--mono);font-size:1.12rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ro.key .v{color:var(--hi)}
+.ro.bad .v{color:var(--muted);text-decoration:line-through}
+
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:420px;height:auto}
+svg .curve{fill:none;stroke:var(--bar);stroke-width:2.2}
+svg .curve.c2{stroke:var(--c2)}
+svg .curve.hi{stroke:var(--hi)}
+svg .curve.ghost{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1.3}
+svg .curve.bad{stroke:var(--hi);stroke-dasharray:6 4;stroke-width:1.6}
+svg .shade{fill:var(--shade)}
+svg .shade.hi{fill:var(--shade-hi)}
+svg .shade.c2{fill:var(--shade-c2)}
+svg .bar{fill:var(--shade);stroke:var(--bar);stroke-width:.8}
+svg .ax{stroke:var(--muted);stroke-width:1}
+svg .grid{stroke:var(--line);stroke-width:1}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+svg text.lab{fill:var(--ink);font-family:var(--body);font-size:12px}
+svg text.lab.hi{fill:var(--hi);font-weight:600}
+svg text.lab.c2{fill:var(--c2);font-weight:600}
+svg text.lab.bar{fill:var(--bar);font-weight:600}
+svg .vl{stroke:var(--ink);stroke-dasharray:4 3;stroke-width:1.2}
+svg .vl.hi{stroke:var(--hi)}
+svg .vl.c2{stroke:var(--c2)}
+svg .vl.soft{stroke:var(--muted);stroke-width:1}
+svg .dot{fill:var(--surface);stroke:var(--hi);stroke-width:2}
+svg .dot.bar{stroke:var(--bar)}
+svg .dot.solid{fill:var(--hi)}
+svg .rug{stroke:var(--bar);stroke-width:1.4}
+svg .rug.out{stroke:var(--hi)}
+svg .nl{stroke:var(--ink);stroke-width:1.5}
+svg .link{stroke:var(--hi);stroke-width:1.5;stroke-dasharray:5 4}
+svg .refline{stroke:var(--hi);stroke-width:1.4;stroke-dasharray:6 4}
+svg .qq{fill:var(--bar);fill-opacity:.75}
+svg .qq.out{fill:var(--hi);fill-opacity:1}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.sw{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.sw.ln{height:3px;vertical-align:3px}
+
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.8rem;color:var(--muted);font-weight:600}
+table.zt{min-width:520px;font-family:var(--mono);font-size:.82rem;font-variant-numeric:tabular-nums}
+table.zt th,table.zt td{padding:5px 7px;text-align:center}
+table.zt th{font-family:var(--mono)}
+table.zt td.rowlab{font-weight:600;color:var(--ink);background:var(--sunk)}
+table.zt td.hit{background:var(--hi-soft);color:var(--hi);font-weight:600;outline:2px solid var(--hi);outline-offset:-2px}
+table.zt td.hit2{background:var(--shade-c2);font-weight:600;outline:2px solid var(--c2);outline-offset:-2px}
+table.zt th.colhit,table.zt td.rowhit{color:var(--hi)}
+.ztwrap{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+table.zt.big{min-width:640px}
+table.zt.big thead th{position:sticky;top:0;background:var(--surface);z-index:2;border-bottom:2px solid var(--line)}
+table.zt.big td.rowlab{position:sticky;left:0;z-index:1}
+table.zt.big td:not(.rowlab){cursor:pointer}
+table.zt.big tbody tr:hover td:not(.hit):not(.pick):not(.rowlab){background:var(--sunk)}
+table.zt.big tbody tr:nth-child(5n) td{border-bottom:2px solid var(--line)}
+table.zt td.pick{background:var(--shade);font-weight:600;outline:2px solid var(--bar);outline-offset:-2px}
+table.small{min-width:0;font-size:.88rem}
+table.small td{font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.small tr.pick td{background:var(--hi-soft);font-weight:600}
+
+.vsgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:820px){.vsgrid{grid-template-columns:minmax(0,1fr)}}
+.side{display:grid;gap:10px;align-content:start;min-width:0;background:var(--sunk);border-radius:10px;padding:14px}
+.side .chart svg{min-width:320px}
+.side h3{font-size:1rem}
+.deriv{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.dstep{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.dnum{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--surface);font-family:var(--mono);font-size:.8rem;font-weight:600}
+.dbody{display:grid;gap:6px;min-width:0}
+.dbody .formula{font-size:1.05rem}
+
+.reveal{display:grid;gap:8px}
+.reveal .ans{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:4px}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.check{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;align-content:start}
+.check .tag{font-family:var(--mono);font-weight:600;color:var(--hi)}
+.check .claim{font-style:italic}
+.check .fix{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:4px}
+.check .fix b{color:var(--ok)}
+.mistakes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.mk{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:6px;align-content:start}
+.mk .n{font-family:var(--mono);font-weight:600;color:var(--hi);font-size:.8rem}
+.mk a{color:var(--bar);font-size:.85rem}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">ENDG 319 · Lecture 11</span>
+  <h1>Normal &amp; Lognormal Lab</h1>
+  <p>Ten stations that follow the lecture's chain: <b>model → standard units → area or percentile → interpretation</b>. Each one pairs the idea from the slides with an instrument you can push around. Name the variable, state the model, and sketch the area before you trust any number.</p>
+</header>
+
+<nav class="stations" aria-label="Stations">
+  <a href="#s1">1 · N(μ, σ²)</a><a href="#s2">2 · 68–95–99.7</a><a href="#s3">3 · z-scores</a><a href="#s4">4 · Areas</a><a href="#s5">5 · Percentiles</a><a href="#s6">6 · aX + b</a><a href="#s7">7 · X − Y</a><a href="#s8">8 · X̄</a><a href="#s9">9 · Is it normal?</a><a href="#s10">10 · Lognormal</a><a href="#s11">Check</a>
+</nav>
+
+<!-- ============ STATION 1 ============ -->
+<section class="station" id="s1">
+  <div class="head">
+    <span class="eyebrow">Station 1 · Slides 3–4</span>
+    <h2>Read N(μ, σ²) correctly</h2>
+    <p>μ moves the curve. σ stretches it. The second slot of the notation holds the variance σ², so you take a square root before standardizing.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula"><i>f</i>(<i>x</i>) = <span class="frac"><span>1</span><span><i>σ</i>√(2π)</span></span> exp[ −<span class="frac"><span>(<i>x</i> − <i>μ</i>)²</span><span>2<i>σ</i>²</span></span> ]</div>
+      <ul>
+        <li><b>Peak at x = μ.</b> The exponent is 0 there, and e⁰ = 1, so the height is 1/(σ√(2π)) ≈ 0.399/σ.</li>
+        <li><b>Symmetric about μ,</b> so μ is both the mean and the median: half the area sits on each side.</li>
+        <li><b>Height is not probability.</b> Shrink σ below about 0.4 and the peak passes 1. That is allowed because only areas are probabilities.</li>
+        <li><b>P(X = x) = 0.</b> Shrink the red interval to width zero and its area goes to zero, even though the curve's height there stays put.</li>
+      </ul>
+      <div class="warn">If a problem says N(10, 4), then σ = 2, not 4.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s1mu">μ (mean) <output id="s1muo"></output></label><input type="range" id="s1mu" min="-3" max="3" step="0.1" value="0"></div>
+        <div class="ctl"><label for="s1sg">σ (standard deviation) <output id="s1sgo"></output></label><input type="range" id="s1sg" min="0.35" max="3" step="0.05" value="1"></div>
+        <div class="ctl"><label for="s1d">Interval half-width δ around μ <output id="s1do"></output></label><input type="range" id="s1d" min="0" max="2" step="0.01" value="0.5"></div>
+      </div>
+      <div class="chart"><svg id="s1svg" role="img" aria-label="Normal density with adjustable mean and standard deviation"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade)"></span>P(X &lt; μ) = 0.50</span><span><span class="sw" style="background:var(--shade-hi)"></span>P(μ − δ &lt; X &lt; μ + δ)</span><span><span class="sw ln" style="background:var(--muted)"></span>N(0, 1) for reference</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Written as</div><div class="v" id="s1not"></div></div>
+        <div class="ro"><div class="k">Divide by σ =</div><div class="v" id="s1sd"></div></div>
+        <div class="ro key"><div class="k">Peak height 1/(σ√2π)</div><div class="v" id="s1pk"></div></div>
+        <div class="ro"><div class="k">Red area</div><div class="v" id="s1area"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 2 ============ -->
+<section class="station" id="s2">
+  <div class="head">
+    <span class="eyebrow">Station 2 · Slide 5</span>
+    <h2>The 68–95–99.7 rule is a model statement</h2>
+    <p>Under a normal model about 68%, 95% and 99.7% of the population lies within 1, 2 and 3 standard deviations of μ. A finite sample only comes close, and the gap shrinks as n grows.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <ul>
+        <li>Exact model values: Φ(1) − Φ(−1) = 0.6827, Φ(2) − Φ(−2) = 0.9545, Φ(3) − Φ(−3) = 0.9973.</li>
+        <li>Use the rule as a quick sanity check. A reading 3σ from the mean happens about 3 times in 1000.</li>
+        <li>Draw a few small samples. With n = 20, the fraction inside ±1σ regularly lands anywhere from about 50% to 85%.</li>
+      </ul>
+      <div class="note">The intervals are centred at μ and measured in standard deviations. The axis below is labelled that way so it fits any normal model.</div>
+    </div>
+    <div class="panel">
+      <div class="row">
+        <div class="seg" role="group" aria-label="Number of standard deviations"><button type="button" data-k="1" aria-pressed="true">±1σ</button><button type="button" data-k="2" aria-pressed="false">±2σ</button><button type="button" data-k="3" aria-pressed="false">±3σ</button></div>
+      </div>
+      <div class="controls">
+        <div class="ctl"><label for="s2n">Sample size n <output id="s2no"></output></label><input type="range" id="s2n" min="10" max="1000" step="10" value="50"></div>
+        <div class="ctl" style="align-self:end"><button type="button" class="btn" id="s2draw">Draw a new sample</button></div>
+      </div>
+      <div class="chart"><svg id="s2svg" role="img" aria-label="Normal curve with shaded band and a sample shown as tick marks"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>sample point inside the band</span><span><span class="sw ln" style="background:var(--hi)"></span>outside</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Model proportion</div><div class="v" id="s2model"></div></div>
+        <div class="ro key"><div class="k">This sample</div><div class="v" id="s2samp"></div></div>
+        <div class="ro"><div class="k">Points inside</div><div class="v" id="s2cnt"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 3 ============ -->
+<section class="station" id="s3">
+  <div class="head">
+    <span class="eyebrow">Station 3 · Slides 6–8 · Example 7</span>
+    <h2>Standard units go both ways</h2>
+    <p>Aluminum sheet thickness X ~ N(10, 1.3²), in thousandths of an inch. A z-score counts signed standard deviations from μ and carries no units.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula"><i>z</i> = <span class="frac"><span><i>x</i> − <i>μ</i></span><span><i>σ</i></span></span> &nbsp;&nbsp;⇔&nbsp;&nbsp; <i>x</i> = <i>μ</i> + <i>σz</i></div>
+      <ul>
+        <li><b>Predict the sign first.</b> A value above the mean gives z &gt; 0; z &lt; 0 gives a value below the mean.</li>
+        <li><b>Standardizing is just a relabelled ruler.</b> Each tick on the top line sits directly over its z on the bottom line.</li>
+        <li><b>The normal assumption comes first.</b> Standardizing a skewed variable gives a skewed variable with mean 0 and SD 1.</li>
+      </ul>
+      <div class="row"><button type="button" class="btn ghost" id="s3ex7a">Example 7(a): x = 10.8</button><button type="button" class="btn ghost" id="s3ex7b">Example 7(b): z = −1.7</button></div>
+    </div>
+    <div class="panel">
+      <div class="row"><div class="seg" role="group" aria-label="Conversion direction"><button type="button" data-m="a" aria-pressed="true">(a) x → z</button><button type="button" data-m="b" aria-pressed="false">(b) z → x</button></div></div>
+      <div class="ctl"><label for="s3s"><span id="s3lab">Thickness x</span> <output id="s3so"></output></label><input type="range" id="s3s" min="6.1" max="13.9" step="0.01" value="10.8"></div>
+      <div class="chart"><svg id="s3svg" role="img" aria-label="Two aligned number lines: original units and standard units"></svg></div>
+      <div class="formula live" id="s3f"></div>
+      <p id="s3txt"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 4 ============ -->
+<section class="station" id="s4">
+  <div class="head">
+    <span class="eyebrow">Station 4 · Slides 9–14, 16 · Examples 8, 9(a)</span>
+    <h2>Every area from one left-tail table</h2>
+    <p>Φ(z) = P(Z ≤ z) is the area to the left of z. The table stores it because the integral has no closed form. Right tails and intervals come from a complement or a difference.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">Φ(<i>z</i>) = ∫<sub>−∞</sub><sup><i>z</i></sup> <span class="frac"><span><i>e</i><sup>−<i>t</i>²/2</sup></span><span>√(2π)</span></span> <i>dt</i></div>
+      <table class="small"><thead><tr><th>Request</th><th>Formula</th><th>Operation</th></tr></thead><tbody>
+        <tr><td>left of b</td><td>Φ(b)</td><td style="font-family:var(--body)">direct lookup</td></tr>
+        <tr><td>right of b</td><td>1 − Φ(b)</td><td style="font-family:var(--body)">complement</td></tr>
+        <tr><td>between a, b</td><td>Φ(b) − Φ(a)</td><td style="font-family:var(--body)">difference</td></tr>
+      </tbody></table>
+      <ul>
+        <li><b>t is a dummy variable.</b> It walks along the axis up to z; the answer depends only on z.</li>
+        <li><b>Reading the table:</b> z = 0.47 is row 0.4 plus column 0.07. Edges are z-values; the body holds areas.</li>
+        <li>For a continuous model, &lt; and ≤ give the same area.</li>
+      </ul>
+      <div class="row"><button type="button" class="btn ghost" data-pre="8a">Ex 8(a)</button><button type="button" class="btn ghost" data-pre="8b">Ex 8(b)</button><button type="button" class="btn ghost" data-pre="9a">Ex 9(a)</button></div>
+    </div>
+    <div class="panel">
+      <div class="row"><div class="seg" role="group" aria-label="Area type" id="s4mode"><button type="button" data-m="left" aria-pressed="true">Left of b</button><button type="button" data-m="right" aria-pressed="false">Right of b</button><button type="button" data-m="between" aria-pressed="false">Between a and b</button></div></div>
+      <div class="controls">
+        <div class="ctl" id="s4actl"><label for="s4a">a <output id="s4ao"></output></label><input type="range" id="s4a" min="-3.49" max="3.49" step="0.01" value="0.71"></div>
+        <div class="ctl"><label for="s4b">b <output id="s4bo"></output></label><input type="range" id="s4b" min="-3.49" max="3.49" step="0.01" value="0.47"></div>
+      </div>
+      <div class="chart"><svg id="s4svg" role="img" aria-label="Standard normal curve with the requested area shaded"></svg></div>
+      <p class="muted" id="s4sanity"></p>
+      <div class="formula live" id="s4f"></div>
+      <div class="readouts">
+        <div class="ro key"><div class="k">Requested area</div><div class="v" id="s4ans"></div></div>
+        <div class="ro bad" id="s4wrongbox"><div class="k" id="s4wrongk">Stopping at the lookup</div><div class="v" id="s4wrong"></div></div>
+      </div>
+      <div class="tbl"><table class="zt" id="s4tbl"></table></div>
+      <p class="muted" style="font-size:.85rem">Table excerpt computed live, four decimals. Negative rows read the same way: row −0.7, column 0.01 means z = −0.71.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="s4full">
+    <div class="head">
+      <h3>Standard normal table: Φ(z) = P(Z ≤ z)</h3>
+      <p class="muted" style="font-size:.92rem">Left-tail areas for z from −3.49 to 3.49, four decimals. The row gives z to one decimal, the column adds the second decimal. Click any cell to read its z and send it to the b slider above.</p>
+    </div>
+    <div class="controls">
+      <div class="ctl"><span style="font-size:.82rem;color:var(--muted)">Table half</span><div class="seg" role="group" aria-label="Table half" id="s4half"><button type="button" data-h="neg" aria-pressed="false">Negative z (Φ &lt; 0.5)</button><button type="button" data-h="pos" aria-pressed="true">Positive z (Φ ≥ 0.5)</button></div></div>
+      <div class="ctl"><label for="s4p">Find z for a percentile: p =</label><input type="number" id="s4p" min="0.0005" max="0.9995" step="0.0005" value="0.95" style="font:inherit;font-family:var(--mono);padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:100%"></div>
+    </div>
+    <div class="readouts">
+      <div class="ro"><div class="k">Clicked cell</div><div class="v" id="s4click">—</div></div>
+      <div class="ro key"><div class="k">Interpolated z<sub>p</sub></div><div class="v" id="s4zp"></div></div>
+      <div class="ro"><div class="k">Software z<sub>p</sub></div><div class="v" id="s4zex"></div></div>
+    </div>
+    <div class="ztwrap"><table class="zt big" id="s4big"></table></div>
+    <div class="legend"><span><span class="sw" style="background:var(--hi-soft);outline:2px solid var(--hi)"></span>the two entries that bracket p</span><span><span class="sw" style="background:var(--shade);outline:2px solid var(--bar)"></span>clicked cell</span></div>
+
+    <div class="deriv">
+      <h3>Finding z for a given percentile: linear interpolation</h3>
+      <p style="font-size:.95rem">For a percentile you know the area p and want the location z. That is the table read backwards: search the <b>body</b> for p, then read z from the row and column labels. Usually p falls between two entries, as it does for the value in the box above.</p>
+      <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>Find the two neighbouring entries with Φ(z<sub>1</sub>) ≤ p ≤ Φ(z<sub>2</sub>), where z<sub>2</sub> = z<sub>1</sub> + 0.01.</span></div></div>
+      <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>Work out how far p sits between the two areas, as a fraction from 0 to 1.</span><div class="formula">fraction = <span class="frac"><span><i>p</i> − Φ(<i>z</i><sub>1</sub>)</span><span>Φ(<i>z</i><sub>2</sub>) − Φ(<i>z</i><sub>1</sub>)</span></span></div></div></div>
+      <div class="dstep"><div class="dnum">3</div><div class="dbody"><span>Move the same fraction of the 0.01 step along z.</span><div class="formula"><i>z<sub>p</sub></i> ≈ <i>z</i><sub>1</sub> + fraction × 0.01</div></div></div>
+      <div class="formula live" id="s4interp2" style="background:var(--sunk)"></div>
+      <ul style="margin:0;padding-left:1.1em;display:grid;gap:6px;font-size:.93rem">
+        <li><b>Worked example, p = 0.95:</b> Φ(1.64) = 0.9495 and Φ(1.65) = 0.9505. The fraction is (0.9500 − 0.9495)/(0.9505 − 0.9495) = 0.5, so z ≈ 1.645. Software gives 1.6449. Here the nearest-entry rule can't choose, which is why 1.645 is the value everyone quotes.</li>
+        <li><b>Example 9(b), p = 0.75:</b> Φ(0.67) = 0.7486 and Φ(0.68) = 0.7517. The fraction is 0.0014/0.0031 ≈ 0.45, so z ≈ 0.6745.</li>
+        <li><b>Why a straight line is good enough.</b> Over a 0.01 step the Φ curve is almost straight, so the interpolation error is smaller than the table's own four-decimal rounding.</li>
+        <li><b>Below the median.</b> For p &lt; 0.5 use the negative half, or use symmetry: z<sub>p</sub> = −z<sub>1−p</sub>. For example z<sub>0.05</sub> = −1.645.</li>
+        <li><b>Interpolate or take the nearest entry?</b> The nearest entry (two decimals) is usually accepted. Interpolate when the question asks for more precision or p sits close to halfway between two entries.</li>
+        <li><b>Then restore the units</b> if the question is about a measurement: x<sub>p</sub> = μ + σz<sub>p</sub> (Station 5).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 5 ============ -->
+<section class="station" id="s5">
+  <div class="head">
+    <span class="eyebrow">Station 5 · Slides 15, 17–18 · Example 9(b)</span>
+    <h2>A percentile is a location, not an area</h2>
+    <p>The 75th percentile is the z with 0.75 of the area to its left. You look for 0.75 inside the table body, then read the z from the edges. Then restore the original units with x = μ + σz.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">Φ(<i>z<sub>p</sub></i>) = <i>p</i> &nbsp;⇒&nbsp; <i>x<sub>p</sub></i> = <i>μ</i> + <i>σ z<sub>p</sub></i></div>
+      <ul>
+        <li><b>Nearest entry</b> is usually accepted on exams.</li>
+        <li><b>Linear interpolation</b> works well because over a 0.01 step the Φ curve is almost a straight line. Its error is smaller than the table's own rounding.</li>
+        <li><b>Below the median</b> (p &lt; 0.5) z<sub>p</sub> is negative. Symmetry gives Φ(−z) = 1 − Φ(z), so z<sub>p</sub> = −z<sub>1−p</sub>.</li>
+      </ul>
+      <div class="row"><button type="button" class="btn ghost" id="s5ex">Example 9(b): p = 0.75</button><button type="button" class="btn ghost" id="s5ex2">p = 0.10</button></div>
+    </div>
+    <div class="panel">
+      <div class="ctl"><label for="s5p">Cumulative area p <output id="s5po"></output></label><input type="range" id="s5p" min="0.01" max="0.99" step="0.005" value="0.75"></div>
+      <div class="chart"><svg id="s5svg" role="img" aria-label="Standard normal with left area p shaded up to the percentile"></svg></div>
+      <div class="vsgrid">
+        <div class="side">
+          <h3>The two table entries around p</h3>
+          <table class="small" id="s5tbl"></table>
+          <div class="formula live" id="s5interp" style="background:var(--surface)"></div>
+        </div>
+        <div class="side">
+          <h3>Back to the aluminum sheets</h3>
+          <p style="font-size:.92rem">X ~ N(10, 1.3²). Which thickness has this fraction of sheets below it?</p>
+          <div class="formula live" id="s5x" style="background:var(--surface)"></div>
+        </div>
+      </div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Nearest entry</div><div class="v" id="s5near"></div></div>
+        <div class="ro"><div class="k">Interpolated</div><div class="v" id="s5int"></div></div>
+        <div class="ro key"><div class="k">Software z<sub>p</sub></div><div class="v" id="s5ex3"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 6 ============ -->
+<section class="station" id="s6">
+  <div class="head">
+    <span class="eyebrow">Station 6 · Slides 21–23 · Example 10</span>
+    <h2>A linear change of scale keeps the curve normal</h2>
+    <p>If X ~ N(μ, σ²) and Y = aX + b with a ≠ 0, then Y ~ N(aμ + b, a²σ²). The shift b moves the centre and leaves the spread alone.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <table class="small"><tbody>
+        <tr><td>mean</td><td>μ<sub>Y</sub> = aμ + b</td><td style="font-family:var(--body)">keep the sign of a, add b</td></tr>
+        <tr><td>variance</td><td>σ<sub>Y</sub>² = a²σ²</td><td style="font-family:var(--body)">b disappears</td></tr>
+        <tr><td>SD</td><td>σ<sub>Y</sub> = |a|σ</td><td style="font-family:var(--body)">spread is never negative</td></tr>
+      </tbody></table>
+      <ul>
+        <li><b>Example 10:</b> C ~ N(40, 1²) in °C and F = 1.8C + 32. So F ~ N(104, 3.24): mean 104 °F, variance 3.24 (°F)², SD 1.8 °F.</li>
+        <li><b>A negative a flips the curve.</b> Watch where μ + σ lands: it moves to the left of the new mean.</li>
+        <li><b>Standardizing is a linear transformation</b> with a = 1/σ and b = −μ/σ. That is why Z ~ N(0, 1), and why X must be normal first.</li>
+      </ul>
+      <div class="reveal panel" style="padding:14px">
+        <b>Slide 22: before calculating, which quantity changes by adding 32?</b>
+        <button type="button" class="btn ghost" id="s6rev" style="justify-self:start">Show answer</button>
+        <div class="ans" id="s6ans" hidden><span>Only the mean. Adding 32 slides every value by the same amount, so the distances between values (the spread) do not change. The variance and SD come from the 1.8 alone.</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="row"><button type="button" class="btn ghost" data-ab="1.8,32">Example 10: °C → °F</button><button type="button" class="btn ghost" data-ab="1,-40">Standardize C</button><button type="button" class="btn ghost" data-ab="-1.5,100">Negative a</button></div>
+      <div class="controls">
+        <div class="ctl"><label for="s6a">a (scale) <output id="s6ao"></output></label><input type="range" id="s6a" min="-3" max="3" step="0.1" value="1.8"></div>
+        <div class="ctl"><label for="s6b">b (shift) <output id="s6bo"></output></label><input type="range" id="s6b" min="-60" max="120" step="1" value="32"></div>
+      </div>
+      <p class="muted" style="font-size:.85rem">Top: C ~ N(40, 1²). Bottom: Y = aC + b. Both axes span 16 units so widths compare directly; the bottom axis re-centres on μ<sub>Y</sub>.</p>
+      <div class="chart"><svg id="s6top" role="img" aria-label="Distribution of C"></svg></div>
+      <div class="chart"><svg id="s6bot" role="img" aria-label="Distribution of Y equals aC plus b"></svg></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">μ<sub>Y</sub> = aμ + b</div><div class="v" id="s6m"></div></div>
+        <div class="ro"><div class="k">σ<sub>Y</sub>² = a²σ²</div><div class="v" id="s6v"></div></div>
+        <div class="ro"><div class="k">σ<sub>Y</sub> = |a|σ</div><div class="v" id="s6s"></div></div>
+        <div class="ro key"><div class="k">Y ~</div><div class="v" id="s6n"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 7 ============ -->
+<section class="station" id="s7">
+  <div class="head">
+    <span class="eyebrow">Station 7 · Slides 24–25</span>
+    <h2>Variances add, even for a difference</h2>
+    <p>For independent normal X and Y, X − Y ~ N(μ<sub>X</sub> − μ<sub>Y</sub>, σ<sub>X</sub>² + σ<sub>Y</sub>²). The coefficient on Y is −1, and (−1)² = +1.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <span class="added">Added example, not in the slides</span>
+      <p><b>Shaft in a bore.</b> A shaft has diameter D ~ N(25.000, σ<sub>D</sub>²) mm and the bore it slides into has diameter B ~ N(μ<sub>B</sub>, σ<sub>B</sub>²) mm, made independently. The clearance is C = B − D. The parts jam when C &lt; 0.</p>
+      <div class="formula"><i>W</i> = Σ <i>c<sub>i</sub>X<sub>i</sub></i> ~ N( Σ <i>c<sub>i</sub>μ<sub>i</sub></i>, Σ <i>c<sub>i</sub></i>²<i>σ<sub>i</sub></i>² )</div>
+      <ul>
+        <li>Here c<sub>B</sub> = +1 and c<sub>D</sub> = −1, so μ<sub>C</sub> = μ<sub>B</sub> − 25 and σ<sub>C</sub>² = σ<sub>B</sub>² + σ<sub>D</sub>².</li>
+        <li><b>Why add?</b> Two sources of variation can't cancel each other; either one can push the clearance up or down.</li>
+        <li>The red dashed curve shows what subtracting the variances would claim: a much narrower clearance and a jam rate that is far too optimistic.</li>
+        <li>Independence is the stated condition. Correlated parts would need a covariance term.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s7mb">Bore mean μ<sub>B</sub> (mm) <output id="s7mbo"></output></label><input type="range" id="s7mb" min="25.000" max="25.120" step="0.005" value="25.060"></div>
+        <div class="ctl"><label for="s7sd">Shaft σ<sub>D</sub> (mm) <output id="s7sdo"></output></label><input type="range" id="s7sd" min="0.005" max="0.040" step="0.001" value="0.020"></div>
+        <div class="ctl"><label for="s7sb">Bore σ<sub>B</sub> (mm) <output id="s7sbo"></output></label><input type="range" id="s7sb" min="0.005" max="0.040" step="0.001" value="0.015"></div>
+      </div>
+      <div class="chart"><svg id="s7svg" role="img" aria-label="Distribution of clearance with the jam region shaded"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>C = B − D, variances added</span><span><span class="sw" style="background:var(--shade-hi)"></span>jam: C &lt; 0</span><span><span class="sw ln" style="background:var(--hi)"></span>variances subtracted (wrong)</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">μ<sub>C</sub></div><div class="v" id="s7mc"></div></div>
+        <div class="ro"><div class="k">σ<sub>C</sub> = √(σ<sub>B</sub>² + σ<sub>D</sub>²)</div><div class="v" id="s7sc"></div></div>
+        <div class="ro key"><div class="k">P(C &lt; 0)</div><div class="v" id="s7p"></div></div>
+        <div class="ro bad"><div class="k">Wrong P(C &lt; 0)</div><div class="v" id="s7pw"></div></div>
+      </div>
+      <div class="side">
+        <div class="row"><button type="button" class="btn" id="s7sim">Build 10,000 pairs at random</button><span class="muted" style="font-size:.85rem">Checks the formula by brute force.</span></div>
+        <div class="readouts" id="s7simout">
+          <div class="ro"><div class="k">Simulated SD of C</div><div class="v" id="s7ssd">—</div></div>
+          <div class="ro"><div class="k">Simulated jam rate</div><div class="v" id="s7sp">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 8 ============ -->
+<section class="station" id="s8">
+  <div class="head">
+    <span class="eyebrow">Station 8 · Slides 19–20, 26</span>
+    <h2>One sheet versus the average of n sheets</h2>
+    <p>For iid X<sub>i</sub> ~ N(μ, σ²), the sample mean is exactly normal: X̄ ~ N(μ, σ²/n). Standardize with the SD of the variable in the question: σ for one observation, σ/√n for a mean.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="deriv">
+        <h3>Where σ²/n comes from</h3>
+        <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>Distribute the 1/n in the definition of the sample mean (slide 19).</span><div class="formula">X̄ = <span class="frac"><span>1</span><span><i>n</i></span></span>X<sub>1</sub> + ⋯ + <span class="frac"><span>1</span><span><i>n</i></span></span>X<sub>n</sub></div></div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>That is a linear combination (slide 24) with every c<sub>i</sub> = 1/n. Independence lets the variances add.</span></div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dbody"><span>Identical distributions make every μ<sub>i</sub> = μ and σ<sub>i</sub>² = σ².</span><div class="formula">mean = n·<span class="frac"><span>1</span><span><i>n</i></span></span>μ = μ &nbsp;&nbsp; var = n·<span class="frac"><span>1</span><span><i>n</i>²</span></span>σ² = <span class="frac"><span>σ²</span><span><i>n</i></span></span></div></div></div>
+      </div>
+      <ul>
+        <li><b>No large-sample approximation needed</b> because the data are already normal. Without normality, X̄ is only approximately normal for large n (Central Limit Theorem).</li>
+        <li><b>SE shrinks like 1/√n.</b> Quadrupling n halves the SE.</li>
+        <li>When σ is unknown, the estimated SE is s/√n. An estimate is not the parameter.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <p style="font-size:.95rem">Aluminum sheets again, X ~ N(10, 1.3²). What is the chance of exceeding the threshold c?</p>
+      <div class="controls">
+        <div class="ctl"><label for="s8n">Sheets averaged, n <output id="s8no"></output></label><input type="range" id="s8n" min="1" max="64" step="1" value="16"></div>
+        <div class="ctl"><label for="s8c">Threshold c <output id="s8co"></output></label><input type="range" id="s8c" min="10" max="13" step="0.05" value="10.8"></div>
+      </div>
+      <div class="chart"><svg id="s8svg" role="img" aria-label="Distribution of one sheet and of the sample mean"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade)"></span>one sheet: P(X &gt; c)</span><span><span class="sw" style="background:var(--shade-hi)"></span>mean of n: P(X̄ &gt; c)</span></div>
+      <div class="tbl"><table class="small" id="s8tbl"></table></div>
+      <div class="side">
+        <h3>Simulate 400 samples of size n</h3>
+        <div class="row"><button type="button" class="btn" id="s8sim">Draw 400 samples</button><span class="muted" style="font-size:.85rem" id="s8simtxt"></span></div>
+        <div class="chart"><svg id="s8hist" role="img" aria-label="Histogram of simulated sample means with the theoretical curve"></svg></div>
+      </div>
+      <div class="side">
+        <h3>What if the readings are correlated?</h3>
+        <p style="font-size:.9rem">σ/√n needs independence. If every pair of readings has correlation ρ (drift, readings taken close in time), Var(X̄) = (σ²/n)[1 + (n − 1)ρ].</p>
+        <div class="ctl"><label for="s8r">ρ <output id="s8ro"></output></label><input type="range" id="s8r" min="0" max="0.9" step="0.05" value="0"></div>
+        <div class="readouts">
+          <div class="ro"><div class="k">σ/√n (assumes iid)</div><div class="v" id="s8se0"></div></div>
+          <div class="ro key"><div class="k">True SE of X̄</div><div class="v" id="s8se1"></div></div>
+          <div class="ro"><div class="k">Underestimated by</div><div class="v" id="s8ratio"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 9 ============ -->
+<section class="station" id="s9">
+  <div class="head">
+    <span class="eyebrow">Station 9 · Slide 27</span>
+    <h2>Is a normal model reasonable?</h2>
+    <p>A histogram gives a rough impression. A normal probability plot (Q–Q plot, §4.10) is sharper: if the data are normal, the points fall close to the straight line.</p>
+  </div>
+  <div class="stack">
+    <div class="concept">
+      <ul>
+        <li><b>How the Q–Q plot is built.</b> Sort the data and standardize it. Pair the i-th smallest value with the normal quantile z at cumulative area (i − 0.5)/n. Normal data line up along y = x.</li>
+        <li><b>Right skew</b> bends the points upward at the right end: the large values are too large for a normal model.</li>
+        <li><b>Small samples</b> wander even when the data are normal. Draw several normal samples at n = 15 to see how much. Not seeing outliers doesn't prove normality; use what you know about the process.</li>
+        <li><b>One outlier</b> shows up as a single point far off the line. Investigate it before modelling. On its own it neither proves non-normality nor justifies a lognormal model.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="row"><div class="seg" role="group" aria-label="Data source" id="s9src"><button type="button" data-s="norm" aria-pressed="true">Normal</button><button type="button" data-s="skew" aria-pressed="false">Right-skewed</button><button type="button" data-s="out" aria-pressed="false">Normal + one outlier</button></div></div>
+      <div class="controls">
+        <div class="ctl"><label for="s9n">n <output id="s9no"></output></label><input type="range" id="s9n" min="10" max="300" step="5" value="60"></div>
+        <div class="ctl" style="align-self:end"><button type="button" class="btn" id="s9draw">Draw a new sample</button></div>
+      </div>
+      <div class="vsgrid">
+        <div class="side"><h3>Histogram with fitted normal</h3><div class="chart"><svg id="s9hist" role="img" aria-label="Histogram of the sample"></svg></div></div>
+        <div class="side"><h3>Normal Q–Q plot</h3><div class="chart"><svg id="s9qq" role="img" aria-label="Normal quantile plot of the sample"></svg></div></div>
+      </div>
+      <p class="muted" style="font-size:.88rem" id="s9txt"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 10 ============ -->
+<section class="station" id="s10">
+  <div class="head">
+    <span class="eyebrow">Station 10 · Slides 28–32</span>
+    <h2>Lognormal: normal after taking logarithms</h2>
+    <p>If X ~ N(μ, σ²) then Y = e<sup>X</sup> is lognormal and ln Y = X is normal. The parameters μ and σ² describe ln Y, not Y.</p>
+  </div>
+  <div class="stack">
+    <div class="concept">
+      <div class="formula"><i>f<sub>Y</sub></i>(<i>y</i>) = <span class="frac"><span>1</span><span><i>σ y</i>√(2π)</span></span> exp[ −<span class="frac"><span>(ln <i>y</i> − <i>μ</i>)²</span><span>2<i>σ</i>²</span></span> ], &nbsp;<i>y</i> &gt; 0</div>
+      <div class="formula">P(<i>Y</i> ≤ <i>y</i>) = Φ( <span class="frac"><span>ln <i>y</i> − <i>μ</i></span><span><i>σ</i></span></span> )</div>
+      <ul>
+        <li><b>The 1/y factor</b> comes from the change of variables (d ln y / dy = 1/y) and keeps the total area at 1.</li>
+        <li><b>The two shaded areas are the same number.</b> ln is increasing, so Y ≤ y exactly when ln Y ≤ ln y.</li>
+        <li><b>Median e<sup>μ</sup> &lt; mean e<sup>μ + σ²/2</sup>.</b> That gap is right skew in numbers. The mean of Y is not μ, and not even e<sup>μ</sup>.</li>
+        <li>Lognormal models fit positive quantities built from multiplicative effects: particle sizes, permeabilities, concentrations, failure times.</li>
+      </ul>
+      <div class="row"><button type="button" class="btn ghost" id="s10ex">Worked example: μ = 1, σ = 0.5, y = 5</button></div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s10m">μ (mean of ln Y) <output id="s10mo"></output></label><input type="range" id="s10m" min="-0.5" max="2" step="0.05" value="1"></div>
+        <div class="ctl"><label for="s10s">σ (SD of ln Y) <output id="s10so"></output></label><input type="range" id="s10s" min="0.1" max="1.2" step="0.05" value="0.5"></div>
+        <div class="ctl"><label for="s10y">Threshold y <output id="s10yo"></output></label><input type="range" id="s10y" min="-1.5" max="4.5" step="0.01" value="1.6094"></div>
+      </div>
+      <div class="vsgrid">
+        <div class="side"><h3>ln Y ~ N(μ, σ²)</h3><div class="chart"><svg id="s10a" role="img" aria-label="Normal distribution of ln Y"></svg></div></div>
+        <div class="side"><h3>Y = e<sup>X</sup>, lognormal</h3><div class="chart"><svg id="s10b" role="img" aria-label="Lognormal distribution of Y"></svg></div></div>
+      </div>
+      <div class="formula live" id="s10f"></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Median e<sup>μ</sup></div><div class="v" id="s10med"></div></div>
+        <div class="ro"><div class="k">E[Y] = e<sup>μ+σ²/2</sup></div><div class="v" id="s10mean"></div></div>
+        <div class="ro"><div class="k">Var(Y)</div><div class="v" id="s10var"></div></div>
+        <div class="ro bad"><div class="k">"Mean of Y is μ"</div><div class="v" id="s10wrong"></div></div>
+      </div>
+      <details class="side">
+        <summary><b>Optional: where the moments come from (slide 31)</b></summary>
+        <div style="display:grid;gap:8px;padding-top:8px;font-size:.93rem">
+          <span>Since Y<sup>r</sup> = e<sup>rX</sup>, E[Y<sup>r</sup>] is the normal moment-generating function at r: E[e<sup>rX</sup>] = exp(rμ + r²σ²/2).</span>
+          <span>r = 1 gives E[Y] = e<sup>μ+σ²/2</sup>. r = 2 gives E[Y²] = e<sup>2μ+2σ²</sup>.</span>
+          <span>Var(Y) = E[Y²] − (E[Y])² = e<sup>2μ+2σ²</sup> − e<sup>2μ+σ²</sup> = (e<sup>σ²</sup> − 1)e<sup>2μ+σ²</sup>.</span>
+        </div>
+      </details>
+    </div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Feature</th><th>Normal X</th><th>Lognormal Y</th></tr></thead>
+    <tbody>
+      <tr><td>Possible values</td><td>all real numbers</td><td>positive only</td></tr>
+      <tr><td>Normal quantity</td><td>X itself</td><td>ln Y</td></tr>
+      <tr><td>Parameter μ</td><td>mean of X</td><td>mean of ln Y (median of Y is e<sup>μ</sup>)</td></tr>
+      <tr><td>Parameter σ²</td><td>variance of X</td><td>variance of ln Y</td></tr>
+      <tr><td>Probability route</td><td>standardize x</td><td>take ln y, then standardize</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ CHECK ============ -->
+<section class="station" id="s11">
+  <div class="head">
+    <span class="eyebrow">Slides 33–35</span>
+    <h2>Common mistakes and concept check</h2>
+    <p>Each mistake comes from misreading what a number represents. Fix the interpretation and the arithmetic follows.</p>
+  </div>
+  <div class="mistakes">
+    <div class="mk"><span class="n">01</span><b>Variance mistaken for SD</b><span>N(μ, σ²) stores variance; divide by σ when standardizing.</span><a href="#s1">Station 1</a></div>
+    <div class="mk"><span class="n">02</span><b>Every table entry treated as the answer</b><span>A left-tail entry needs a complement for a right-tail request.</span><a href="#s4">Station 4</a></div>
+    <div class="mk"><span class="n">03</span><b>A percentile confused with a probability</b><span>The 75th percentile is a z or x location, not the number 0.75.</span><a href="#s5">Station 5</a></div>
+    <div class="mk"><span class="n">04</span><b>Spread shifted or variances subtracted</b><span>A shift does not change spread; square every coefficient.</span><a href="#s7">Stations 6–7</a></div>
+    <div class="mk"><span class="n">05</span><b>Wrong scale for lognormal parameters</b><span>μ and σ² describe ln Y, not Y.</span><a href="#s10">Station 10</a></div>
+  </div>
+  <p><b>Concept check.</b> Explain why each statement is wrong before revealing the fix. A one-word "false" is not an explanation.</p>
+  <div class="checks">
+    <div class="check"><span class="tag">A</span><span class="claim">Standardizing any random variable makes it normally distributed.</span><button type="button" class="btn ghost" data-rev="ca">Reveal</button><div class="fix" id="ca" hidden><b>If X is normal, Z is standard normal.</b><span>Subtracting and scaling change the scale, not the shape. A skewed X gives a skewed Z.</span></div></div>
+    <div class="check"><span class="tag">B</span><span class="claim">The area to the right of z = 1.38 is Φ(1.38).</span><button type="button" class="btn ghost" data-rev="cb">Reveal</button><div class="fix" id="cb" hidden><b>P(Z &gt; 1.38) = 1 − Φ(1.38) ≈ 0.0838.</b><span>The table is left-tail; the requested event is right-tail.</span></div></div>
+    <div class="check"><span class="tag">C</span><span class="claim">For independent normal X and Y, Var(X − Y) = σ<sub>X</sub>² − σ<sub>Y</sub>².</span><button type="button" class="btn ghost" data-rev="cc">Reveal</button><div class="fix" id="cc" hidden><b>Var(X − Y) = σ<sub>X</sub>² + σ<sub>Y</sub>².</b><span>The coefficient of Y is −1, and (−1)² = 1.</span></div></div>
+    <div class="check"><span class="tag">D</span><span class="claim">A lognormal variable with parameters μ and σ² has mean μ.</span><button type="button" class="btn ghost" data-rev="cd">Reveal</button><div class="fix" id="cd" hidden><b>E[ln Y] = μ; E[Y] = e<sup>μ+σ²/2</sup>.</b><span>The parameters live on the log scale, not the raw scale.</span></div></div>
+  </div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const SQ2PI=Math.sqrt(2*Math.PI);
+const pdf=(x,m=0,s=1)=>Math.exp(-((x-m)**2)/(2*s*s))/(s*SQ2PI);
+function erf(x){const t=1/(1+0.3275911*Math.abs(x));const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return x>=0?y:-y;}
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+function invPhi(p){const a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00],b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01],c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00],d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];const pl=0.02425;let q,r;
+ if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ q=p-.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+const r2=z=>Math.round(z*100)/100;
+const T=z=>Math.round(Phi(r2(z))*1e4)/1e4;          // four-decimal table entry at z rounded to 2 dp
+const f=(v,d=2)=>{const s=Math.abs(v).toFixed(d);return (v<0&&+s!==0?'−':'')+s;};
+const fp=p=>p<1e-4?(p<1e-9?'< 0.000000001':p.toExponential(1).replace('e-',' × 10⁻').replace(/⁻(\d+)/,(m,g)=>'⁻'+g.split('').map(ch=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[ch]).join(''))):p.toFixed(4);
+function gauss(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function setText(id,t){$(id).textContent=t;}
+function seg(groupEl,attr,cb){groupEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{groupEl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));cb(b.dataset[attr]);}));}
+function press(groupEl,attr,val){groupEl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset[attr]===String(val)));}
+const rng=(a,b,s)=>{const o=[];for(let v=a;v<=b+1e-9;v+=s)o.push(+v.toFixed(6));return o;};
+
+/* generic plot */
+function plot(svg,o){
+  const W=o.w||640,H=o.h||250,L=o.L??46,R=16,Tp=20,B=o.rug?62:42;
+  const X=x=>L+(x-o.x0)/(o.x1-o.x0)*(W-L-R);
+  const Y=y=>H-B-(Math.min(y,o.y1*1.03)/o.y1)*(H-B-Tp);
+  let s='';
+  (o.yt||[]).forEach(v=>{s+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${o.yfmt?o.yfmt(v):v}</text>`;});
+  (o.bars||[]).forEach(b=>{s+=`<rect class="bar" x="${X(b.a)}" y="${Y(b.h)}" width="${Math.max(0,X(b.b)-X(b.a))}" height="${Math.max(0,Y(0)-Y(b.h))}"/>`;});
+  (o.shade||[]).forEach(sh=>{const a=Math.max(sh.a,o.x0),b=Math.min(sh.b,o.x1);if(b<=a)return;let d=`M${X(a).toFixed(1)},${Y(0)}`;const n=160;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;d+=`L${X(x).toFixed(1)},${Y(sh.f(x)).toFixed(1)}`;}d+=`L${X(b).toFixed(1)},${Y(0)}Z`;s+=`<path class="shade ${sh.cls||''}" d="${d}"/>`;});
+  (o.curves||[]).forEach(c=>{let d='';const n=400;for(let i=0;i<=n;i++){const x=o.x0+(o.x1-o.x0)*i/n;d+=(i?'L':'M')+X(x).toFixed(1)+','+Y(c.f(x)).toFixed(1);}s+=`<path class="curve ${c.cls||''}" d="${d}"/>`;});
+  s+=`<line class="ax" x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  (o.vlines||[]).forEach(v=>{if(v.x<o.x0||v.x>o.x1)return;const top=v.top!=null?Y(v.top):Tp;s+=`<line class="vl ${v.cls||''}" x1="${X(v.x)}" x2="${X(v.x)}" y1="${Y(0)}" y2="${top}"/>`;if(v.label)s+=`<text class="lab ${v.lcls||''}" x="${X(v.x)+(v.dx||4)}" y="${top+(v.dy||10)}" text-anchor="${v.anchor||'start'}">${v.label}</text>`;});
+  (o.rug||[]).forEach(r=>{s+=`<line class="rug ${r.cls||''}" x1="${X(r.x).toFixed(1)}" x2="${X(r.x).toFixed(1)}" y1="${Y(0)+5}" y2="${Y(0)+17}"/>`;});
+  const ty=Y(0)+(o.rug?34:16);
+  (o.xt||[]).forEach(t=>{const v=typeof t==='object'?t.v:t,l=typeof t==='object'?t.l:f(t,o.xd??0);if(v<o.x0-1e-9||v>o.x1+1e-9)return;s+=`<line class="ax" x1="${X(v)}" x2="${X(v)}" y1="${Y(0)}" y2="${Y(0)+4}"/><text x="${X(v)}" y="${ty}" text-anchor="middle">${l}</text>`;});
+  (o.dots||[]).forEach(p=>{s+=`<circle class="dot ${p.cls||''}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${p.r||4}"/>`;});
+  (o.labels||[]).forEach(l=>{s+=`<text class="lab ${l.cls||''}" x="${X(l.x)}" y="${Y(l.y)}" text-anchor="${l.anchor||'middle'}">${l.t}</text>`;});
+  if(o.xlabel)s+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle">${o.xlabel}</text>`;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML=s;return{X,Y};
+}
+
+/* ===== Station 1 ===== */
+function r1(){const mu=+$('s1mu').value,sg=+$('s1sg').value,d=+$('s1d').value;
+  setText('s1muo',f(mu,1));setText('s1sgo',sg.toFixed(2));setText('s1do',d.toFixed(2));
+  const pk=1/(sg*SQ2PI);
+  plot($('s1svg'),{x0:-8,x1:8,y1:1.2,yt:[0,0.4,0.8,1.2],yfmt:v=>v.toFixed(1),
+    shade:[{a:-99,b:mu,f:x=>pdf(x,mu,sg)},{a:mu-d,b:mu+d,f:x=>pdf(x,mu,sg),cls:'hi'}],
+    curves:[{f:x=>pdf(x),cls:'ghost'},{f:x=>pdf(x,mu,sg)}],
+    vlines:[{x:mu,top:Math.min(pk,1.2),label:'μ',dy:-6,dx:6}],
+    dots:[{x:mu,y:Math.min(pk,1.2)}],
+    labels:[{x:mu-Math.min(3,1.4*sg)-.2,y:0.06,t:'0.50',cls:'bar'}],
+    xt:rng(-8,8,2),xlabel:'measurement x'});
+  setText('s1not',`N(${f(mu,1)}, ${(sg*sg).toFixed(4).replace(/\.?0+$/,'')})`);
+  setText('s1sd',`√${(sg*sg).toFixed(4).replace(/\.?0+$/,'')} = ${sg.toFixed(2)}`);
+  setText('s1pk',pk.toFixed(3)+(pk>1?'  (> 1, fine)':''));
+  setText('s1area',(Phi(d/sg)-Phi(-d/sg)).toFixed(4));
+}
+['s1mu','s1sg','s1d'].forEach(id=>$(id).addEventListener('input',r1));
+
+/* ===== Station 2 ===== */
+let s2k=1,s2data=[];
+function draw2(){const n=+$('s2n').value;s2data=Array.from({length:n},gauss);r2plot();}
+function r2plot(){const n=s2data.length;setText('s2no',$('s2n').value);
+  const k=s2k,model=Phi(k)-Phi(-k);
+  const lbl=v=>v===0?'μ':(v>0?'μ + ':'μ − ')+(Math.abs(v)===1?'':Math.abs(v))+'σ';
+  const inside=s2data.filter(z=>Math.abs(z)<=k).length;
+  plot($('s2svg'),{x0:-4,x1:4,y1:0.45,h:270,
+    shade:[{a:-k,b:k,f:x=>pdf(x)}],curves:[{f:x=>pdf(x)}],
+    vlines:[{x:-k,cls:'soft',top:0.43},{x:k,cls:'soft',top:0.43}],
+    labels:[{x:0,y:0.43,t:`≈ ${(model*100).toFixed(1)}% within ±${k}σ`,cls:'bar'}],
+    rug:s2data.map(z=>({x:Math.max(-3.98,Math.min(3.98,z)),cls:Math.abs(z)<=k?'':'out'})),
+    xt:[-3,-2,-1,0,1,2,3].map(v=>({v,l:lbl(v)}))});
+  setText('s2model',(model*100).toFixed(2)+'%');
+  setText('s2samp',(inside/n*100).toFixed(1)+'%');
+  setText('s2cnt',`${inside} of ${n}`);
+}
+seg(document.querySelector('#s2 .seg'),'k',k=>{s2k=+k;r2plot();});
+$('s2n').addEventListener('input',()=>{setText('s2no',$('s2n').value);});
+$('s2n').addEventListener('change',draw2);
+$('s2draw').addEventListener('click',draw2);
+
+/* ===== Station 3 ===== */
+let s3m='a';const M3=10,S3=1.3;
+function cfg3(m,val){s3m=m;press(document.querySelector('#s3 .seg'),'m',m);const s=$('s3s');
+  if(m==='a'){s.min=6.1;s.max=13.9;s.step=0.01;setText('s3lab','Thickness x');}else{s.min=-3;s.max=3;s.step=0.01;setText('s3lab','z-score');}
+  if(val!=null)s.value=val;r3();}
+function r3(){const v=+$('s3s').value;let x,z;
+  if(s3m==='a'){x=v;z=(x-M3)/S3;setText('s3so',x.toFixed(2));}else{z=v;x=M3+S3*z;setText('s3so',f(z,2));}
+  const W=640,H=180,L=40,R=40,X=t=>L+(t+3)/6*(W-L-R),yt=52,yb=132;
+  let s=`<text class="lab" x="${L}" y="20">Original units: x (thousandths of an inch)</text><text class="lab" x="${L}" y="${H-8}">Standard units: z (no units)</text>`;
+  s+=`<line class="nl" x1="${L}" x2="${W-R}" y1="${yt}" y2="${yt}"/><line class="nl" x1="${L}" x2="${W-R}" y1="${yb}" y2="${yb}"/>`;
+  for(let k=-3;k<=3;k++){const px=X(k);s+=`<line class="ax" x1="${px}" x2="${px}" y1="${yt-5}" y2="${yt+5}"/><text x="${px}" y="${yt-10}" text-anchor="middle">${(M3+S3*k).toFixed(1)}</text><line class="ax" x1="${px}" x2="${px}" y1="${yb-5}" y2="${yb+5}"/><text x="${px}" y="${yb+18}" text-anchor="middle">${f(k,0)}</text><line class="grid" x1="${px}" x2="${px}" y1="${yt+8}" y2="${yb-8}"/>`;}
+  const zc=Math.max(-3,Math.min(3,z)),px=X(zc);
+  s+=`<line class="link" x1="${px}" x2="${px}" y1="${yt}" y2="${yb}"/><circle class="dot solid" cx="${px}" cy="${yt}" r="6"/><circle class="dot solid" cx="${px}" cy="${yb}" r="6"/>`;
+  s+=`<text class="lab hi" x="${px+9}" y="${yt+20}">x = ${x.toFixed(2)}</text><text class="lab hi" x="${px+9}" y="${yb-10}">z = ${f(z,2)}</text>`;
+  const sv=$('s3svg');sv.setAttribute('viewBox',`0 0 ${W} ${H}`);sv.innerHTML=s;
+  if(s3m==='a'){$('s3f').innerHTML=`<i>z</i> = <span class="frac"><span>${x.toFixed(2)} − 10</span><span>1.3</span></span> = <span class="frac"><span>${f(x-10,2)}</span><span>1.3</span></span> ≈ <b>${f(z,4)}</b>`;
+    $('s3txt').textContent=Math.abs(z)<0.005?'The sheet sits at the mean.':`The sheet is about ${Math.abs(z).toFixed(2)} standard deviations ${z>0?'above':'below'} the mean.`;}
+  else{$('s3f').innerHTML=`<i>x</i> = 10 + 1.3(${f(z,2)}) = 10 ${z<0?'−':'+'} ${Math.abs(1.3*z).toFixed(3)} = <b>${x.toFixed(2)}</b> thousandths of an inch`;
+    $('s3txt').textContent=`Restore the units when you report x: ${x.toFixed(2)} thousandths of an inch, ${Math.abs(z)<0.005?'at':z>0?'above':'below'} the mean.`;}
+}
+seg(document.querySelector('#s3 .seg'),'m',m=>cfg3(m,m==='a'?10.8:-1.7));
+$('s3s').addEventListener('input',r3);
+$('s3ex7a').addEventListener('click',()=>cfg3('a',10.8));
+$('s3ex7b').addEventListener('click',()=>cfg3('b',-1.7));
+
+/* ===== Station 4 ===== */
+let s4m='left';
+function rowOf(z){const zr=r2(z),neg=zr<0,az=Math.abs(zr),r=Math.floor(az*10+1e-9)/10,c=Math.round(az*100-r*100);return{neg,r,c};}
+function zTable(hits){ // hits: [{z,cls}]
+  const rows=new Map();
+  hits.forEach(h=>{const{neg,r}=rowOf(h.z);[r-0.1,r,r+0.1].forEach(rr=>{rr=Math.round(rr*10)/10;if(rr<0||rr>3.4)return;rows.set((neg?'-':'+')+rr.toFixed(1),{neg,r:rr});});});
+  const list=[...rows.values()].sort((A,B)=>(A.neg?-A.r-0.05:A.r)-(B.neg?-B.r-0.05:B.r));
+  const hitCols=new Set(hits.map(h=>rowOf(h.z).c));
+  let s='<thead><tr><th>z</th>'+rng(0,9,1).map(c=>`<th class="${hitCols.has(c)?'colhit':''}">.0${c}</th>`).join('')+'</tr></thead><tbody>';
+  list.forEach(rw=>{s+=`<tr><td class="rowlab">${rw.neg?'−':''}${rw.r.toFixed(1)}</td>`;
+    for(let c=0;c<10;c++){const z=(rw.neg?-1:1)*(rw.r+c/100);let cls='';hits.forEach(h=>{const o=rowOf(h.z);if(o.neg===rw.neg&&Math.abs(o.r-rw.r)<1e-9&&o.c===c)cls=h.cls;});
+      s+=`<td class="${cls}">${(Math.round(Phi(z)*1e4)/1e4).toFixed(4)}</td>`;}
+    s+='</tr>';});
+  return s+'</tbody>';
+}
+function r4(){let a=+$('s4a').value,b=+$('s4b').value;
+  if(s4m==='between'&&a>b){[a,b]=[b,a];}
+  setText('s4ao',f(+$('s4a').value,2));setText('s4bo',f(+$('s4b').value,2));
+  $('s4actl').hidden=s4m!=='between';
+  const pb=T(b),pa=T(a);let shade,ans,fhtml,wrong=null,wk='',sanity;
+  if(s4m==='left'){shade=[{a:-9,b:b,f:x=>pdf(x)}];ans=pb;fhtml=`P(<i>Z</i> ≤ ${f(b)}) = Φ(${f(b)}) ≈ <b>${pb.toFixed(4)}</b>`;
+    sanity=`Predict first: b is ${b>0?'above':b<0?'below':'at'} the mean, so the left area should be ${b>0?'more than':b<0?'less than':'exactly'} 0.5.`;}
+  else if(s4m==='right'){shade=[{a:b,b:9,f:x=>pdf(x)}];ans=Math.round((1-pb)*1e4)/1e4;fhtml=`P(<i>Z</i> &gt; ${f(b)}) = 1 − Φ(${f(b)}) ≈ 1 − ${pb.toFixed(4)} = <b>${ans.toFixed(4)}</b>`;
+    wrong=pb;wk='Stopping at the lookup Φ(b)';sanity=`Predict first: b is ${b>0?'above':b<0?'below':'at'} the mean, so the right tail should be ${b>0?'less than':b<0?'more than':'exactly'} 0.5.`;}
+  else{shade=[{a:a,b:b,f:x=>pdf(x)}];ans=Math.round((pb-pa)*1e4)/1e4;fhtml=`P(${f(a)} &lt; <i>Z</i> &lt; ${f(b)}) = Φ(${f(b)}) − Φ(${f(a)}) ≈ ${pb.toFixed(4)} − ${pa.toFixed(4)} = <b>${ans.toFixed(4)}</b>`;
+    wrong=pa+pb;wk='Adding the two entries';sanity='Larger CDF minus smaller CDF. Both entries contain all the area to the left of a.';}
+  const vl=[{x:b,cls:'hi',top:0.42,label:'b = '+f(b),lcls:'hi',dy:-4,anchor:b>2.6?'end':'start',dx:b>2.6?-4:4}];
+  if(s4m==='between')vl.push({x:a,cls:'c2',top:0.36,label:'a = '+f(a),lcls:'c2',dy:-4,anchor:'end',dx:-4});
+  plot($('s4svg'),{x0:-3.6,x1:3.6,y1:0.45,shade:shade.map(s=>({...s,cls:'hi'})),curves:[{f:x=>pdf(x)}],vlines:vl,xt:rng(-3,3,1),xlabel:'standard units z'});
+  $('s4f').innerHTML=fhtml;setText('s4ans',ans.toFixed(4)+`  (${(ans*100).toFixed(2)}%)`);
+  setText('s4sanity',sanity);
+  $('s4wrongbox').hidden=wrong===null;if(wrong!==null){setText('s4wrongk',wk);setText('s4wrong',wrong.toFixed(4));}
+  const hits=[{z:b,cls:'hit'}];if(s4m==='between')hits.push({z:a,cls:'hit2'});
+  $('s4tbl').innerHTML=zTable(hits);
+}
+seg($('s4mode'),'m',m=>{s4m=m;r4();});
+['s4a','s4b'].forEach(id=>$(id).addEventListener('input',r4));
+document.querySelectorAll('[data-pre]').forEach(btn=>btn.addEventListener('click',()=>{const p=btn.dataset.pre;
+  if(p==='8a'){s4m='left';$('s4b').value=0.47;}if(p==='8b'){s4m='right';$('s4b').value=1.38;}if(p==='9a'){s4m='between';$('s4a').value=0.71;$('s4b').value=1.28;}
+  press($('s4mode'),'m',s4m);r4();}));
+
+/* Station 4: full table + interpolation */
+let s4half='pos',s4pick=null;
+function bracket(p){const ze=invPhi(p);let z1=Math.floor(ze*100+1e-9)/100,g=0;
+  while(T(z1)>p&&g++<5)z1=r2(z1-0.01);while(T(r2(z1+0.01))<p&&g++<10)z1=r2(z1+0.01);
+  const z2=r2(z1+0.01),t1=T(z1),t2=T(z2),fr=t2>t1?(p-t1)/(t2-t1):0;return{ze,z1,z2,t1,t2,fr,zi:z1+fr*0.01};}
+function bigTable(){
+  const p=+$('s4p').value,ok=p>=0.0002&&p<=0.9998,br=ok?bracket(p):null;
+  const neg=s4half==='neg';
+  let s='<thead><tr><th>z</th>'+rng(0,9,1).map(c=>`<th>.0${c}</th>`).join('')+'</tr></thead><tbody>';
+  for(let i=0;i<35;i++){const r=i/10;s+=`<tr><td class="rowlab">${neg?'−':''}${r.toFixed(1)}</td>`;
+    for(let c=0;c<10;c++){const z=r2((neg?-1:1)*(r+c/100));let cls='';
+      if(br&&(Math.abs(z-br.z1)<1e-9||Math.abs(z-br.z2)<1e-9))cls='hit';
+      if(s4pick!==null&&Math.abs(z-s4pick)<1e-9)cls=cls||'pick';
+      s+=`<td class="${cls}" data-z="${z}">${(Math.round(Phi(z)*1e4)/1e4).toFixed(4)}</td>`;}
+    s+='</tr>';}
+  $('s4big').innerHTML=s+'</tbody>';
+  if(!br){setText('s4zp','p must be between 0.0002 and 0.9998');setText('s4zex','—');$('s4interp2').innerHTML='Enter a p between 0.0002 and 0.9998.';return;}
+  setText('s4zp',f(br.zi,4));setText('s4zex',f(br.ze,4));
+  $('s4interp2').innerHTML=`For p = ${p.toFixed(4)}: &nbsp;Φ(${f(br.z1)}) = ${br.t1.toFixed(4)}, &nbsp;Φ(${f(br.z2)}) = ${br.t2.toFixed(4)}<br>fraction = <span class="frac"><span>${p.toFixed(4)} − ${br.t1.toFixed(4)}</span><span>${br.t2.toFixed(4)} − ${br.t1.toFixed(4)}</span></span> ≈ ${br.fr.toFixed(2)} &nbsp;⇒&nbsp; <i>z<sub>p</sub></i> ≈ ${f(br.z1)} + ${br.fr.toFixed(2)} × 0.01 = <b>${f(br.zi,4)}</b>`;
+}
+seg($('s4half'),'h',h=>{s4half=h;bigTable();});
+$('s4p').addEventListener('input',()=>{const p=+$('s4p').value;if(p>0&&p<1){s4half=p>=0.5?'pos':'neg';press($('s4half'),'h',s4half);}bigTable();});
+$('s4big').addEventListener('click',e=>{const td=e.target.closest('td[data-z]');if(!td)return;const z=+td.dataset.z;s4pick=z;
+  setText('s4click',`z = ${f(z)} → Φ = ${T(z).toFixed(4)}`);
+  $('s4b').value=Math.max(-3.49,Math.min(3.49,z));r4();bigTable();});
+
+/* ===== Station 5 ===== */
+function r5(){const p=+$('s5p').value;setText('s5po',p.toFixed(3));
+  const ze=invPhi(p);let z1=Math.floor(ze*100)/100;let guard=0;
+  while(T(z1)>p&&guard++<5)z1=r2(z1-0.01);while(T(r2(z1+0.01))<p&&guard++<10)z1=r2(z1+0.01);
+  const z2=r2(z1+0.01),t1=T(z1),t2=T(z2);
+  const near=Math.abs(p-t1)<=Math.abs(t2-p)?z1:z2;
+  const frac=t2>t1?(p-t1)/(t2-t1):0;const zi=z1+frac*0.01;
+  plot($('s5svg'),{x0:-3.6,x1:3.6,y1:0.45,shade:[{a:-9,b:ze,f:x=>pdf(x),cls:'hi'}],curves:[{f:x=>pdf(x)}],
+    vlines:[{x:ze,cls:'hi',top:0.43,label:'z_p = '+f(ze,4),lcls:'hi',dy:-4,anchor:ze>1.5?'end':'start',dx:ze>1.5?-4:4}],
+    labels:[{x:Math.max(-3,Math.min(ze-0.9,1.8)),y:0.06,t:'area '+p.toFixed(3),cls:'hi'}],xt:rng(-3,3,1),xlabel:'standard units z'});
+  $('s5tbl').innerHTML=`<thead><tr><th>z</th><th>Φ(z)</th></tr></thead><tbody><tr class="${near===z1?'pick':''}"><td>${f(z1)}</td><td>${t1.toFixed(4)}</td></tr><tr><td colspan="2" style="color:var(--hi);font-family:var(--body);font-size:.85rem">target p = ${p.toFixed(4)} falls here</td></tr><tr class="${near===z2?'pick':''}"><td>${f(z2)}</td><td>${t2.toFixed(4)}</td></tr></tbody>`;
+  $('s5interp').innerHTML=`fraction = <span class="frac"><span>${p.toFixed(4)} − ${t1.toFixed(4)}</span><span>${t2.toFixed(4)} − ${t1.toFixed(4)}</span></span> ≈ ${frac.toFixed(2)}<br><i>z</i> ≈ ${f(z1)} + ${frac.toFixed(2)} × 0.01 = <b>${f(zi,4)}</b>`;
+  const x=10+1.3*ze;
+  $('s5x').innerHTML=`<i>x<sub>p</sub></i> = 10 + 1.3(${f(ze,4)}) ≈ <b>${x.toFixed(2)}</b><br><span style="font-family:var(--body);font-size:.88rem">${(p*100).toFixed(1)}% of sheets are thinner than ${x.toFixed(2)} thousandths.${p<0.5?` Symmetry check: z<sub>p</sub> = −z<sub>${(1-p).toFixed(3)}</sub> = −${Math.abs(ze).toFixed(4)}.`:''}</span>`;
+  setText('s5near',f(near));setText('s5int',f(zi,4));setText('s5ex3',f(ze,4));
+}
+$('s5p').addEventListener('input',r5);
+$('s5ex').addEventListener('click',()=>{$('s5p').value=0.75;r5();});
+$('s5ex2').addEventListener('click',()=>{$('s5p').value=0.10;r5();});
+
+/* ===== Station 6 ===== */
+function r6(){let a=+$('s6a').value;const b=+$('s6b').value;
+  if(Math.abs(a)<0.3){a=a<0?-0.3:0.3;$('s6a').value=a;}
+  setText('s6ao',f(a,1));setText('s6bo',f(b,0));
+  const mu=40,sg=1,my=a*mu+b,sy=Math.abs(a)*sg;
+  const pts=[-1,0,1],nm=['μ − σ','μ','μ + σ'],cls=['c2','','hi'];
+  plot($('s6top'),{x0:mu-8,x1:mu+8,y1:1.4,h:200,yt:[0,0.7,1.4],yfmt:v=>v.toFixed(1),curves:[{f:x=>pdf(x,mu,sg)}],shade:[{a:0,b:99,f:x=>pdf(x,mu,sg)}],
+    vlines:pts.map((k,i)=>({x:mu+k,cls:cls[i]||'',top:0.5+0.18*i,label:nm[i],lcls:cls[i],dy:-4,anchor:'middle',dx:0})),xt:rng(mu-8,mu+8,2),xlabel:'C (°C)'});
+  plot($('s6bot'),{x0:my-8,x1:my+8,y1:1.4,h:200,yt:[0,0.7,1.4],yfmt:v=>v.toFixed(1),curves:[{f:x=>pdf(x,my,sy),cls:'c2'}],shade:[{a:-1e9,b:1e9,f:x=>pdf(x,my,sy),cls:'c2'}],
+    vlines:pts.map((k,i)=>({x:a*(mu+k)+b,cls:cls[i]||'',top:Math.min(1.25,pdf(0,0,sy)*0.9)+0.05+0.12*i,label:'from '+nm[i],lcls:cls[i],dy:-4,anchor:'middle',dx:0})),
+    xt:rng(Math.ceil(my-8),Math.floor(my+8),2),xd:0,xlabel:'Y = aC + b'});
+  setText('s6m',f(my,2));setText('s6v',(a*a).toFixed(2));setText('s6s',sy.toFixed(2));setText('s6n',`N(${f(my,2)}, ${(a*a).toFixed(2)})`);
+}
+['s6a','s6b'].forEach(id=>$(id).addEventListener('input',r6));
+document.querySelectorAll('[data-ab]').forEach(btn=>btn.addEventListener('click',()=>{const[a,b]=btn.dataset.ab.split(',').map(Number);$('s6a').value=a;$('s6b').value=b;r6();}));
+$('s6rev').addEventListener('click',()=>{$('s6ans').hidden=!$('s6ans').hidden;$('s6rev').textContent=$('s6ans').hidden?'Show answer':'Hide answer';});
+
+/* ===== Station 7 ===== */
+function s7vals(){return{mb:+$('s7mb').value,sd:+$('s7sd').value,sb:+$('s7sb').value};}
+function r7(){const{mb,sd,sb}=s7vals();setText('s7mbo',mb.toFixed(3));setText('s7sdo',sd.toFixed(3));setText('s7sbo',sb.toFixed(3));
+  const mc=mb-25,sc=Math.sqrt(sb*sb+sd*sd),dv=sd*sd-sb*sb,sw=dv>0?Math.sqrt(dv):null;
+  const pk=pdf(0,0,sc);
+  const curves=[{f:x=>pdf(x,mc,sc)}];if(sw)curves.push({f:x=>pdf(x,mc,sw),cls:'bad'});
+  plot($('s7svg'),{x0:-0.08,x1:0.2,y1:pk*1.6,yt:[],shade:[{a:-1,b:0,f:x=>pdf(x,mc,sc),cls:'hi'}],curves,
+    vlines:[{x:0,cls:'hi',top:pk*1.5,label:'C = 0: jam',lcls:'hi',dy:-4,anchor:'end',dx:-4},{x:mc,cls:'soft',top:pk*1.1,label:'μ_C',dy:-4}],
+    xt:rng(-0.08,0.2,0.04),xd:2,xlabel:'clearance C (mm)'});
+  setText('s7mc',mc.toFixed(3)+' mm');setText('s7sc',sc.toFixed(4)+' mm');
+  setText('s7p',`${fp(Phi(-mc/sc))}  (z = ${f(-mc/sc,2)})`);
+  setText('s7pw',sw?fp(Phi(-mc/sw)):'σ_D² − σ_B² < 0: impossible');
+  setText('s7ssd','—');setText('s7sp','—');
+}
+['s7mb','s7sd','s7sb'].forEach(id=>$(id).addEventListener('input',r7));
+$('s7sim').addEventListener('click',()=>{const{mb,sd,sb}=s7vals();const N=10000;let s=0,ss=0,j=0;
+  for(let i=0;i<N;i++){const c=(mb+sb*gauss())-(25+sd*gauss());s+=c;ss+=c*c;if(c<0)j++;}
+  const m=s/N,sdv=Math.sqrt((ss-N*m*m)/(N-1));setText('s7ssd',sdv.toFixed(4)+' mm');setText('s7sp',(j/N).toFixed(4)+` (${j} jams)`);});
+
+/* ===== Station 8 ===== */
+let s8means=null;
+function r8(){const n=+$('s8n').value,c=+$('s8c').value,mu=10,sg=1.3,se=sg/Math.sqrt(n);
+  setText('s8no',n);setText('s8co',c.toFixed(2));
+  const y1=Math.max(0.4,pdf(0,0,se)*1.1);
+  plot($('s8svg'),{x0:6,x1:14,y1,shade:[{a:c,b:99,f:x=>pdf(x,mu,sg)},{a:c,b:99,f:x=>pdf(x,mu,se),cls:'hi'}],
+    curves:[{f:x=>pdf(x,mu,sg)},{f:x=>pdf(x,mu,se),cls:'hi'}],
+    vlines:[{x:c,cls:'',top:y1*0.95,label:'c = '+c.toFixed(2),dy:-4}],
+    labels:[{x:7.2,y:pdf(7.2,mu,sg)+y1*0.06,t:'one sheet, SD 1.3',cls:'bar'},{x:mu-se*1.4-0.15,y:pdf(0,0,se)*0.75,t:`mean of ${n}, SD ${se.toFixed(3)}`,cls:'hi',anchor:'end'}],
+    xt:rng(6,14,1),xlabel:'thickness (thousandths of an inch)'});
+  const z1=(c-mu)/sg,z2=(c-mu)/se;
+  $('s8tbl').innerHTML=`<thead><tr><th style="font-family:var(--body)">Question about</th><th>SD used</th><th>z</th><th>P(&gt; c)</th></tr></thead><tbody>
+   <tr><td style="font-family:var(--body)">one sheet X</td><td>σ = 1.3</td><td>${f(z1,2)}</td><td>${fp(1-Phi(z1))}</td></tr>
+   <tr class="pick"><td style="font-family:var(--body)">mean of ${n}, X̄</td><td>σ/√${n} = ${se.toFixed(3)}</td><td>${f(z2,2)}</td><td>${fp(1-Phi(z2))}</td></tr></tbody>`;
+  const r=+$('s8r').value;setText('s8ro',r.toFixed(2));const seT=sg*Math.sqrt((1+(n-1)*r)/n);
+  setText('s8se0',se.toFixed(3));setText('s8se1',seT.toFixed(3));setText('s8ratio','× '+(seT/se).toFixed(2));
+  drawHist8();
+}
+function drawHist8(){const n=+$('s8n').value,mu=10,se=1.3/Math.sqrt(n);const x0=mu-4*se,x1=mu+4*se;
+  const bars=[];let txt='Press the button to draw samples.';
+  if(s8means&&s8means.n===n){const k=28,w=(x1-x0)/k,cnt=new Array(k).fill(0);s8means.v.forEach(m=>{const i=Math.floor((m-x0)/w);if(i>=0&&i<k)cnt[i]++;});
+    cnt.forEach((cn,i)=>bars.push({a:x0+i*w,b:x0+(i+1)*w,h:cn/(s8means.v.length*w)}));
+    const m=s8means.v.reduce((a,b)=>a+b,0)/s8means.v.length,sd=Math.sqrt(s8means.v.reduce((a,b)=>a+(b-m)**2,0)/(s8means.v.length-1));
+    txt=`Simulated means: average ${m.toFixed(3)}, SD ${sd.toFixed(3)} (theory: 10, ${se.toFixed(3)}).`;}
+  setText('s8simtxt',txt);
+  const y1=pdf(0,0,se)*1.35;
+  plot($('s8hist'),{x0,x1,y1,h:200,bars,curves:[{f:x=>pdf(x,mu,se),cls:'hi'}],xt:rng(x0,x1,(x1-x0)/4).map(v=>({v,l:v.toFixed(2)})),xlabel:'sample mean x̄'});
+}
+$('s8sim').addEventListener('click',()=>{const n=+$('s8n').value;const v=[];for(let i=0;i<400;i++){let s=0;for(let j=0;j<n;j++)s+=10+1.3*gauss();v.push(s/n);}s8means={n,v};drawHist8();});
+['s8n','s8c','s8r'].forEach(id=>$(id).addEventListener('input',r8));
+
+/* ===== Station 9 ===== */
+let s9src='norm',s9data=[];
+function draw9(){const n=+$('s9n').value;let d;
+  if(s9src==='norm')d=Array.from({length:n},()=>50+5*gauss());
+  else if(s9src==='skew')d=Array.from({length:n},()=>40*Math.exp(0.55*gauss()));
+  else{d=Array.from({length:n-1},()=>50+5*gauss());d.push(50+5*6.2);}
+  s9data=d;r9();}
+function r9(){setText('s9no',$('s9n').value);const d=s9data,n=d.length;const m=d.reduce((a,b)=>a+b,0)/n,s=Math.sqrt(d.reduce((a,b)=>a+(b-m)**2,0)/(n-1));
+  const lo=Math.min(...d),hi=Math.max(...d),pad=(hi-lo)*0.08,x0=Math.min(lo-pad,m-3.5*s),x1=Math.max(hi+pad,m+3.5*s);
+  const k=Math.max(6,Math.min(24,Math.round(Math.sqrt(n)*1.3))),w=(hi-lo)/k||1,cnt=new Array(k).fill(0);
+  d.forEach(v=>{let i=Math.floor((v-lo)/w);if(i>=k)i=k-1;cnt[i]++;});
+  const bars=cnt.map((c,i)=>({a:lo+i*w,b:lo+(i+1)*w,h:c/(n*w)}));const y1=Math.max(...bars.map(b=>b.h),pdf(0,0,s))*1.15;
+  plot($('s9hist'),{x0,x1,y1,h:240,L:16,bars,curves:[{f:x=>pdf(x,m,s),cls:'hi'}],xt:rng(Math.ceil(x0/10)*10,x1,10),xlabel:'measurement'});
+  const sorted=[...d].sort((a,b)=>a-b);const pts=sorted.map((v,i)=>({x:invPhi((i+0.5)/n),y:(v-m)/s}));
+  const lim=Math.max(3,...pts.map(p=>Math.abs(p.y)))+0.3;
+  const W=360,H=300,L=40,R=12,Tp=12,B=38,X=x=>L+(x+lim)/(2*lim)*(W-L-R),Y=y=>H-B-(y+lim)/(2*lim)*(H-B-Tp);
+  let sv=`<line class="ax" x1="${L}" x2="${W-R}" y1="${Y(-lim)}" y2="${Y(-lim)}"/><line class="ax" x1="${L}" x2="${L}" y1="${Tp}" y2="${Y(-lim)}"/>`;
+  for(let t=Math.ceil(-lim);t<=lim;t++){sv+=`<line class="grid" x1="${X(t)}" x2="${X(t)}" y1="${Tp}" y2="${Y(-lim)}"/><line class="grid" x1="${L}" x2="${W-R}" y1="${Y(t)}" y2="${Y(t)}"/>`;
+    if(t%2===0){sv+=`<text x="${X(t)}" y="${Y(-lim)+15}" text-anchor="middle">${f(t,0)}</text><text x="${L-6}" y="${Y(t)+4}" text-anchor="end">${f(t,0)}</text>`;}}
+  sv+=`<line class="refline" x1="${X(-lim)}" y1="${Y(-lim)}" x2="${X(lim)}" y2="${Y(lim)}"/>`;
+  const outIdx=s9src==='out'?pts.length-1:-1;
+  pts.forEach((p,i)=>{sv+=`<circle class="qq ${i===outIdx?'out':''}" cx="${X(p.x).toFixed(1)}" cy="${Y(p.y).toFixed(1)}" r="${i===outIdx?5:3}"/>`;});
+  sv+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle">normal quantile z</text><text x="12" y="${(Tp+H-B)/2}" transform="rotate(-90 12 ${(Tp+H-B)/2})" text-anchor="middle">standardized data</text>`;
+  const q=$('s9qq');q.setAttribute('viewBox',`0 0 ${W} ${H}`);q.innerHTML=sv;
+  setText('s9txt',{norm:'Normal data: points hug the dashed line, with some wobble in the tails. The wobble grows as n shrinks.',skew:'Right-skewed data: the points curve upward at the right end and flatten at the left. A straight line does not describe them.',out:'One outlier (red): the rest of the sample follows the line. Find out where that reading came from before deciding on a model.'}[s9src]);
+}
+seg($('s9src'),'s',s=>{s9src=s;draw9();});
+$('s9n').addEventListener('input',()=>setText('s9no',$('s9n').value));
+$('s9n').addEventListener('change',draw9);$('s9draw').addEventListener('click',draw9);
+
+/* ===== Station 10 ===== */
+const lnpdf=(y,m,s)=>y<=0?0:pdf(Math.log(y),m,s)/y;
+function r10(){const m=+$('s10m').value,s=+$('s10s').value,ly=+$('s10y').value,y=Math.exp(ly);
+  setText('s10mo',f(m,2));setText('s10so',s.toFixed(2));setText('s10yo',y<1?y.toFixed(3):y.toFixed(2));
+  plot($('s10a'),{x0:-3,x1:6,y1:4.2,h:230,L:16,shade:[{a:-9,b:ly,f:x=>pdf(x,m,s),cls:'hi'}],curves:[{f:x=>pdf(x,m,s)}],
+    vlines:[{x:m,cls:'soft',top:pdf(m,m,s),label:'μ',dy:-4},{x:ly,cls:'hi',top:4,label:'ln y',lcls:'hi',dy:-2,anchor:ly>4?'end':'start',dx:ly>4?-4:4}],xt:rng(-2,6,2),xlabel:'x = ln y'});
+  const yhi=Math.exp(m+2.6*s);let pk=0;for(let i=1;i<=400;i++)pk=Math.max(pk,lnpdf(yhi*i/400,m,s));
+  const med=Math.exp(m),mean=Math.exp(m+s*s/2);const step=[0.5,1,2,5,10,20,50][[0.5,1,2,5,10,20,50].findIndex(t=>yhi/t<=8)]||100;
+  plot($('s10b'),{x0:0,x1:yhi,y1:pk*1.25,h:230,L:16,shade:[{a:1e-9,b:y,f:x=>lnpdf(x,m,s),cls:'hi'}],curves:[{f:x=>lnpdf(x,m,s)}],
+    vlines:[{x:med,cls:'soft',top:pk*1.12,label:'median',dy:-3,anchor:'end',dx:-3},{x:mean,cls:'c2',top:pk*1.12,label:'mean',lcls:'c2',dy:-3},{x:y,cls:'hi',top:pk*0.85,label:'y',lcls:'hi',dy:-2}],
+    xt:rng(0,yhi,step),xd:step<1?1:0,xlabel:'y'});
+  const z=(ly-m)/s;
+  $('s10f').innerHTML=`P(<i>Y</i> ≤ ${y.toFixed(2)}) = Φ( <span class="frac"><span>ln ${y.toFixed(2)} − ${f(m,2)}</span><span>${s.toFixed(2)}</span></span> ) = Φ( <span class="frac"><span>${f(ly,4)} − ${f(m,2)}</span><span>${s.toFixed(2)}</span></span> ) = Φ(${f(z,2)}) ≈ <b>${T(z).toFixed(4)}</b>`;
+  setText('s10med',med.toFixed(3));setText('s10mean',mean.toFixed(3));setText('s10var',((Math.exp(s*s)-1)*Math.exp(2*m+s*s)).toFixed(3));setText('s10wrong',f(m,2));
+}
+['s10m','s10s','s10y'].forEach(id=>$(id).addEventListener('input',r10));
+$('s10ex').addEventListener('click',()=>{$('s10m').value=1;$('s10s').value=0.5;$('s10y').value=Math.log(5).toFixed(4);r10();});
+
+/* ===== Check ===== */
+document.querySelectorAll('[data-rev]').forEach(b=>b.addEventListener('click',()=>{const el=$(b.dataset.rev);el.hidden=!el.hidden;b.textContent=el.hidden?'Reveal':'Hide';}));
+
+/* initial render */
+r1();draw2();cfg3('a',10.8);r4();bigTable();r5();r6();r7();r8();draw9();r10();
+</script>
+</body>
+</html>

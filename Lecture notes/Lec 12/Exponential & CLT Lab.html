@@ -1,0 +1,1158 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Exponential &amp; CLT Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: the ENDG 319 lab-manual series — one long column of stations, each pairing a short concept panel with a live instrument. */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --sunk:#e3e8ee; --ink:#15202b; --muted:#566373; --line:#cfd7e0;
+  --bar:#3a64ad; --hi:#c8283e; --hi-soft:#f6dde1; --ok:#1f7a55; --warn:#a4620d;
+  --c2:#c58a14; --shade:rgba(58,100,173,.18); --shade-hi:rgba(200,40,62,.26); --shade-c2:rgba(197,138,20,.26);
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Public Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c2:#e2b14b; --shade:rgba(111,155,227,.22); --shade-hi:rgba(241,106,125,.3); --shade-c2:rgba(226,177,75,.28); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141a; --surface:#16202a; --sunk:#1d2935; --ink:#e4eaf0; --muted:#97a5b4; --line:#2b3947;
+  --bar:#6f9be3; --hi:#f16a7d; --hi-soft:#3a1f26; --ok:#4cc08d; --warn:#e2a74b;
+  --c2:#e2b14b; --shade:rgba(111,155,227,.22); --shade-hi:rgba(241,106,125,.3); --shade-c2:rgba(226,177,75,.28); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1060px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0;max-width:66ch}
+.eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--hi);font-weight:600}
+.muted{color:var(--muted)}
+code,.m{font-family:var(--mono);font-size:.9em}
+:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+
+header.top{padding-block:40px 20px;display:grid;gap:14px}
+header.top p{font-size:1.08rem}
+nav.stations{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+nav.stations a{flex:none;text-decoration:none;color:var(--ink);font-family:var(--mono);font-size:.8rem;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+nav.stations a:hover{border-color:var(--bar)}
+nav.stations a.part{border-color:var(--hi);color:var(--hi)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+
+.part-head{padding-block:56px 0;display:grid;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:14px}
+.part-head .eyebrow{color:var(--muted)}
+section.station{padding-block:48px 8px;display:grid;gap:22px;scroll-margin-top:60px}
+.head{display:grid;gap:8px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:22px;align-items:start}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.stack{display:grid;gap:22px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:14px;min-width:0}
+.concept{display:grid;gap:12px;min-width:0}
+.concept ul{margin:0;padding-left:1.1em;display:grid;gap:6px}
+.formula{font-family:"Times New Roman",Georgia,serif;font-size:1.22rem;background:var(--sunk);border-radius:8px;padding:12px 14px;overflow-x:auto;white-space:nowrap}
+.formula.live{font-size:1.08rem;line-height:1.9}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;margin:0 2px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.warn{border-left:3px solid var(--hi);background:var(--hi-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.95rem}
+.note{border-left:3px solid var(--bar);background:var(--sunk);padding:10px 12px;border-radius:0 6px 6px 0;font-size:.93rem}
+.added{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--warn);border:1px solid var(--warn);border-radius:999px;padding:1px 8px;justify-self:start}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 18px}
+.ctl{display:grid;gap:2px;min-width:0}
+.ctl label{font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.ctl label output{font-family:var(--mono);color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--hi)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);color:var(--ink);font:inherit;font-size:.85rem;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--surface)}
+.btn{font:inherit;font-size:.88rem;padding:7px 14px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:var(--surface);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--bar)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.ro{background:var(--sunk);border-radius:8px;padding:8px 10px;min-width:0}
+.ro .k{font-size:.78rem;color:var(--muted)}
+.ro .v{font-family:var(--mono);font-size:1.12rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ro.key .v{color:var(--hi)}
+.ro.bad .v{color:var(--muted);text-decoration:line-through}
+.ro.good .v{color:var(--ok)}
+
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:420px;height:auto}
+svg .curve{fill:none;stroke:var(--bar);stroke-width:2.2}
+svg .curve.c2{stroke:var(--c2)}
+svg .curve.hi{stroke:var(--hi)}
+svg .curve.ghost{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1.3}
+svg .curve.bad{stroke:var(--hi);stroke-dasharray:6 4;stroke-width:1.6}
+svg .curve.dash2{stroke:var(--c2);stroke-dasharray:7 5;stroke-width:2.4}
+svg .curve.wide{stroke-width:6;stroke-opacity:.45}
+svg .shade{fill:var(--shade)}
+svg .shade.hi{fill:var(--shade-hi)}
+svg .shade.c2{fill:var(--shade-c2)}
+svg .bar{fill:var(--shade);stroke:var(--bar);stroke-width:.8}
+svg .bar.in{fill:var(--shade-hi);stroke:var(--hi)}
+svg .ax{stroke:var(--muted);stroke-width:1}
+svg .grid{stroke:var(--line);stroke-width:1}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:11px}
+svg text.lab{fill:var(--ink);font-family:var(--body);font-size:12px}
+svg text.lab.hi{fill:var(--hi);font-weight:600}
+svg text.lab.c2{fill:var(--c2);font-weight:600}
+svg text.lab.bar{fill:var(--bar);font-weight:600}
+svg .vl{stroke:var(--ink);stroke-dasharray:4 3;stroke-width:1.2}
+svg .vl.hi{stroke:var(--hi)}
+svg .vl.c2{stroke:var(--c2)}
+svg .vl.soft{stroke:var(--muted);stroke-width:1}
+svg .dot{fill:var(--surface);stroke:var(--hi);stroke-width:2}
+svg .dot.bar{stroke:var(--bar)}
+svg .dot.solid{fill:var(--hi)}
+svg .rug{stroke:var(--bar);stroke-width:1.6}
+svg .rug.out{stroke:var(--hi)}
+svg rect.band{fill:var(--shade)}
+svg rect.band.hi{fill:var(--shade-hi)}
+svg .ev{fill:var(--bar)}
+svg .ev.first{fill:var(--hi)}
+svg .tick{stroke:var(--muted);stroke-width:1}
+svg .tl{stroke:var(--ink);stroke-width:1.5}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.sw{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.sw.ln{height:3px;vertical-align:3px}
+
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.8rem;color:var(--muted);font-weight:600}
+table.small{min-width:0;font-size:.88rem}
+table.small td{font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.small td.t{font-family:var(--body)}
+table.small tr.pick td{background:var(--hi-soft);font-weight:600}
+table.layers{min-width:540px}
+table.layers td:first-child,table.layers th:first-child{white-space:nowrap}
+
+.vsgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:820px){.vsgrid{grid-template-columns:minmax(0,1fr)}}
+.tri{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.tri{grid-template-columns:minmax(0,1fr)}}
+.side{display:grid;gap:10px;align-content:start;min-width:0;background:var(--sunk);border-radius:10px;padding:14px}
+.side .chart svg{min-width:300px}
+.side h3{font-size:1rem}
+.layer{font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--surface);background:var(--ink);border-radius:999px;padding:2px 9px;justify-self:start}
+.deriv{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.dstep{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.dnum{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--surface);font-family:var(--mono);font-size:.8rem;font-weight:600}
+.dbody{display:grid;gap:6px;min-width:0}
+.dbody .formula{font-size:1.05rem}
+
+.chip{font-family:var(--mono);font-size:.78rem;font-weight:600;border-radius:999px;padding:2px 10px;border:1px solid currentColor}
+.chip.pass{color:var(--ok)}
+.chip.fail{color:var(--hi)}
+.squares{display:flex;flex-wrap:wrap;gap:3px;max-height:150px;overflow:auto}
+.sq{width:12px;height:12px;border-radius:2px;background:var(--surface);border:1px solid var(--line)}
+.sq.one{background:var(--hi);border-color:var(--hi)}
+.pieces{display:flex;flex-wrap:wrap;gap:4px}
+.piece{min-width:34px;padding:4px 0;text-align:center;border:1px solid var(--line);border-radius:4px;background:var(--surface);font-family:var(--mono);font-size:.85rem}
+.piece.z{color:var(--muted)}
+.piece.nz{border-color:var(--bar);color:var(--bar);font-weight:600}
+
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.check{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:10px;align-content:start}
+.check .tag{font-family:var(--mono);font-weight:600;color:var(--hi)}
+.check .claim{font-style:italic}
+.check .fix{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:4px}
+.check .fix b{color:var(--ok)}
+.mistakes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.mk{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:6px;align-content:start}
+.mk .n{font-family:var(--mono);font-weight:600;color:var(--hi);font-size:.8rem}
+.mk a{color:var(--bar);font-size:.85rem}
+.qa{display:grid;gap:10px}
+.qa .q{font-weight:600}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}
+html{scroll-behavior:smooth}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">ENDG 319 · Lecture 12</span>
+  <h1>Exponential &amp; CLT Lab</h1>
+  <p>Fourteen stations in two parts. Part A follows a single waiting time: how long until the next Poisson event, and why the clock seems to reset. Part B steps back to averages, sums and counts of many observations, and why they end up looking normal. Before each calculation, name the variable: <b>a count, a waiting time, a sum, or a mean?</b></p>
+</header>
+
+<nav class="stations" aria-label="Stations">
+  <a href="#s1">1 · Exp(λ)</a><a href="#s2">2 · CDF, tail, median</a><a href="#s3">3 · Poisson link</a><a href="#s4">4 · Ex 11</a><a href="#s5">5 · Memoryless</a><a href="#s6">6 · Ex 12</a><a href="#s7">7 · Three layers</a><a href="#s8">8 · Mean vs sum</a><a href="#s9">9 · How large n?</a><a href="#s10">10 · When to use CLT</a><a href="#s11">11 · Binomial</a><a href="#s12">12 · Poisson</a><a href="#s13">13 · ±0.5 · Ex 14</a><a href="#s14">14 · Ex 13</a><a href="#s15">Check</a>
+</nav>
+
+<div class="part-head"><span class="eyebrow">Part A · Slides 3–14</span><h2>One waiting time</h2></div>
+
+<!-- ============ STATION 1 ============ -->
+<section class="station" id="s1">
+  <div class="head">
+    <span class="eyebrow">Station 1 · Slides 3, 4, 6</span>
+    <h2>A rate sets the time scale</h2>
+    <p>T is the time from a chosen starting point until the next event, and T ~ Exp(λ). λ is a rate, in events per unit time. A larger rate means shorter waits.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula"><i>f<sub>T</sub></i>(<i>t</i>) = <i>λ e</i><sup>−<i>λt</i></sup>, &nbsp; <i>t</i> &gt; 0</div>
+      <div class="formula"><i>E</i>[<i>T</i>] = <span class="frac"><span>1</span><span><i>λ</i></span></span> &nbsp;&nbsp; Var(<i>T</i>) = <span class="frac"><span>1</span><span><i>λ</i>²</span></span> &nbsp;&nbsp; <i>σ<sub>T</sub></i> = <span class="frac"><span>1</span><span><i>λ</i></span></span></div>
+      <ul>
+        <li><b>The curve starts at height λ</b> and decays. Short waits are always the densest region, whatever the rate.</li>
+        <li><b>Height is density, not probability.</b> With λ = 2 the curve starts at 2. Only areas are probabilities, and the total area is 1.</li>
+        <li><b>Units.</b> λ is in time⁻¹, so 1/λ is a time and 1/λ² is a squared time.</li>
+        <li><b>Mean equals SD</b> for every exponential. Doubling λ halves both and cuts the variance to one quarter.</li>
+      </ul>
+      <div class="warn">The rate is not the mean wait. 15 particles per minute means a mean wait of 1/15 min = 4 s.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s1l">Rate λ (per unit time) <output id="s1lo"></output></label><input type="range" id="s1l" min="0.25" max="2.5" step="0.05" value="1"></div>
+        <div class="ctl"><label for="s1a">Interval start a <output id="s1ao"></output></label><input type="range" id="s1a" min="0" max="6" step="0.05" value="0.5"></div>
+        <div class="ctl"><label for="s1b">Interval end b <output id="s1bo"></output></label><input type="range" id="s1b" min="0" max="6" step="0.05" value="2"></div>
+      </div>
+      <div class="chart"><svg id="s1svg" role="img" aria-label="Exponential density with adjustable rate and a shaded interval"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>your Exp(λ)</span><span><span class="sw ln" style="background:var(--muted)"></span>slide 4 curves: λ = 0.5, 1, 2</span><span><span class="sw" style="background:var(--shade-hi)"></span>P(a &lt; T ≤ b) = e<sup>−λa</sup> − e<sup>−λb</sup></span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Peak height f(0) = λ</div><div class="v" id="s1pk"></div></div>
+        <div class="ro"><div class="k">Mean = SD = 1/λ</div><div class="v" id="s1m"></div></div>
+        <div class="ro"><div class="k">Variance 1/λ²</div><div class="v" id="s1v"></div></div>
+        <div class="ro key"><div class="k">Shaded area</div><div class="v" id="s1ar"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 2 ============ -->
+<section class="station" id="s2">
+  <div class="head">
+    <span class="eyebrow">Station 2 · Slide 5</span>
+    <h2>"By time t" and "after time t" split the probability</h2>
+    <p>The CDF F(t) = 1 − e<sup>−λt</sup> answers "the event has happened by t". The tail P(T &gt; t) = e<sup>−λt</sup> answers "we are still waiting at t". The two always add to 1.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">P(<i>T</i> &gt; <i>t</i>) = 1 − <i>F</i>(<i>t</i>) = 1 − (1 − <i>e</i><sup>−<i>λt</i></sup>) = <i>e</i><sup>−<i>λt</i></sup></div>
+      <ul>
+        <li><b>The tail is 1 − CDF.</b> For the exponential the subtraction simplifies to e<sup>−λt</sup>, which is why the slide writes it that way.</li>
+        <li><b>The mistake to avoid</b> is using the CDF itself for "more than t". In Example 11 that gives 0.7135 instead of 0.2865, the complement of the right answer.</li>
+        <li><b>Scaled time u = λt</b> lets one pair of curves cover every rate.</li>
+      </ul>
+      <div class="deriv">
+        <span class="added">Added: not in the slides</span>
+        <h3>Where the curves cross: the median</h3>
+        <p style="font-size:.95rem">The curves can only be equal where each is 0.5. That point splits the probability in half, which is the definition of the median.</p>
+        <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>Set the tail equal to one half.</span><div class="formula"><i>e</i><sup>−<i>u</i></sup> = 0.5</div></div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>Take ln of both sides.</span><div class="formula">−<i>u</i> = ln(0.5) ≈ −0.693</div></div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dbody"><span>Multiply by −1. Since ln(0.5) = ln(1/2) = −ln 2, the signs cancel.</span><div class="formula"><i>u</i> = −ln(0.5) = ln 2 ≈ 0.693</div></div></div>
+        <div class="dstep"><div class="dnum">4</div><div class="dbody"><span>Convert back to real time with u = λt.</span><div class="formula"><i>t</i><sub>median</sub> = <span class="frac"><span>ln 2</span><span><i>λ</i></span></span> ≈ <span class="frac"><span>0.693</span><span><i>λ</i></span></span></div></div></div>
+        <p class="muted" style="font-size:.88rem">ln(0.5) is the value of −u, not u. It is negative, and a scaled time can't be.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="ctl"><label for="s2u">Scaled time u = λt <output id="s2uo"></output></label><input type="range" id="s2u" min="0" max="4" step="0.01" value="1.25"></div>
+      <div class="chart"><svg id="s2svg" role="img" aria-label="Exponential CDF and tail curves against scaled time"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>CDF 1 − e<sup>−u</sup></span><span><span class="sw ln" style="background:var(--hi)"></span>tail e<sup>−u</sup></span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">By time: F = 1 − e<sup>−u</sup></div><div class="v" id="s2F"></div></div>
+        <div class="ro key"><div class="k">After time: e<sup>−u</sup></div><div class="v" id="s2S"></div></div>
+        <div class="ro"><div class="k">Sum of the two</div><div class="v" id="s2sum"></div></div>
+      </div>
+      <div class="side">
+        <span class="added">Added: not in the slides</span>
+        <h3>Why the median sits below the mean</h3>
+        <p style="font-size:.92rem">Most of the probability is packed near zero, so the halfway point comes early. A long right tail of occasional very long waits pulls the mean up, because each long wait adds its full size to the average. Move λ: the ratio median/mean stays at 0.693 and P(T ≤ mean) stays at 63.2%.</p>
+        <div class="ctl"><label for="s2l">λ <output id="s2lo"></output></label><input type="range" id="s2l" min="0.1" max="1.5" step="0.05" value="0.25"></div>
+        <div class="chart"><svg id="s2svg2" role="img" aria-label="Exponential density with median and mean marked"></svg></div>
+        <div class="readouts">
+          <div class="ro"><div class="k">Median ln2/λ</div><div class="v" id="s2med"></div></div>
+          <div class="ro"><div class="k">Mean 1/λ</div><div class="v" id="s2mean"></div></div>
+          <div class="ro key"><div class="k">P(T ≤ mean)</div><div class="v" id="s2pm"></div></div>
+        </div>
+        <p class="muted" style="font-size:.85rem">At λ = 0.25 s⁻¹ (Example 11), the median wait is 2.77 s and the mean is 4 s. About 63% of waits are shorter than the average wait.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 3 ============ -->
+<section class="station" id="s3">
+  <div class="head">
+    <span class="eyebrow">Station 3 · Slide 7</span>
+    <h2>One process, two questions</h2>
+    <p>A Poisson process with rate λ can be described by a count, N(t) ~ Poisson(λt), or by a wait, T ~ Exp(λ). "The first event comes after t" and "no events in [0, t]" are the same event.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">{ <i>T</i> &gt; <i>t</i> } = { <i>N</i>(<i>t</i>) = 0 }</div>
+      <div class="deriv">
+        <span class="added">Added: step by step</span>
+        <h3>The exponential tail from the Poisson PMF</h3>
+        <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>The count in a window of length t has mean λt.</span><div class="formula">P(<i>N</i>(<i>t</i>) = <i>k</i>) = <span class="frac"><span><i>e</i><sup>−<i>λt</i></sup>(<i>λt</i>)<sup><i>k</i></sup></span><span><i>k</i>!</span></span></div></div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>Waiting longer than t means zero events in the window, so we need k = 0.</span></div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dbody"><span>Substitute k = 0.</span><div class="formula">P(<i>N</i>(<i>t</i>) = 0) = <span class="frac"><span><i>e</i><sup>−<i>λt</i></sup>(<i>λt</i>)<sup>0</sup></span><span>0!</span></span></div></div></div>
+        <div class="dstep"><div class="dnum">4</div><div class="dbody"><span>(λt)⁰ = 1 because anything nonzero to the power 0 is 1, and 0! = 1 because there is one way to arrange nothing.</span><div class="formula">= <i>e</i><sup>−<i>λt</i></sup> · 1 / 1 = <i>e</i><sup>−<i>λt</i></sup></div></div></div>
+        <div class="dstep"><div class="dnum">5</div><div class="dbody"><span>That is the tail. The CDF and PDF follow.</span><div class="formula"><i>F</i>(<i>t</i>) = 1 − <i>e</i><sup>−<i>λt</i></sup>, &nbsp; <i>f</i>(<i>t</i>) = <i>F</i>′(<i>t</i>) = <i>λe</i><sup>−<i>λt</i></sup></div></div></div>
+        <p class="muted" style="font-size:.88rem">Check with Example 12: λ = 3 per minute, t = 1 minute, so the mean count is 3 and P(N(1) = 0) = e<sup>−3</sup> ≈ 0.0498, matching P(T &gt; 1) on slide 13.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s3l">Rate λ (events per unit time) <output id="s3lo"></output></label><input type="range" id="s3l" min="0.2" max="3" step="0.1" value="0.8"></div>
+        <div class="ctl"><label for="s3t">Window length t <output id="s3to"></output></label><input type="range" id="s3t" min="0.2" max="5" step="0.1" value="1.5"></div>
+      </div>
+      <div class="row"><button type="button" class="btn" id="s3new">Run a new timeline</button></div>
+      <div class="chart"><svg id="s3svg" role="img" aria-label="Timeline of Poisson events with the window from 0 to t shaded"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade)"></span>window [0, t]</span><span><span class="sw" style="background:var(--hi);border-radius:50%"></span>first event: T</span><span><span class="sw" style="background:var(--bar);border-radius:50%"></span>later events</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Count N(t) this run</div><div class="v" id="s3N"></div></div>
+        <div class="ro"><div class="k">First wait T this run</div><div class="v" id="s3T"></div></div>
+        <div class="ro"><div class="k">T &gt; t ?</div><div class="v" id="s3a"></div></div>
+        <div class="ro"><div class="k">N(t) = 0 ?</div><div class="v" id="s3b"></div></div>
+      </div>
+      <div class="side">
+        <div class="row"><button type="button" class="btn ghost" id="s3sim">Run 2,000 timelines</button><span class="muted" style="font-size:.85rem">The two answers in each run always agree.</span></div>
+        <div class="readouts">
+          <div class="ro"><div class="k">Fraction with T &gt; t</div><div class="v" id="s3f1">—</div></div>
+          <div class="ro"><div class="k">Fraction with N(t) = 0</div><div class="v" id="s3f2">—</div></div>
+          <div class="ro key"><div class="k">Theory e<sup>−λt</sup></div><div class="v" id="s3th"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 4 ============ -->
+<section class="station" id="s4">
+  <div class="head">
+    <span class="eyebrow">Station 4 · Slides 8–9 · Example 11</span>
+    <h2>Particle emissions: convert units, then use the tail</h2>
+    <p>Particles arrive as a Poisson process at 15 per minute. What is the chance more than t seconds pass before the next emission, and what is the mean wait?</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <ul>
+        <li><b>Write the event first:</b> "more than 5 seconds" is T &gt; 5, a right tail.</li>
+        <li><b>Pick one time unit</b> and express both λ and t in it. The product λt has no units, so either choice gives the same exponent.</li>
+        <li><b>The trap:</b> e<sup>−15 × 5</sup> multiplies a per-minute rate by seconds and gives a probability that is essentially zero.</li>
+      </ul>
+      <div class="row"><div class="seg" role="group" aria-label="Time unit" id="s4unit"><button type="button" data-u="s" aria-pressed="true">Work in seconds</button><button type="button" data-u="m" aria-pressed="false">Work in minutes</button></div></div>
+      <div class="formula live" id="s4f"></div>
+    </div>
+    <div class="panel">
+      <div class="ctl"><label for="s4t">Threshold t (seconds) <output id="s4to"></output></label><input type="range" id="s4t" min="0.5" max="15" step="0.5" value="5"></div>
+      <div class="chart"><svg id="s4svg" role="img" aria-label="Exponential density in seconds with the right tail shaded"></svg></div>
+      <div class="readouts">
+        <div class="ro key"><div class="k">P(T &gt; t)</div><div class="v" id="s4p"></div></div>
+        <div class="ro"><div class="k">Mean wait E[T]</div><div class="v" id="s4m"></div></div>
+        <div class="ro bad"><div class="k">Mixed units e<sup>−15t</sup></div><div class="v" id="s4w"></div></div>
+        <div class="ro bad"><div class="k">CDF instead of tail</div><div class="v" id="s4w2"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 5 ============ -->
+<section class="station" id="s5">
+  <div class="head">
+    <span class="eyebrow">Station 5 · Slides 10–11, 14</span>
+    <h2>Memorylessness: the clock resets</h2>
+    <p>If you have already waited s with no event, the chance of waiting at least t more is the same as if you had just started. Only the additional time t enters the answer.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">P(<i>T</i> &gt; <i>s</i> + <i>t</i> | <i>T</i> &gt; <i>s</i>) = P(<i>T</i> &gt; <i>t</i>)</div>
+      <div class="deriv">
+        <h3>Why it holds</h3>
+        <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>Use the conditional-probability ratio. {T &gt; s+t} is a subset of {T &gt; s}, so the intersection is just {T &gt; s+t}.</span><div class="formula">P(<i>T</i> &gt; <i>s</i>+<i>t</i> | <i>T</i> &gt; <i>s</i>) = <span class="frac"><span>P(<i>T</i> &gt; <i>s</i>+<i>t</i>)</span><span>P(<i>T</i> &gt; <i>s</i>)</span></span></div></div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>Insert the exponential tails. The factor e<sup>−λs</sup> cancels.</span><div class="formula"><span class="frac"><span><i>e</i><sup>−<i>λ</i>(<i>s</i>+<i>t</i>)</sup></span><span><i>e</i><sup>−<i>λs</i></sup></span></span> = <i>e</i><sup>−<i>λt</i></sup></div></div></div>
+      </div>
+      <div class="note">The two events are nested, which is the opposite of independent. The cancellation comes from the subset relationship and the exponential form, not from an independence assumption.</div>
+      <div class="deriv">
+        <span class="added">Added: from class discussion</span>
+        <h3>"The average is 4 s and I've waited 3 s. Shouldn't the next second be more likely?"</h3>
+        <p style="font-size:.93rem">That intuition fits things with a schedule or wear. It does not fit an exponential wait, because the average of 4 s is not a schedule. Picture the process flipping a weighted coin in every tiny slice of time. After 300 slices of "no", the next slice has exactly the same chance. Nothing accumulates, so the event is never "due".</p>
+        <p style="font-size:.93rem">The average of 4 s covers all waits, and most of them are short. Waits that have already lasted 3 s are a selected group from the long tail, and that group runs longer than average. Conditioning on "I've waited 3 s" removes every short wait from the picture.</p>
+        <p class="muted" style="font-size:.88rem">Check it below: simulate the waits and look only at the ones that survived past s.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s5l">Rate λ (s⁻¹) <output id="s5lo"></output></label><input type="range" id="s5l" min="0.1" max="1" step="0.05" value="0.25"></div>
+        <div class="ctl"><label for="s5s">Already waited s (s) <output id="s5so"></output></label><input type="range" id="s5s" min="0" max="10" step="0.5" value="3"></div>
+        <div class="ctl"><label for="s5t">Additional t (s) <output id="s5to"></output></label><input type="range" id="s5t" min="0.5" max="6" step="0.5" value="1"></div>
+      </div>
+      <div class="chart"><svg id="s5tl" role="img" aria-label="Timeline split into elapsed time s and additional time t"></svg></div>
+      <div class="chart"><svg id="s5svg" role="img" aria-label="Original density and the conditional density after surviving s"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>original f(x)</span><span><span class="sw" style="background:var(--hi);opacity:.55;height:6px;vertical-align:1px"></span>given T &gt; s: f(x)/P(T &gt; s)</span><span><span class="sw ln" style="background:var(--c2)"></span>original shifted right by s (dashed)</span></div>
+      <p class="muted" style="font-size:.86rem">The gold dashes run exactly along the wide red band: the two are the same curve. Conditioning on survival rescales the leftover tail into a fresh copy of the original, starting at s. The two shaded areas are equal.</p>
+      <div class="formula live" id="s5f"></div>
+      <div class="readouts">
+        <div class="ro key"><div class="k">P(event in next t | waited s)</div><div class="v" id="s5p"></div></div>
+        <div class="ro"><div class="k">P(event in first t), fresh</div><div class="v" id="s5p0"></div></div>
+        <div class="ro"><div class="k">Expected remaining wait</div><div class="v" id="s5rem"></div></div>
+        <div class="ro"><div class="k">Expected total wait</div><div class="v" id="s5tot"></div></div>
+      </div>
+      <div class="side">
+        <span class="added">Added: simulation check</span>
+        <div class="row"><button type="button" class="btn" id="s5sim">Simulate 20,000 waits</button></div>
+        <div class="readouts">
+          <div class="ro"><div class="k">All waits: ended within t</div><div class="v" id="s5r1">—</div></div>
+          <div class="ro"><div class="k">Survivors past s: ended in next t</div><div class="v" id="s5r2">—</div></div>
+          <div class="ro"><div class="k">Survivors: mean remaining</div><div class="v" id="s5r3">—</div></div>
+          <div class="ro"><div class="k">Survivors found</div><div class="v" id="s5r4">—</div></div>
+        </div>
+      </div>
+      <div class="side">
+        <span class="added">Added: when elapsed time does matter</span>
+        <h3>Chance of an event in the next t, given you've waited s</h3>
+        <p style="font-size:.9rem">Three models, each with a mean wait of 4 s. Only the exponential gives a flat line. A bus timetable (wait uniform on 0–8 s) and a wear-out process (Erlang, shape 3) both become more urgent as time passes.</p>
+        <div class="chart"><svg id="s5cmp" role="img" aria-label="Conditional probability of an event in the next t seconds versus elapsed time for three models"></svg></div>
+        <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>exponential: memoryless</span><span><span class="sw ln" style="background:var(--hi)"></span>bus timetable, uniform(0, 8)</span><span><span class="sw ln" style="background:var(--c2)"></span>wear-out, Erlang(3, 0.75)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 6 ============ -->
+<section class="station" id="s6">
+  <div class="head">
+    <span class="eyebrow">Station 6 · Slides 12–13 · Example 12</span>
+    <h2>Website hits: condition, then take the complement</h2>
+    <p>Hits arrive at 3 per minute, and T is in minutes. Part (1): P(more than one minute without a hit). Part (2): given two quiet minutes, P(a hit in the next minute).</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">(1) &nbsp; P(<i>T</i> &gt; 1) = <i>e</i><sup>−3(1)</sup> = <i>e</i><sup>−3</sup> ≈ 0.0498</div>
+      <ul>
+        <li>A full quiet minute is rare: 3 hits are expected every minute.</li>
+        <li>Part (2) asks about the interval from minute 2 to minute 3, given no earlier hit. A hit in the next minute is the complement of waiting a full additional minute.</li>
+      </ul>
+      <div class="chart"><svg id="s6tl" role="img" aria-label="Timeline for Example 12 with s equals 2 and t equals 1"></svg></div>
+      <div class="warn">Slide 14 trap: computing P(T ≤ 3) = 1 − e<sup>−9</sup> ≈ 0.9999 ignores the condition. The elapsed two minutes do not add to the extra wait.</div>
+    </div>
+    <div class="deriv">
+      <span class="added">Added: written in s + t form to match slides 10–11</span>
+      <h3>Part (2), step by step</h3>
+      <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>Map the problem onto the template: s = 2 min elapsed, t = 1 additional min, s + t = 3, λ = 3 per min.</span></div></div>
+      <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>Write the event.</span><div class="formula">P(<i>T</i> ≤ <i>s</i>+<i>t</i> | <i>T</i> &gt; <i>s</i>) = P(<i>T</i> ≤ 3 | <i>T</i> &gt; 2)</div></div></div>
+      <div class="dstep"><div class="dnum">3</div><div class="dbody"><span>Take the complement inside the condition.</span><div class="formula">= 1 − P(<i>T</i> &gt; 3 | <i>T</i> &gt; 2)</div></div></div>
+      <div class="dstep"><div class="dnum">4</div><div class="dbody"><span>Use the ratio from slide 11. {T &gt; 3} is a subset of {T &gt; 2}.</span><div class="formula">P(<i>T</i> &gt; 3 | <i>T</i> &gt; 2) = <span class="frac"><span><i>e</i><sup>−<i>λ</i>(<i>s</i>+<i>t</i>)</sup></span><span><i>e</i><sup>−<i>λs</i></sup></span></span> = <span class="frac"><span><i>e</i><sup>−3·3</sup></span><span><i>e</i><sup>−3·2</sup></span></span> = <span class="frac"><span><i>e</i><sup>−9</sup></span><span><i>e</i><sup>−6</sup></span></span></div></div></div>
+      <div class="dstep"><div class="dnum">5</div><div class="dbody"><span>Cancel. The e<sup>−9</sup> is there, but it is divided by e<sup>−6</sup>, so the net exponent is λt = 3 × 1.</span><div class="formula"><i>e</i><sup>−9+6</sup> = <i>e</i><sup>−3</sup> = <i>e</i><sup>−<i>λt</i></sup> ≈ 0.0498</div></div></div>
+      <div class="dstep"><div class="dnum">6</div><div class="dbody"><span>Finish with the complement.</span><div class="formula">P(<i>T</i> ≤ 3 | <i>T</i> &gt; 2) = 1 − <i>e</i><sup>−3</sup> ≈ 0.9502</div></div></div>
+      <p class="muted" style="font-size:.88rem">The two answers, 4.98% and 95.02%, are complements: after conditioning, part (2) is just "does a 1-minute window contain a hit?"</p>
+    </div>
+  </div>
+</section>
+
+<div class="part-head"><span class="eyebrow">Part B · Slides 15–32</span><h2>Many observations: means, sums and counts</h2></div>
+
+<!-- ============ STATION 7 ============ -->
+<section class="station" id="s7">
+  <div class="head">
+    <span class="eyebrow">Station 7 · Slides 15–16</span>
+    <h2>Three layers: observation, sample, sampling distribution</h2>
+    <p>The CLT is a statement about the distribution of X̄ (or S<sub>n</sub>) across repeated samples. It does not make the population or the individual observations normal.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula">X̄ <span style="font-size:.8em">≈</span> N(<i>μ</i>, <i>σ</i>²/<i>n</i>) &nbsp;&nbsp; <i>S<sub>n</sub></i> <span style="font-size:.8em">≈</span> N(<i>nμ</i>, <i>nσ</i>²)</div>
+      <ul>
+        <li><b>Conditions:</b> X<sub>1</sub>, …, X<sub>n</sub> independent, identically distributed, with finite variance σ² &gt; 0. "Any population" is shorthand that leaves these out.</li>
+        <li><b>The second slot is the variance</b>, as everywhere in this course.</li>
+      </ul>
+      <span class="added">Added: from class discussion</span>
+      <div class="tbl"><table class="small layers">
+        <thead><tr><th>Layer</th><th>What it is</th><th>Example 11 waits</th><th>Shape</th></tr></thead>
+        <tbody>
+          <tr><td class="t"><b>1 · X<sub>i</sub></b></td><td class="t">One observation</td><td class="t">One wait, e.g. 2.3 s</td><td class="t">Exponential, always</td></tr>
+          <tr><td class="t"><b>2 · X<sub>1</sub>, …, X<sub>n</sub></b></td><td class="t">One sample of size n</td><td class="t">40 waits recorded in one session</td><td class="t">Looks like the population (skewed)</td></tr>
+          <tr><td class="t"><b>3 · x̄<sub>1</sub>, x̄<sub>2</sub>, …</b></td><td class="t">Many samples, each reduced to one mean or sum</td><td class="t">Repeat the 40-wait session many times</td><td class="t">Approximately normal for large n</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><b>X̄ is computed from one sample</b> (layer 2), giving one number. N(μ, σ²/n) describes how that number <i>would vary</i> if you repeated the sampling (layer 3). With only one sample, it tells you how far your x̄ is likely to be from μ.</li>
+        <li><b>A bigger sample sharpens the picture of the population.</b> It does not make that picture normal. Only the histogram of many sample means becomes normal.</li>
+        <li><b>If the population is normal,</b> X̄ is exactly normal for every n. Nothing needs to converge.</li>
+      </ul>
+      <div class="note">Wording tip: say "a sample of n observations", not "n samples". The second phrasing is common, and it is exactly what causes the confusion between layers 2 and 3.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s7n">Observations per sample n <output id="s7no"></output></label><input type="range" id="s7n" min="1" max="60" step="1" value="5"></div>
+        <div class="ctl"><span style="font-size:.82rem;color:var(--muted)">Reduce each sample to its</span><div class="seg" role="group" aria-label="Statistic" id="s7mode"><button type="button" data-m="mean" aria-pressed="true">mean X̄</button><button type="button" data-m="sum" aria-pressed="false">sum S<sub>n</sub></button></div></div>
+      </div>
+      <div class="row"><button type="button" class="btn" id="s7one">Draw one sample</button><button type="button" class="btn ghost" id="s7many">Draw 500 samples</button><button type="button" class="btn ghost" id="s7clr">Clear</button></div>
+      <div class="side">
+        <span class="layer">Layer 1 · population</span>
+        <p style="font-size:.88rem">Individual waits: Exp with mean μ = 4 s, SD σ = 4 s.</p>
+        <div class="chart"><svg id="s7a" role="img" aria-label="Population density of individual waits"></svg></div>
+      </div>
+      <div class="side">
+        <span class="layer">Layer 2 · the latest sample</span>
+        <p style="font-size:.88rem" id="s7btxt"></p>
+        <div class="chart"><svg id="s7b" role="img" aria-label="The values in the most recent sample"></svg></div>
+      </div>
+      <div class="side">
+        <span class="layer">Layer 3 · sampling distribution</span>
+        <p style="font-size:.88rem" id="s7ctxt"></p>
+        <div class="chart"><svg id="s7c" role="img" aria-label="Histogram of collected sample means or sums with the CLT normal curve"></svg></div>
+        <div class="readouts">
+          <div class="ro"><div class="k">Samples collected</div><div class="v" id="s7cnt"></div></div>
+          <div class="ro"><div class="k">Average of collected</div><div class="v" id="s7avg"></div></div>
+          <div class="ro"><div class="k">SD of collected</div><div class="v" id="s7sd"></div></div>
+          <div class="ro key"><div class="k" id="s7thk">Theory σ/√n</div><div class="v" id="s7th"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 8 ============ -->
+<section class="station" id="s8">
+  <div class="head">
+    <span class="eyebrow">Station 8 · Slide 17</span>
+    <h2>Use the SD of the variable in your event</h2>
+    <p>One observation, a mean and a sum share the same μ and σ but have different spreads. A mean divides the spread by √n; a sum multiplies it by √n.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="formula"><i>Z</i> = <span class="frac"><span>X̄ − <i>μ</i></span><span><i>σ</i>/√<i>n</i></span></span> &nbsp;&nbsp;&nbsp; <i>Z</i> = <span class="frac"><span><i>S<sub>n</sub></i> − <i>nμ</i></span><span><i>σ</i>√<i>n</i></span></span></div>
+      <ul>
+        <li><b>Why √n for a sum, not n?</b> Var(S<sub>n</sub>) = nσ² under independence. Independent fluctuations partly cancel. A sum SD of nσ would only happen if the observations were perfectly correlated.</li>
+      </ul>
+      <span class="added">Added: from class discussion</span>
+      <ul>
+        <li><b>S<sub>n</sub> is the total of the n values within one sample.</b> Repeat the sampling and you get many totals; their histogram is approximately N(nμ, nσ²).</li>
+        <li><b>The mean and the sum are the same variable on a different scale:</b> S<sub>n</sub> = n·X̄. So n·μ = nμ, and n·(σ/√n) = σ√n.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <p style="font-size:.93rem">Example 11 waits again: μ = σ = 4 s.</p>
+      <div class="ctl"><label for="s8n">n <output id="s8no"></output></label><input type="range" id="s8n" min="1" max="100" step="1" value="40"></div>
+      <div class="tbl"><table class="small" id="s8tbl"></table></div>
+      <p class="muted" style="font-size:.86rem" id="s8txt"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 9 ============ -->
+<section class="station" id="s9">
+  <div class="head">
+    <span class="eyebrow">Station 9 · Slides 18–19</span>
+    <h2>How large is "large enough"?</h2>
+    <p>The mean of n exponential waits has an exact distribution (a gamma). Compare it to the CLT normal curve. The bulk lines up quickly; the tails take much longer.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <ul>
+        <li><b>Slide 18:</b> n = 1 shows strong right skew, n = 5 less skew with the same mean, n = 40 narrower and more symmetric. Individual waits stay exponential throughout.</li>
+        <li><b>Skewness fades slowly.</b> The exponential has skewness 2, and the skewness of X̄ is 2/√n: about 0.89 at n = 5 and 0.32 at n = 40.</li>
+        <li><b>Check the tail you are asked about.</b> The normal curve is least accurate far from the centre. A skewed population puts too little probability in the normal's left tail and too much in its right.</li>
+        <li><b>n &gt; 30 is a working guideline,</b> not a guarantee. A nearly symmetric population can work with a smaller n.</li>
+      </ul>
+      <div class="warn">A large n does not repair selection bias or justify an unexamined independence assumption.</div>
+    </div>
+    <div class="panel">
+      <div class="ctl"><label for="s9n">n <output id="s9no"></output></label><input type="range" id="s9n" min="1" max="60" step="1" value="5"></div>
+      <div class="row"><button type="button" class="btn ghost" data-n9="1">n = 1</button><button type="button" class="btn ghost" data-n9="5">n = 5</button><button type="button" class="btn ghost" data-n9="40">n = 40</button></div>
+      <div class="chart"><svg id="s9svg" role="img" aria-label="Exact distribution of the sample mean versus the normal approximation"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>exact distribution of X̄</span><span><span class="sw ln" style="background:var(--c2)"></span>CLT normal N(4, 16/n)</span><span><span class="sw" style="background:var(--shade-hi)"></span>exact area beyond μ + 2·SD</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Skewness 2/√n</div><div class="v" id="s9sk"></div></div>
+        <div class="ro"><div class="k">SD of X̄ = 4/√n</div><div class="v" id="s9sd"></div></div>
+        <div class="ro key"><div class="k">Exact P(X̄ &gt; μ + 2SD)</div><div class="v" id="s9r"></div></div>
+        <div class="ro"><div class="k">Normal says</div><div class="v">0.0228</div></div>
+        <div class="ro key"><div class="k">Exact P(X̄ &lt; μ − 2SD)</div><div class="v" id="s9l"></div></div>
+        <div class="ro"><div class="k">Normal says</div><div class="v">0.0228</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 10 ============ -->
+<section class="station" id="s10">
+  <div class="head">
+    <span class="eyebrow">Station 10 · Added: not in the slides</span>
+    <h2>What the CLT approximates, and when you need it</h2>
+    <p>The CLT replaces the true, often unknown, distribution of a mean or sum with a normal curve that has the right mean and variance. Then a z-table does the rest.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <h3>The problem it solves</h3>
+      <p>To find P(total of 65 processing times is between 50 and 55 h) exactly, you would need (1) the exact distribution of one processing time, which Example 13 doesn't give, and (2) the distribution of a sum of 65 of them, which is hard even when (1) is known. The CLT skips both steps and needs only μ and σ.</p>
+      <h3>Use it for</h3>
+      <ul>
+        <li><b>Totals:</b> machine time, load on a structure, time to clear a job queue.</li>
+        <li><b>Averages:</b> the mean of 40 sensor readings or 40 waiting times.</li>
+        <li><b>Counts:</b> a binomial count is a sum of 0/1 trials (Station 11); a Poisson count is a sum of many small independent pieces (Station 12).</li>
+        <li><b>Later in the course:</b> confidence intervals and hypothesis tests for means and proportions.</li>
+      </ul>
+      <h3>Don't use it for</h3>
+      <ul><li><b>One observation.</b> P(a single wait &gt; 5 s) uses the exponential. One wait is not normal, whatever n you collected.</li></ul>
+    </div>
+    <div class="panel">
+      <div class="vsgrid">
+        <div class="side">
+          <h3>One wait: P(T &gt; 5)</h3>
+          <div class="readouts">
+            <div class="ro good"><div class="k">Exponential (correct)</div><div class="v" id="s10a"></div></div>
+            <div class="ro bad"><div class="k">Normal N(4, 4²)</div><div class="v" id="s10b"></div></div>
+          </div>
+          <p style="font-size:.88rem">Using a normal curve on a single skewed observation is off by more than 11 percentage points.</p>
+        </div>
+        <div class="side">
+          <h3>Mean of 40 waits: P(X̄ &gt; 5)</h3>
+          <div class="readouts">
+            <div class="ro"><div class="k">Exact (gamma)</div><div class="v" id="s10c"></div></div>
+            <div class="ro good"><div class="k">CLT N(4, 16/40)</div><div class="v" id="s10d"></div></div>
+          </div>
+          <p style="font-size:.88rem">For the average of 40, the CLT answer is close to the exact one.</p>
+        </div>
+      </div>
+      <h3>Which rule? Decide, then reveal.</h3>
+      <div class="checks">
+        <div class="check"><span class="claim">The time until the next hit on a server.</span><button type="button" class="btn ghost" data-rev="w1">Reveal</button><div class="fix" id="w1" hidden><b>Exponential, no CLT.</b><span>One waiting time.</span></div></div>
+        <div class="check"><span class="claim">The average of 50 independent resistor readings.</span><button type="button" class="btn ghost" data-rev="w2">Reveal</button><div class="fix" id="w2" hidden><b>CLT for X̄, SD σ/√50.</b><span>A mean of many iid observations.</span></div></div>
+        <div class="check"><span class="claim">Total machine-hours for 65 parts.</span><button type="button" class="btn ghost" data-rev="w3">Reveal</button><div class="fix" id="w3" hidden><b>CLT for S<sub>n</sub>, SD σ√65.</b><span>A sum of many iid times (Example 13). No ±0.5: time is continuous.</span></div></div>
+        <div class="check"><span class="claim">Heads in 100 fair tosses.</span><button type="button" class="btn ghost" data-rev="w4">Reveal</button><div class="fix" id="w4" hidden><b>Normal approximation to Bin(100, 0.5), with ±0.5.</b><span>A count is a sum of 0/1 trials, so this is the CLT too.</span></div></div>
+        <div class="check"><span class="claim">The diameter of one randomly chosen bearing.</span><button type="button" class="btn ghost" data-rev="w5">Reveal</button><div class="fix" id="w5" hidden><b>Whatever model fits one bearing, no CLT.</b><span>The CLT says nothing about a single observation.</span></div></div>
+        <div class="check"><span class="claim">Requests in an hour when the mean is 180.</span><button type="button" class="btn ghost" data-rev="w6">Reveal</button><div class="fix" id="w6" hidden><b>N(180, 180), SD √180 ≈ 13.4, with ±0.5.</b><span>A large Poisson count (Station 12).</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 11 ============ -->
+<section class="station" id="s11">
+  <div class="head">
+    <span class="eyebrow">Station 11 · Slide 20</span>
+    <h2>A binomial count is a sum, so the CLT applies</h2>
+    <p>If X ~ Bin(n, p) with np &gt; 10 and n(1 − p) &gt; 10, then X ≈ N(np, np(1 − p)). Both checks keep the distribution from piling up against 0 or n.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="deriv">
+        <span class="added">Added: from class discussion</span>
+        <h3>Same CLT, not an extension</h3>
+        <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>Let B<sub>i</sub> = 1 for a success on trial i and 0 otherwise. Each B<sub>i</sub> ~ Bernoulli(p).</span><div class="formula"><i>μ</i> = <i>p</i>, &nbsp; <i>σ</i>² = <i>p</i>(1 − <i>p</i>)</div></div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>The count is the sum of the trials, which is slide 16's S<sub>n</sub>.</span><div class="formula"><i>X</i> = <i>B</i><sub>1</sub> + <i>B</i><sub>2</sub> + ⋯ + <i>B<sub>n</sub></i></div></div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dbody"><span>Plug into the sum formula.</span><div class="formula"><i>nμ</i> = <i>np</i>, &nbsp; <i>nσ</i>² = <i>np</i>(1 − <i>p</i>)</div></div></div>
+        <div class="dstep"><div class="dnum">4</div><div class="dbody"><span>The proportion p̂ = X/n is the sample mean of the 0/1 outcomes.</span><div class="formula"><i>p̂</i> ≈ N(<i>p</i>, <i>p</i>(1 − <i>p</i>)/<i>n</i>)</div></div></div>
+      </div>
+      <h3>Does it need a very large n?</h3>
+      <p>Only when p is near 0 or 1. The rule counts expected successes and failures, not n alone.</p>
+      <div class="tbl"><table class="small" id="s11tbl">
+        <thead><tr><th>p</th><th>Smallest n with np &gt; 10 and n(1 − p) &gt; 10</th></tr></thead>
+        <tbody><tr><td>0.5</td><td>21</td></tr><tr><td>0.2</td><td>51</td></tr><tr><td>0.05</td><td>201</td></tr><tr><td>0.01</td><td>1001</td></tr></tbody>
+      </table></div>
+      <div class="warn">The second normal parameter is the variance. The count SD is √[np(1 − p)].</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s11n">Trials n <output id="s11no"></output></label><input type="range" id="s11n" min="5" max="400" step="1" value="100"></div>
+        <div class="ctl"><label for="s11p">Success probability p <output id="s11po"></output></label><input type="range" id="s11p" min="0.01" max="0.99" step="0.01" value="0.5"></div>
+      </div>
+      <div class="row"><span id="s11chk"></span></div>
+      <div class="chart"><svg id="s11svg" role="img" aria-label="Binomial probabilities with the normal approximation"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade);outline:1px solid var(--bar)"></span>Bin(n, p) probabilities</span><span><span class="sw ln" style="background:var(--hi)"></span>N(np, np(1 − p))</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">np</div><div class="v" id="s11a"></div></div>
+        <div class="ro"><div class="k">n(1 − p)</div><div class="v" id="s11b"></div></div>
+        <div class="ro"><div class="k">SD √[np(1 − p)]</div><div class="v" id="s11sd"></div></div>
+        <div class="ro"><div class="k">Skewness</div><div class="v" id="s11sk"></div></div>
+        <div class="ro key"><div class="k">Smallest n for this p</div><div class="v" id="s11min"></div></div>
+      </div>
+      <div class="side">
+        <h3>One sample of n trials, as 0/1 outcomes</h3>
+        <div class="row"><button type="button" class="btn ghost" id="s11toss">Run the n trials</button></div>
+        <div class="squares" id="s11sq" aria-label="Outcomes of each trial"></div>
+        <p style="font-size:.9rem" id="s11sum"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 12 ============ -->
+<section class="station" id="s12">
+  <div class="head">
+    <span class="eyebrow">Station 12 · Slide 21</span>
+    <h2>A Poisson count is a sum too</h2>
+    <p>If X ~ Poisson(λ) with λ &gt; 10, then X ≈ N(λ, λ). The mean and variance are both λ, so the SD is √λ. The slide corrects a source that wrote N(λ, λ²).</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="warn">Notation: here λ is the <b>mean count in the interval</b> (λt in slide 7's notation), not the per-unit-time rate of Part A.</div>
+      <div class="deriv">
+        <span class="added">Added: from class discussion</span>
+        <h3>Cut the window into pieces</h3>
+        <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>Counts in non-overlapping parts of a Poisson process are independent. Split the window into m equal pieces.</span><div class="formula"><i>X</i> = <i>N</i><sub>1</sub> + <i>N</i><sub>2</sub> + ⋯ + <i>N<sub>m</sub></i>, &nbsp; <i>N<sub>i</sub></i> ~ Poisson(<i>λ</i>/<i>m</i>) iid</div></div></div>
+        <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>Choose pieces with mean count 1, so m = λ and each N<sub>i</sub> has μ = 1, σ² = 1.</span><div class="formula"><i>nμ</i> = <i>λ</i> · 1 = <i>λ</i>, &nbsp; <i>nσ</i>² = <i>λ</i> · 1 = <i>λ</i></div></div></div>
+        <div class="dstep"><div class="dnum">3</div><div class="dbody"><span>The CLT sum formula gives slide 21 exactly.</span><div class="formula"><i>X</i> ≈ N(<i>λ</i>, <i>λ</i>)</div></div></div>
+      </div>
+      <ul>
+        <li><b>λ plays the role of n:</b> it is how many unit-mean pieces are added. λ &gt; 10 is the Poisson counterpart of n &gt; 30 or np &gt; 10.</li>
+        <li><b>Another view:</b> cut the window into very many tiny slices, each with at most one event. Then X is a binomial count with large n and small p, the classical route from binomial to Poisson.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <div class="ctl"><label for="s12l">Mean count λ <output id="s12lo"></output></label><input type="range" id="s12l" min="1" max="40" step="1" value="12"></div>
+      <div class="row"><span id="s12chk"></span></div>
+      <div class="chart"><svg id="s12svg" role="img" aria-label="Poisson probabilities with the correct and incorrect normal approximations"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade);outline:1px solid var(--bar)"></span>Poisson(λ)</span><span><span class="sw ln" style="background:var(--c2)"></span>N(λ, λ) correct</span><span><span class="sw ln" style="background:var(--hi)"></span>N(λ, λ²) wrong</span></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Mean = variance</div><div class="v" id="s12m"></div></div>
+        <div class="ro key"><div class="k">SD √λ</div><div class="v" id="s12sd"></div></div>
+        <div class="ro bad"><div class="k">Wrong SD λ</div><div class="v" id="s12w"></div></div>
+        <div class="ro"><div class="k">Skewness 1/√λ</div><div class="v" id="s12sk"></div></div>
+      </div>
+      <div class="side">
+        <h3>One window, split into λ unit-mean pieces</h3>
+        <div class="row"><button type="button" class="btn ghost" id="s12new">Simulate a window</button></div>
+        <div class="pieces" id="s12pc"></div>
+        <p style="font-size:.9rem" id="s12sum"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 13 ============ -->
+<section class="station" id="s13">
+  <div class="head">
+    <span class="eyebrow">Station 13 · Slides 22–23, 29–31 · Example 14</span>
+    <h2>Continuity correction: give each integer a width</h2>
+    <p>A count puts probability on integers; the normal curve gives area. Treat each integer k as a bar from k − 0.5 to k + 0.5. Included endpoints keep their full bars, excluded ones lose them.</p>
+  </div>
+  <div class="grid2">
+    <div class="concept">
+      <div class="tbl"><table class="small">
+        <thead><tr><th>Discrete event</th><th>Continuous event</th></tr></thead>
+        <tbody><tr><td>X ≤ k</td><td>Y &lt; k + 0.5</td></tr><tr><td>X &lt; k</td><td>Y &lt; k − 0.5</td></tr><tr><td>X ≥ k</td><td>Y &gt; k − 0.5</td></tr><tr><td>X &gt; k</td><td>Y &gt; k + 0.5</td></tr><tr><td>a ≤ X ≤ b</td><td>a − 0.5 &lt; Y &lt; b + 0.5</td></tr><tr><td>a &lt; X &lt; b</td><td>a + 0.5 &lt; Y &lt; b − 0.5</td></tr></tbody>
+      </table></div>
+      <ul>
+        <li><b>Easiest route:</b> rewrite the event as an inclusive range of integers first (X &lt; 10 becomes X ≤ 9), then add 0.5 outward on both ends.</li>
+        <li>&lt; versus ≤ for Y doesn't matter, because Y is continuous.</li>
+        <li><b>Example 14:</b> X ~ Bin(100, 0.5), so Y ~ N(50, 25) and σ = 5. 45 ≤ X ≤ 55 becomes 44.5 &lt; Y &lt; 55.5, z = ±1.10, area 0.7287.</li>
+        <li><b>The exact binomial answer is also about 0.7287.</b> Without the correction, z = ±1 gives 0.6827, about 4.6 points too low.</li>
+      </ul>
+      <div class="warn">Only integer counts get ±0.5. Machine-hours in Example 13 are continuous and get none.</div>
+    </div>
+    <div class="panel">
+      <p style="font-size:.93rem">X ~ Bin(100, 0.5), approximated by Y ~ N(50, 25).</p>
+      <div class="seg" role="group" aria-label="Event type" id="s13type"><button type="button" data-t="ab" aria-pressed="true">a ≤ X ≤ b</button><button type="button" data-t="aob" aria-pressed="false">a &lt; X &lt; b</button><button type="button" data-t="le" aria-pressed="false">X ≤ a</button><button type="button" data-t="lt" aria-pressed="false">X &lt; a</button><button type="button" data-t="ge" aria-pressed="false">X ≥ a</button><button type="button" data-t="gt" aria-pressed="false">X &gt; a</button></div>
+      <div class="controls">
+        <div class="ctl"><label for="s13a">a <output id="s13ao"></output></label><input type="range" id="s13a" min="32" max="68" step="1" value="45"></div>
+        <div class="ctl" id="s13bctl"><label for="s13b">b <output id="s13bo"></output></label><input type="range" id="s13b" min="32" max="68" step="1" value="55"></div>
+      </div>
+      <div class="row"><button type="button" class="btn ghost" id="s13ex">Example 14: 45 to 55 inclusive</button></div>
+      <div class="chart"><svg id="s13svg" role="img" aria-label="Binomial bars with included integers highlighted and the corrected normal boundaries"></svg></div>
+      <div class="legend"><span><span class="sw" style="background:var(--shade-hi);outline:1px solid var(--hi)"></span>included integers</span><span><span class="sw ln" style="background:var(--hi)"></span>corrected boundary</span><span><span class="sw ln" style="background:var(--muted)"></span>uncorrected boundary</span></div>
+      <div class="formula live" id="s13f"></div>
+      <div class="readouts">
+        <div class="ro"><div class="k">Exact binomial</div><div class="v" id="s13ex1"></div></div>
+        <div class="ro key"><div class="k">Normal with ±0.5</div><div class="v" id="s13c"></div></div>
+        <div class="ro bad"><div class="k">Normal without</div><div class="v" id="s13u"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATION 14 ============ -->
+<section class="station" id="s14">
+  <div class="head">
+    <span class="eyebrow">Station 14 · Slides 24–28 · Example 13</span>
+    <h2>Total processing time for 65 parts</h2>
+    <p>Each part needs a Machine 1 operation (mean 0.40 h, SD 0.10 h) and a Machine 2 operation (mean 0.45 h, SD 0.15 h). Find P(50 &lt; combined total &lt; 55 h).</p>
+  </div>
+  <div class="grid2">
+    <div class="deriv">
+      <h3>Worked solution</h3>
+      <div class="dstep"><div class="dnum">1</div><div class="dbody"><span>Define the sums. X<sub>i</sub> and Y<sub>i</sub> are the machine-1 and machine-2 times for part i.</span><div class="formula"><i>S</i><sub>1</sub> = Σ<i>X<sub>i</sub></i>, &nbsp; <i>S</i><sub>2</sub> = Σ<i>Y<sub>i</sub></i>, &nbsp; <i>S</i> = <i>S</i><sub>1</sub> + <i>S</i><sub>2</sub></div></div></div>
+      <div class="dstep"><div class="dnum">2</div><div class="dbody"><span>Assume independent parts, the same moments for every part, and independent machine sequences. Then the moments are exact; only the normal shape is approximate.</span></div></div>
+      <div class="dstep"><div class="dnum">3</div><div class="dbody"><span>Square each SD first, then multiply by 65.</span><div class="formula"><i>S</i><sub>1</sub> ≈ N(26.00, 0.6500), &nbsp; <i>S</i><sub>2</sub> ≈ N(29.25, 1.4625)</div></div></div>
+      <div class="dstep"><div class="dnum">4</div><div class="dbody"><span>Add means and add variances, then take the square root.</span><div class="formula"><i>S</i> ≈ N(55.25, 2.1125), &nbsp; <i>σ<sub>S</sub></i> ≈ 1.4534 h</div></div></div>
+      <div class="dstep"><div class="dnum">5</div><div class="dbody"><span>Standardize. No continuity correction: S is a continuous time.</span><div class="formula"><i>z<sub>L</sub></i> ≈ −3.6121, &nbsp; <i>z<sub>U</sub></i> ≈ −0.1720</div></div></div>
+      <div class="dstep"><div class="dnum">6</div><div class="dbody"><span>Take the difference of the left-tail areas.</span><div class="formula">Φ(−0.1720) − Φ(−3.6121) ≈ 0.4316</div></div></div>
+      <p class="muted" style="font-size:.88rem">Plausibility: the whole interval lies below the mean of 55.25 h, so the answer must be under 0.5. The lower limit is 3.6 SDs away and removes almost nothing.</p>
+      <div class="note">This is total machine-hours, not the clock time of a schedule where the two machines run in parallel.</div>
+    </div>
+    <div class="panel">
+      <div class="controls">
+        <div class="ctl"><label for="s14L">Lower limit (h) <output id="s14Lo"></output></label><input type="range" id="s14L" min="49" max="61" step="0.25" value="50"></div>
+        <div class="ctl"><label for="s14U">Upper limit (h) <output id="s14Uo"></output></label><input type="range" id="s14U" min="49" max="61" step="0.25" value="55"></div>
+      </div>
+      <div class="row"><button type="button" class="btn ghost" id="s14ex">Example 13: 50 to 55 h</button></div>
+      <div class="chart"><svg id="s14svg" role="img" aria-label="Normal approximation to the combined total with the interval shaded"></svg></div>
+      <div class="legend"><span><span class="sw ln" style="background:var(--bar)"></span>S ≈ N(55.25, 2.1125)</span><span><span class="sw ln" style="background:var(--hi)"></span>SDs added (wrong)</span></div>
+      <div class="formula live" id="s14f"></div>
+      <div class="readouts">
+        <div class="ro key"><div class="k">P(L &lt; S &lt; U)</div><div class="v" id="s14p"></div></div>
+        <div class="ro bad"><div class="k">With SDs added</div><div class="v" id="s14w"></div></div>
+        <div class="ro"><div class="k">Correct σ<sub>S</sub></div><div class="v">1.4534 h</div></div>
+        <div class="ro bad"><div class="k">0.806 + 1.209</div><div class="v">2.0156 h</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHECK ============ -->
+<section class="station" id="s15">
+  <div class="head">
+    <span class="eyebrow">Slides 14, 32–36</span>
+    <h2>Common mistakes and concept check</h2>
+    <p>A correct formula used for the wrong variable still gives a wrong probability. Identify the variable before you choose the rule.</p>
+  </div>
+  <div class="mistakes">
+    <div class="mk"><span class="n">01</span><b>Treating λ as a time</b><span>λ is a rate; the mean wait is 1/λ.</span><a href="#s1">Station 1</a></div>
+    <div class="mk"><span class="n">02</span><b>Mixing minutes and seconds</b><span>Convert so λt has no units.</span><a href="#s4">Station 4</a></div>
+    <div class="mk"><span class="n">03</span><b>CDF for "longer than t"</b><span>A longer wait is the right tail e<sup>−λt</sup> = 1 − F(t).</span><a href="#s2">Station 2</a></div>
+    <div class="mk"><span class="n">04</span><b>Using s + t after conditioning</b><span>Only the additional t remains in the exponent.</span><a href="#s6">Station 6</a></div>
+    <div class="mk"><span class="n">05</span><b>"n &gt; 30 makes my data normal"</b><span>The CLT concerns the mean or sum, never the data.</span><a href="#s7">Station 7</a></div>
+    <div class="mk"><span class="n">06</span><b>Standardizing X̄ with σ</b><span>Use its own SD, σ/√n.</span><a href="#s8">Station 8</a></div>
+    <div class="mk"><span class="n">07</span><b>Poisson as N(λ, λ²)</b><span>Variance λ, SD √λ.</span><a href="#s12">Station 12</a></div>
+    <div class="mk"><span class="n">08</span><b>Adding the two machine SDs</b><span>Add independent variances, then take the square root.</span><a href="#s14">Station 14</a></div>
+    <div class="mk"><span class="n">09</span><b>±0.5 on every normal calculation</b><span>Only for an integer count.</span><a href="#s13">Station 13</a></div>
+  </div>
+  <p><b>Concept check (slide 33).</b> Give the variable, the rule, and one sentence of reasoning before you reveal.</p>
+  <div class="checks">
+    <div class="check"><span class="tag">A</span><span class="claim">If an exponential event rate doubles, what happens to the mean wait?</span><button type="button" class="btn ghost" data-rev="ca">Reveal</button><div class="fix" id="ca" hidden><b>It is halved.</b><span>E[T] = 1/λ, so 1/(2λ) is half as large.</span></div></div>
+    <div class="check"><span class="tag">B</span><span class="claim">After already waiting s, what enters the exponent for another t-unit wait?</span><button type="button" class="btn ghost" data-rev="cb">Reveal</button><div class="fix" id="cb" hidden><b>λt, so use e<sup>−λt</sup>.</b><span>The elapsed s cancels after conditioning.</span></div></div>
+    <div class="check"><span class="tag">C</span><span class="claim">For a sum of n iid observations, is the SD σ/n, σ√n, or nσ?</span><button type="button" class="btn ghost" data-rev="cc">Reveal</button><div class="fix" id="cc" hidden><b>σ√n.</b><span>Var(S<sub>n</sub>) = nσ² under independence. σ/n shrinks the wrong way; nσ would need perfect correlation.</span></div></div>
+    <div class="check"><span class="tag">D</span><span class="claim">Why is a half-unit correction used for heads but not for machine-hours?</span><button type="button" class="btn ghost" data-rev="cd">Reveal</button><div class="fix" id="cd" hidden><b>Correct the heads only.</b><span>Counts are discrete; machine-hours are continuous.</span></div></div>
+    <div class="check"><span class="tag">E</span><span class="claim">For a Poisson count with mean λ, what is the normal approximation's SD?</span><button type="button" class="btn ghost" data-rev="ce">Reveal</button><div class="fix" id="ce" hidden><b>√λ.</b><span>A Poisson count has variance λ, not λ².</span></div></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>What is being described?</th><th>Model or method</th><th>Essential check</th></tr></thead>
+    <tbody>
+      <tr><td>Time to the next Poisson event</td><td>Exponential waiting time</td><td>Rate and time units agree</td></tr>
+      <tr><td>An additional wait after no event</td><td>Memoryless property</td><td>Use only the extra duration</td></tr>
+      <tr><td>A mean or sum of many observations</td><td>CLT normal approximation</td><td>Independence, finite variance, correct SD</td></tr>
+      <tr><td>A large binomial or Poisson count</td><td>Normal approximation</td><td>Moments and count boundaries</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Before you calculate, ask (slide 36):</b> Variable: count, waiting time, sum or mean? Assumptions: what justifies the model? Scale: are units, variance and SD consistent? Event: does an integer boundary need a correction? Then define → check assumptions → match units → translate the event → calculate → verify.</div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const SQ2PI=Math.sqrt(2*Math.PI);
+const pdf=(x,m=0,s=1)=>Math.exp(-((x-m)**2)/(2*s*s))/(s*SQ2PI);
+function erf(x){const t=1/(1+0.3275911*Math.abs(x));const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return x>=0?y:-y;}
+const Phi=z=>z===Infinity?1:z===-Infinity?0:0.5*(1+erf(z/Math.SQRT2));
+const f=(v,d=2)=>{const s=Math.abs(v).toFixed(d);return (v<0&&+s!==0?'−':'')+s;};
+const fp=p=>p<1e-4?(p<1e-12?'≈ 0':p.toExponential(1).replace('e-',' × 10⁻').replace(/⁻(\d+)/,(m,g)=>'⁻'+g.split('').map(ch=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[ch]).join(''))):p.toFixed(4);
+function setText(id,t){$(id).textContent=t;}
+function seg(groupEl,attr,cb){groupEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{groupEl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));cb(b.dataset[attr]);}));}
+function press(groupEl,attr,val){groupEl.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset[attr]===String(val)));}
+const expR=l=>-Math.log(1-Math.random())/l;
+function lgamma(z){const c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  if(z<0.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z);z-=1;let x=c[0];for(let i=1;i<9;i++)x+=c[i]/(z+i);const t=z+7.5;return 0.5*Math.log(2*Math.PI)+(z+0.5)*Math.log(t)-t+Math.log(x);}
+const binpmf=(k,n,p)=>(k<0||k>n)?0:Math.exp(lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1)+k*Math.log(p)+(n-k)*Math.log(1-p));
+const poipmf=(k,l)=>k<0?0:Math.exp(-l+k*Math.log(l)-lgamma(k+1));
+const gampdf=(x,k,r)=>x<=0?0:Math.exp(k*Math.log(r)+(k-1)*Math.log(x)-r*x-lgamma(k));
+function erlangSurv(x,k,r){if(x<=0)return 1;const y=r*x;let term=Math.exp(-y),s=term;for(let i=1;i<k;i++){term*=y/i;s+=term;}return Math.min(1,s);}
+function poiR(m){const L=Math.exp(-m);let k=0,p=1;do{k++;p*=Math.random();}while(p>L);return k-1;}
+function nice(span){const raw=span/5,p=Math.pow(10,Math.floor(Math.log10(raw))),r=raw/p;return (r<1.5?1:r<3?2:r<7?5:10)*p;}
+function ticks(a,b){const st=nice(b-a),d=st<1?(st<0.1?2:1):0,o=[];for(let v=Math.ceil(a/st)*st;v<=b+1e-9;v+=st)o.push({v,l:f(v,d)});return o;}
+function hist(data,x0,x1,nb){const w=(x1-x0)/nb,c=new Array(nb).fill(0);data.forEach(v=>{const i=Math.floor((v-x0)/w);if(i>=0&&i<nb)c[i]++;});return c.map((n,i)=>({a:x0+i*w,b:x0+(i+1)*w,h:data.length?n/(data.length*w):0}));}
+
+/* generic plot (same helper as the Lecture 11 lab) */
+function plot(svg,o){
+  const W=o.w||640,H=o.h||250,L=o.L??46,R=16,Tp=20,B=o.rug?62:42;
+  const X=x=>L+(x-o.x0)/(o.x1-o.x0)*(W-L-R);
+  const Y=y=>H-B-(Math.min(y,o.y1*1.03)/o.y1)*(H-B-Tp);
+  let s='';
+  (o.yt||[]).forEach(v=>{s+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${o.yfmt?o.yfmt(v):v}</text>`;});
+  (o.bars||[]).forEach(b=>{const a=Math.max(b.a,o.x0),bb=Math.min(b.b,o.x1);if(bb<=a)return;s+=`<rect class="bar ${b.cls||''}" x="${X(a)}" y="${Y(b.h)}" width="${Math.max(0,X(bb)-X(a))}" height="${Math.max(0,Y(0)-Y(b.h))}"/>`;});
+  (o.shade||[]).forEach(sh=>{const a=Math.max(sh.a,o.x0),b=Math.min(sh.b,o.x1);if(b<=a)return;let d=`M${X(a).toFixed(1)},${Y(0)}`;const n=160;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;d+=`L${X(x).toFixed(1)},${Y(sh.f(x)).toFixed(1)}`;}d+=`L${X(b).toFixed(1)},${Y(0)}Z`;s+=`<path class="shade ${sh.cls||''}" d="${d}"/>`;});
+  (o.curves||[]).forEach(c=>{let d='';const n=400;const a=c.a??o.x0,b=c.b??o.x1;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;d+=(i?'L':'M')+X(x).toFixed(1)+','+Y(c.f(x)).toFixed(1);}s+=`<path class="curve ${c.cls||''}" d="${d}"/>`;});
+  s+=`<line class="ax" x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  (o.vlines||[]).forEach(v=>{if(v.x<o.x0||v.x>o.x1)return;const top=v.top!=null?Y(v.top):Tp;s+=`<line class="vl ${v.cls||''}" x1="${X(v.x)}" x2="${X(v.x)}" y1="${Y(0)}" y2="${top}"/>`;if(v.label)s+=`<text class="lab ${v.lcls||''}" x="${X(v.x)+(v.dx??4)}" y="${top+(v.dy??10)}" text-anchor="${v.anchor||'start'}">${v.label}</text>`;});
+  (o.rug||[]).forEach(r=>{if(r.x<o.x0||r.x>o.x1)return;s+=`<line class="rug ${r.cls||''}" x1="${X(r.x).toFixed(1)}" x2="${X(r.x).toFixed(1)}" y1="${Y(0)+5}" y2="${Y(0)+17}"/>`;});
+  const ty=Y(0)+(o.rug?34:16);
+  (o.xt||[]).forEach(t=>{const v=typeof t==='object'?t.v:t,l=typeof t==='object'?t.l:f(t,o.xd??0);if(v<o.x0-1e-9||v>o.x1+1e-9)return;s+=`<line class="ax" x1="${X(v)}" x2="${X(v)}" y1="${Y(0)}" y2="${Y(0)+4}"/><text x="${X(v)}" y="${ty}" text-anchor="middle">${l}</text>`;});
+  (o.dots||[]).forEach(p=>{s+=`<circle class="dot ${p.cls||''}" cx="${X(p.x)}" cy="${Y(p.y)}" r="${p.r||4}"/>`;});
+  (o.labels||[]).forEach(l=>{s+=`<text class="lab ${l.cls||''}" x="${X(l.x)}" y="${Y(l.y)}" text-anchor="${l.anchor||'middle'}">${l.t}</text>`;});
+  if(o.xlabel)s+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle">${o.xlabel}</text>`;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML=s;return{X,Y};
+}
+
+/* ===== Station 1 ===== */
+function r1(){const l=+$('s1l').value;let a=+$('s1a').value,b=+$('s1b').value;
+  setText('s1lo',l.toFixed(2));setText('s1ao',a.toFixed(2));setText('s1bo',b.toFixed(2));
+  if(b<a)[a,b]=[b,a];
+  const fx=x=>x<0?0:l*Math.exp(-l*x);
+  plot($('s1svg'),{x0:0,x1:6,y1:2.6,yt:[0,0.5,1,1.5,2,2.5],yfmt:v=>v.toFixed(1),
+    shade:[{a,b,f:fx,cls:'hi'}],
+    curves:[{f:x=>0.5*Math.exp(-0.5*x),cls:'ghost'},{f:x=>Math.exp(-x),cls:'ghost'},{f:x=>2*Math.exp(-2*x),cls:'ghost'},{f:fx}],
+    vlines:[{x:1/l,top:Math.min(2.5,fx(1/l)+0.35),label:'mean 1/λ',dy:-6,dx:6}],
+    dots:[{x:0,y:l}],labels:[{x:0.14,y:Math.min(l,2.45)+0.06,t:'f(0) = λ = '+l.toFixed(2),anchor:'start',cls:'hi'}],
+    xt:[0,1,2,3,4,5,6],xlabel:'time t'});
+  setText('s1pk',l.toFixed(2)+(l>1?' (> 1, fine)':''));
+  setText('s1m',(1/l).toFixed(3));setText('s1v',(1/(l*l)).toFixed(3));
+  setText('s1ar',(Math.exp(-l*a)-Math.exp(-l*b)).toFixed(4));
+}
+['s1l','s1a','s1b'].forEach(id=>$(id).addEventListener('input',r1));
+
+/* ===== Station 2 ===== */
+function r2(){const u=+$('s2u').value;setText('s2uo',u.toFixed(2));
+  const F=1-Math.exp(-u),S=Math.exp(-u);
+  plot($('s2svg'),{x0:0,x1:4,y1:1,yt:[0,0.25,0.5,0.75,1],yfmt:v=>v.toFixed(2),
+    curves:[{f:x=>1-Math.exp(-x)},{f:x=>Math.exp(-x),cls:'hi'}],
+    vlines:[{x:Math.LN2,top:0.5,cls:'soft',label:'ln 2 ≈ 0.693',dy:-26,dx:-4,anchor:'middle'},{x:u,top:1,cls:'',label:'u = '+u.toFixed(2),dx:6}],
+    dots:[{x:u,y:F,cls:'bar'},{x:u,y:S},{x:Math.LN2,y:0.5,cls:'solid',r:3}],
+    xt:[0,0.5,1,1.5,2,2.5,3,3.5,4],xd:1,xlabel:'scaled time u = λt'});
+  setText('s2F',F.toFixed(4));setText('s2S',S.toFixed(4));setText('s2sum',(F+S).toFixed(4));
+}
+$('s2u').addEventListener('input',r2);
+function r2b(){const l=+$('s2l').value;setText('s2lo',l.toFixed(2));
+  const med=Math.LN2/l,mean=1/l,x1=5/l,fx=x=>x<0?0:l*Math.exp(-l*x);
+  plot($('s2svg2'),{x0:0,x1,y1:l*1.08,yt:[0,l/2,l],yfmt:v=>v.toFixed(2),w:560,h:220,
+    shade:[{a:0,b:mean,f:fx}],curves:[{f:fx}],
+    vlines:[{x:med,top:l*0.92,cls:'c2',lcls:'c2',label:'median',dy:-4,anchor:'end',dx:-4},{x:mean,top:l*0.72,cls:'hi',lcls:'hi',label:'mean',dy:-4}],
+    xt:ticks(0,x1),xlabel:'waiting time t'});
+  setText('s2med',med.toFixed(2));setText('s2mean',mean.toFixed(2));setText('s2pm',(1-Math.exp(-1)).toFixed(4));
+}
+$('s2l').addEventListener('input',r2b);
+
+/* ===== Station 3 ===== */
+let s3ev=[];
+function gen3(){const l=+$('s3l').value;s3ev=[];let x=0;for(;;){x+=expR(l);if(x>10)break;s3ev.push(x);}draw3();}
+function draw3(){const l=+$('s3l').value,t=+$('s3t').value;setText('s3lo',l.toFixed(1));setText('s3to',t.toFixed(1));
+  const W=640,H=120,L=24,R=20,X=x=>L+x/10*(W-L-R),y=64;
+  let s=`<rect class="band" x="${X(0)}" y="${y-30}" width="${X(t)-X(0)}" height="60"/>`;
+  s+=`<text class="lab bar" x="${X(t)-4}" y="${y-36}" text-anchor="end">window [0, t]</text>`;
+  s+=`<line class="tl" x1="${X(0)}" x2="${X(10)}" y1="${y}" y2="${y}"/>`;
+  for(let i=0;i<=10;i++)s+=`<line class="tick" x1="${X(i)}" x2="${X(i)}" y1="${y}" y2="${y+6}"/><text x="${X(i)}" y="${y+20}" text-anchor="middle">${i}</text>`;
+  s3ev.forEach((e,i)=>{s+=`<circle class="ev ${i===0?'first':''}" cx="${X(e)}" cy="${y}" r="${i===0?7:5}"/>`;});
+  if(s3ev.length)s+=`<text class="lab hi" x="${X(s3ev[0])}" y="${y-14}" text-anchor="middle">T = ${s3ev[0].toFixed(2)}</text>`;
+  s+=`<text x="${(W)/2}" y="${H-4}" text-anchor="middle">time</text>`;
+  $('s3svg').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s3svg').innerHTML=s;
+  const N=s3ev.filter(e=>e<=t).length,T=s3ev.length?s3ev[0]:Infinity;
+  setText('s3N',N);setText('s3T',T===Infinity?'> 10':T.toFixed(2));
+  setText('s3a',T>t?'yes':'no');setText('s3b',N===0?'yes':'no');
+  setText('s3th',Math.exp(-l*t).toFixed(4));
+}
+$('s3l').addEventListener('input',()=>{gen3();clr3();});$('s3t').addEventListener('input',()=>{draw3();clr3();});
+$('s3new').addEventListener('click',gen3);
+function clr3(){setText('s3f1','—');setText('s3f2','—');}
+$('s3sim').addEventListener('click',()=>{const l=+$('s3l').value,t=+$('s3t').value,K=2000;let a=0,b=0;
+  for(let k=0;k<K;k++){const T=expR(l);let n=0,x=T;while(x<=t){n++;x+=expR(l);}if(T>t)a++;if(n===0)b++;}
+  setText('s3f1',(a/K).toFixed(4));setText('s3f2',(b/K).toFixed(4));});
+
+/* ===== Station 4 ===== */
+let s4u='s';
+function r4(){const t=+$('s4t').value;setText('s4to',t.toFixed(1));const l=0.25;
+  const fx=x=>x<0?0:l*Math.exp(-l*x),P=Math.exp(-l*t);
+  plot($('s4svg'),{x0:0,x1:16,y1:0.27,yt:[0,0.1,0.2],yfmt:v=>v.toFixed(1),
+    shade:[{a:t,b:16,f:fx,cls:'hi'}],curves:[{f:fx}],
+    vlines:[{x:t,top:fx(t)+0.04,cls:'hi',label:'t = '+t,lcls:'hi',dy:-4},{x:4,top:0.24,cls:'soft',label:'mean 4 s',dy:-2}],
+    xt:[0,2,4,6,8,10,12,14,16],xlabel:'waiting time (s)'});
+  const ex=(l*t).toFixed(4).replace(/0+$/,'').replace(/\.$/,'');
+  $('s4f').innerHTML=s4u==='s'
+    ? `<i>λ</i> = 15 min⁻¹ = <span class="frac"><span>15</span><span>60</span></span> s⁻¹ = 0.25 s⁻¹, &nbsp; <i>t</i> = ${t} s<br><i>λt</i> = 0.25 × ${t} = ${ex} &nbsp;⇒&nbsp; P(<i>T</i> &gt; ${t}) = <i>e</i><sup>−${ex}</sup> ≈ ${P.toFixed(4)}<br><i>E</i>[<i>T</i>] = 1/0.25 = 4 s`
+    : `<i>λ</i> = 15 min⁻¹, &nbsp; <i>t</i> = ${t}/60 = ${(t/60).toFixed(4)} min<br><i>λt</i> = 15 × ${(t/60).toFixed(4)} = ${ex} &nbsp;⇒&nbsp; P(<i>T</i> &gt; <i>t</i>) = <i>e</i><sup>−${ex}</sup> ≈ ${P.toFixed(4)}<br><i>E</i>[<i>T</i>] = 1/15 min ≈ 0.0667 min = 4 s`;
+  setText('s4p',P.toFixed(4));setText('s4m',s4u==='s'?'4 s':'0.0667 min');
+  setText('s4w',fp(Math.exp(-15*t)));setText('s4w2',(1-P).toFixed(4));
+}
+$('s4t').addEventListener('input',r4);seg($('s4unit'),'u',u=>{s4u=u;r4();});
+
+/* ===== Station 5 ===== */
+function r5(){const l=+$('s5l').value,s=+$('s5s').value,t=+$('s5t').value;
+  setText('s5lo',l.toFixed(2));setText('s5so',s.toFixed(1));setText('s5to',t.toFixed(1));
+  // timeline
+  {const W=640,H=86,L=20,R=20,mx=Math.max(16,s+t+1),X=x=>L+x/mx*(W-L-R),y=52;
+   let h=`<rect class="band" x="${X(0)}" y="${y-30}" width="${X(s)-X(0)}" height="30"/><rect class="band hi" x="${X(s)}" y="${y-30}" width="${X(s+t)-X(s)}" height="30"/>`;
+   if(s>0)h+=`<text class="lab bar" x="${(X(0)+X(s))/2}" y="${y-11}" text-anchor="middle">elapsed s, no event</text>`;
+   h+=`<text class="lab hi" x="${X(s+t)+6}" y="${y-11}" text-anchor="start">additional t</text>`;
+   h+=`<line class="tl" x1="${X(0)}" x2="${X(mx)}" y1="${y}" y2="${y}"/>`;
+   [[0,'0'],[s,'s'],[s+t,'s + t']].forEach(([v,lb],i)=>{if(i===1&&s===0)return;h+=`<circle class="ev" cx="${X(v)}" cy="${y}" r="4"/><text class="lab" x="${X(v)}" y="${y+20}" text-anchor="middle">${lb}</text>`;});
+   $('s5tl').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s5tl').innerHTML=h;}
+  const fx=x=>x<0?0:l*Math.exp(-l*x),Ss=Math.exp(-l*s),x1=Math.max(16,s+4/l);
+  plot($('s5svg'),{x0:0,x1,y1:l*1.12,yt:[0,l/2,l],yfmt:v=>v.toFixed(2),
+    shade:[{a:0,b:t,f:fx},{a:s,b:s+t,f:x=>fx(x)/Ss,cls:'hi'}],
+    curves:[{f:fx},{f:x=>fx(x)/Ss,cls:'hi wide',a:s},{f:x=>fx(x-s),cls:'dash2',a:s}],
+    vlines:[{x:s,top:l*1.05,cls:'soft',label:'s',dy:-4}],
+    xt:ticks(0,x1),xlabel:'time (s)'});
+  const e1=(l*(s+t)),e0=(l*s),et=l*t,P=1-Math.exp(-et);
+  $('s5f').innerHTML=`P(<i>T</i> &gt; ${s+t} | <i>T</i> &gt; ${s}) = <span class="frac"><span><i>e</i><sup>−${l}·${s+t}</sup></span><span><i>e</i><sup>−${l}·${s}</sup></span></span> = <span class="frac"><span><i>e</i><sup>−${+e1.toFixed(4)}</sup></span><span><i>e</i><sup>−${+e0.toFixed(4)}</sup></span></span> = <i>e</i><sup>−${+et.toFixed(4)}</sup> ≈ ${Math.exp(-et).toFixed(4)}`;
+  setText('s5p',P.toFixed(4));setText('s5p0',P.toFixed(4));
+  setText('s5rem',(1/l).toFixed(2)+' s');setText('s5tot',(s+1/l).toFixed(2)+' s');
+  // comparison chart: three models, mean 4 s
+  const k=3,r=0.75;
+  const cE=x=>1-Math.exp(-0.25*t),cU=x=>x>=8?1:Math.min(1,t/(8-x)),cG=x=>1-erlangSurv(x+t,k,r)/erlangSurv(x,k,r);
+  plot($('s5cmp'),{x0:0,x1:7.9,y1:1,yt:[0,0.25,0.5,0.75,1],yfmt:v=>v.toFixed(2),w:560,h:220,
+    curves:[{f:cE},{f:cU,cls:'hi'},{f:cG,cls:'c2'}],
+    vlines:[{x:Math.min(s,7.9),cls:'soft',label:'s = '+s,dy:-2}],
+    xt:[0,1,2,3,4,5,6,7],xlabel:'time already waited s (s), next window t = '+t+' s'});
+  setText('s5r1','—');setText('s5r2','—');setText('s5r3','—');setText('s5r4','—');
+}
+['s5l','s5s','s5t'].forEach(id=>$(id).addEventListener('input',r5));
+$('s5sim').addEventListener('click',()=>{const l=+$('s5l').value,s=+$('s5s').value,t=+$('s5t').value,K=20000;
+  let a=0,surv=0,b=0,rem=0;for(let i=0;i<K;i++){const T=expR(l);if(T<=t)a++;if(T>s){surv++;if(T<=s+t)b++;rem+=T-s;}}
+  setText('s5r1',(a/K).toFixed(4));setText('s5r2',surv?(b/surv).toFixed(4):'—');setText('s5r3',surv?(rem/surv).toFixed(2)+' s':'—');setText('s5r4',surv.toLocaleString());});
+
+/* ===== Station 6 timeline ===== */
+(function(){const W=640,H=86,L=20,R=20,X=x=>L+x/4*(W-L-R),y=52;
+  let h=`<rect class="band" x="${X(0)}" y="${y-30}" width="${X(2)-X(0)}" height="30"/><rect class="band hi" x="${X(2)}" y="${y-30}" width="${X(3)-X(2)}" height="30"/>`;
+  h+=`<text class="lab bar" x="${X(1)}" y="${y-11}" text-anchor="middle">s = 2 quiet minutes</text><text class="lab hi" x="${X(2.5)}" y="${y-11}" text-anchor="middle">next t = 1</text>`;
+  h+=`<line class="tl" x1="${X(0)}" x2="${X(4)}" y1="${y}" y2="${y}"/>`;
+  [0,1,2,3,4].forEach(v=>{h+=`<line class="tick" x1="${X(v)}" x2="${X(v)}" y1="${y}" y2="${y+6}"/><text x="${X(v)}" y="${y+20}" text-anchor="middle">${v} min</text>`;});
+  $('s6tl').setAttribute('viewBox',`0 0 ${W} ${H}`);$('s6tl').innerHTML=h;})();
+
+/* ===== Station 7 ===== */
+const MU=4;let s7mode='mean',s7m=[],s7s=[],s7last=[];
+function draw7(k){const n=+$('s7n').value;for(let j=0;j<k;j++){const v=Array.from({length:n},()=>expR(1/MU));const s=v.reduce((a,b)=>a+b,0);s7m.push(s/n);s7s.push(s);s7last=v;}r7();}
+function r7(){const n=+$('s7n').value;setText('s7no',n);
+  const fx=x=>x<0?0:Math.exp(-x/MU)/MU;
+  plot($('s7a'),{x0:0,x1:20,y1:0.27,yt:[0,0.1,0.2],yfmt:v=>v.toFixed(1),w:600,h:190,
+    shade:[{a:0,b:20,f:fx}],curves:[{f:fx}],vlines:[{x:4,top:0.2,cls:'hi',label:'μ = 4',lcls:'hi',dy:-4}],
+    xt:[0,4,8,12,16,20],xlabel:'one wait (s)'});
+  // layer 2
+  if(s7last.length){const xb=s7last.reduce((a,b)=>a+b,0)/s7last.length,sm=xb*s7last.length;
+    plot($('s7b'),{x0:0,x1:20,y1:0.27,w:600,h:190,yt:[],
+      curves:[{f:fx,cls:'ghost'}],rug:s7last.map(x=>({x})),
+      vlines:[{x:Math.min(xb,20),top:0.2,cls:'hi',label:'x̄ = '+xb.toFixed(2),lcls:'hi',dy:-4}],
+      xt:[0,4,8,12,16,20],xlabel:'the n waits in this sample (s)'});
+    const over=s7last.filter(x=>x>20).length;
+    $('s7btxt').textContent=`${n} observation${n>1?'s':''} in one sample`+(n<=8?': '+s7last.map(x=>x.toFixed(2)).join(', ')+' s.':'.')+` Mean x̄ = ${xb.toFixed(2)} s, sum = ${sm.toFixed(2)} s.`+(over?` ${over} value${over>1?'s':''} beyond 20 s not drawn.`:'')+(n>=20?' The values still pile up near zero, like the population.':'');
+  } else {plot($('s7b'),{x0:0,x1:20,y1:0.27,w:600,h:190,curves:[{f:fx,cls:'ghost'}],xt:[0,4,8,12,16,20],xlabel:'the n waits in this sample (s)'});$('s7btxt').textContent='Draw a sample to see its n values as tick marks.';}
+  // layer 3
+  const data=s7mode==='mean'?s7m:s7s,m=s7mode==='mean'?MU:n*MU,sd=s7mode==='mean'?MU/Math.sqrt(n):MU*Math.sqrt(n);
+  const x0=0,x1=s7mode==='mean'?16:Math.max(20,m+4.5*sd);
+  const bars=hist(data,x0,x1,40);const hmax=Math.max(...bars.map(b=>b.h),pdf(m,m,sd));
+  plot($('s7c'),{x0,x1,y1:hmax*1.1,w:600,h:210,yt:[],
+    bars,curves:[{f:x=>pdf(x,m,sd),cls:'hi'}],
+    vlines:[{x:m,cls:'soft',top:hmax*1.05}],
+    xt:ticks(x0,x1),xlabel:s7mode==='mean'?'sample mean x̄ (s), one per sample':'sample sum Sₙ (s), one per sample'});
+  $('s7ctxt').innerHTML=`Each sample contributes one ${s7mode==='mean'?'mean':'sum'}. Red curve: CLT ${s7mode==='mean'?`N(4, 16/${n})`:`N(${4*n}, ${16*n})`}.${n===1?' With n = 1 the "mean" is just one wait, so this reproduces the population.':''}`;
+  setText('s7cnt',data.length.toLocaleString());
+  if(data.length>1){const av=data.reduce((a,b)=>a+b,0)/data.length,v=data.reduce((a,b)=>a+(b-av)**2,0)/(data.length-1);setText('s7avg',av.toFixed(3));setText('s7sd',Math.sqrt(v).toFixed(3));}else{setText('s7avg','—');setText('s7sd','—');}
+  $('s7thk').innerHTML=s7mode==='mean'?'Theory σ/√n':'Theory σ√n';setText('s7th',sd.toFixed(3));
+}
+$('s7n').addEventListener('input',()=>{s7m=[];s7s=[];s7last=[];r7();});
+seg($('s7mode'),'m',m=>{s7mode=m;r7();});
+$('s7one').addEventListener('click',()=>draw7(1));$('s7many').addEventListener('click',()=>draw7(500));
+$('s7clr').addEventListener('click',()=>{s7m=[];s7s=[];s7last=[];r7();});
+
+/* ===== Station 8 ===== */
+function r8(){const n=+$('s8n').value;setText('s8no',n);const rn=Math.sqrt(n);
+  $('s8tbl').innerHTML=`<thead><tr><th>Variable</th><th>Mean</th><th>Variance</th><th>SD</th></tr></thead><tbody>
+  <tr><td class="t">One observation X<sub>i</sub></td><td>μ = 4</td><td>σ² = 16</td><td>σ = 4</td></tr>
+  <tr class="pick"><td class="t">Sample mean X̄</td><td>μ = 4</td><td>σ²/n = ${(16/n).toFixed(3)}</td><td>σ/√n = ${(4/rn).toFixed(3)}</td></tr>
+  <tr><td class="t">Sample sum S<sub>n</sub></td><td>nμ = ${4*n}</td><td>nσ² = ${16*n}</td><td>σ√n = ${(4*rn).toFixed(3)}</td></tr></tbody>`;
+  setText('s8txt',`Check: n × (SD of X̄) = ${n} × ${(4/rn).toFixed(3)} = ${(4*rn).toFixed(3)}, the SD of the sum. For the 40-wait sessions, each total has mean 160 s and SD 4√40 ≈ 25.3 s.`);
+}
+$('s8n').addEventListener('input',r8);
+
+/* ===== Station 9 ===== */
+function r9(){const n=+$('s9n').value;setText('s9no',n);const r=n/MU,sd=MU/Math.sqrt(n);
+  const ex=x=>gampdf(x,n,r),nm=x=>pdf(x,MU,sd);
+  let ym=0;for(let i=0;i<=300;i++){const x=14*i/300;ym=Math.max(ym,ex(x),nm(x));}
+  const hiT=MU+2*sd,loT=MU-2*sd;
+  plot($('s9svg'),{x0:0,x1:14,y1:ym*1.1,yt:[],
+    shade:[{a:hiT,b:14,f:ex,cls:'hi'},{a:0,b:Math.max(0,loT),f:ex,cls:'hi'}],
+    curves:[{f:nm,cls:'c2'},{f:ex}],
+    vlines:[{x:MU,cls:'soft',top:ym*1.02,label:'μ = 4',dy:-2},{x:hiT,cls:'hi',top:ym*0.4,label:'μ + 2SD',lcls:'hi',dy:-4}],
+    xt:[0,2,4,6,8,10,12,14],xlabel:'mean waiting time x̄ (s)'});
+  setText('s9sk',(2/Math.sqrt(n)).toFixed(3));setText('s9sd',sd.toFixed(3));
+  setText('s9r',erlangSurv(hiT,n,r).toFixed(4));
+  setText('s9l',loT<=0?'0 (impossible)':(1-erlangSurv(loT,n,r)).toFixed(4));
+}
+$('s9n').addEventListener('input',r9);
+document.querySelectorAll('[data-n9]').forEach(b=>b.addEventListener('click',()=>{$('s9n').value=b.dataset.n9;r9();}));
+
+/* ===== Station 10 ===== */
+setText('s10a',Math.exp(-1.25).toFixed(4));setText('s10b',(1-Phi(0.25)).toFixed(4));
+setText('s10c',erlangSurv(5,40,10).toFixed(4));setText('s10d',(1-Phi(1/(4/Math.sqrt(40)))).toFixed(4));
+
+/* ===== Station 11 ===== */
+function r11(){const n=+$('s11n').value,p=+$('s11p').value;setText('s11no',n);setText('s11po',p.toFixed(2));
+  const mu=n*p,sd=Math.sqrt(n*p*(1-p));
+  let k0=Math.max(0,Math.floor(mu-4.5*sd)),k1=Math.min(n,Math.ceil(mu+4.5*sd));if(k1-k0<12){k0=Math.max(0,k0-6);k1=Math.min(n,k1+6);}
+  const bars=[];let ym=pdf(mu,mu,sd);for(let k=k0;k<=k1;k++){const h=binpmf(k,n,p);ym=Math.max(ym,h);bars.push({a:k-0.5,b:k+0.5,h});}
+  plot($('s11svg'),{x0:k0-1,x1:k1+1,y1:ym*1.1,yt:[],bars,curves:[{f:x=>pdf(x,mu,sd),cls:'hi'}],xt:ticks(k0-1,k1+1).filter(t=>Number.isInteger(t.v)),xlabel:'number of successes k'});
+  const a=n*p,b=n*(1-p),ok=a>10&&b>10;
+  $('s11chk').innerHTML=`<span class="chip ${ok?'pass':'fail'}">${ok?'Both checks pass: normal approximation OK':'Check fails: the normal curve is a poor fit'}</span>`;
+  setText('s11a',a.toFixed(1));setText('s11b',b.toFixed(1));setText('s11sd',sd.toFixed(3));
+  setText('s11sk',((1-2*p)/sd).toFixed(3));
+  setText('s11min',String(Math.floor(10/Math.min(p,1-p)+1e-9)+1));
+  $('s11sq').innerHTML='';setText('s11sum','Press the button to run one sample of n trials.');
+}
+['s11n','s11p'].forEach(id=>$(id).addEventListener('input',r11));
+$('s11toss').addEventListener('click',()=>{const n=+$('s11n').value,p=+$('s11p').value;let x=0,h='';
+  for(let i=0;i<n;i++){const o=Math.random()<p?1:0;x+=o;h+=`<span class="sq ${o?'one':''}"></span>`;}
+  $('s11sq').innerHTML=h;
+  $('s11sum').innerHTML=`X = B<sub>1</sub> + ⋯ + B<sub>${n}</sub> = <b>${x}</b> successes, so p̂ = ${x}/${n} = ${(x/n).toFixed(3)}. Repeat and X changes; its spread across repeats is √[np(1 − p)] = ${Math.sqrt(n*p*(1-p)).toFixed(2)}.`;});
+
+/* ===== Station 12 ===== */
+function r12(){const l=+$('s12l').value;setText('s12lo',l);const sd=Math.sqrt(l);
+  const k0=Math.max(0,Math.floor(l-4.5*sd)),k1=Math.ceil(l+4.5*sd)+1;
+  const bars=[];let ym=pdf(l,l,sd);for(let k=k0;k<=k1;k++){const h=poipmf(k,l);ym=Math.max(ym,h);bars.push({a:k-0.5,b:k+0.5,h});}
+  plot($('s12svg'),{x0:k0-1,x1:k1+1,y1:ym*1.1,yt:[],bars,curves:[{f:x=>pdf(x,l,sd),cls:'c2'},{f:x=>pdf(x,l,l),cls:'bad'}],xt:ticks(k0-1,k1+1).filter(t=>Number.isInteger(t.v)),xlabel:'count k'});
+  const ok=l>10;$('s12chk').innerHTML=`<span class="chip ${ok?'pass':'fail'}">${ok?'λ > 10: normal approximation OK':'λ ≤ 10: still visibly skewed'}</span>`;
+  setText('s12m',l);setText('s12sd',sd.toFixed(3));setText('s12w',l);setText('s12sk',(1/sd).toFixed(3));
+  sim12();
+}
+function sim12(){const l=+$('s12l').value,m=Math.max(1,Math.round(l));let tot=0,h='';
+  for(let i=0;i<m;i++){const c=poiR(l/m);tot+=c;h+=`<span class="piece ${c?'nz':'z'}">${c}</span>`;}
+  $('s12pc').innerHTML=h;
+  $('s12sum').innerHTML=`${m} piece${m>1?'s':''}, each Poisson(${(l/m).toFixed(m===l?0:2)}). Window total X = <b>${tot}</b>. Each new window gives a new total; across many windows the totals follow Poisson(${l}) ≈ N(${l}, ${l}).`;}
+$('s12l').addEventListener('input',r12);$('s12new').addEventListener('click',sim12);
+
+/* ===== Station 13 ===== */
+let s13t='ab';
+function r13(){let a=+$('s13a').value,b=+$('s13b').value;setText('s13ao',a);setText('s13bo',b);
+  const two=s13t==='ab'||s13t==='aob';$('s13bctl').hidden=!two;if(two&&b<a)[a,b]=[b,a];
+  const n=100,p=0.5,mu=50,sd=5;let lo,hi,dTxt,cLo,cHi,uLo,uHi;
+  switch(s13t){
+    case 'ab':lo=a;hi=b;dTxt=`${a} ≤ X ≤ ${b}`;uLo=a;uHi=b;break;
+    case 'aob':lo=a+1;hi=b-1;dTxt=`${a} < X < ${b}`;uLo=a;uHi=b;break;
+    case 'le':lo=0;hi=a;dTxt=`X ≤ ${a}`;uLo=-Infinity;uHi=a;break;
+    case 'lt':lo=0;hi=a-1;dTxt=`X < ${a}`;uLo=-Infinity;uHi=a;break;
+    case 'ge':lo=a;hi=n;dTxt=`X ≥ ${a}`;uLo=a;uHi=Infinity;break;
+    case 'gt':lo=a+1;hi=n;dTxt=`X > ${a}`;uLo=a;uHi=Infinity;break;}
+  cLo=lo<=0?-Infinity:lo-0.5;cHi=hi>=n?Infinity:hi+0.5;
+  let exact=0;for(let k=Math.max(0,lo);k<=Math.min(n,hi);k++)exact+=binpmf(k,n,p);
+  const corr=hi<lo?0:Phi((cHi-mu)/sd)-Phi((cLo-mu)/sd),unc=Math.max(0,Phi((uHi-mu)/sd)-Phi((uLo-mu)/sd));
+  const bars=[];let ym=0;for(let k=30;k<=70;k++){const h=binpmf(k,n,p);ym=Math.max(ym,h);bars.push({a:k-0.5,b:k+0.5,h,cls:(k>=lo&&k<=hi)?'in':''});}
+  const vl=[];if(isFinite(cLo))vl.push({x:cLo,cls:'hi',top:ym*1.08,label:f(cLo,1),lcls:'hi',dy:-4,anchor:'end',dx:-3});if(isFinite(cHi))vl.push({x:cHi,cls:'hi',top:ym*1.08,label:f(cHi,1),lcls:'hi',dy:-4,dx:3});
+  if(isFinite(uLo))vl.push({x:uLo,cls:'soft',top:ym*0.95});if(isFinite(uHi))vl.push({x:uHi,cls:'soft',top:ym*0.95});
+  plot($('s13svg'),{x0:29.5,x1:70.5,y1:ym*1.18,yt:[],bars,curves:[{f:x=>pdf(x,mu,sd)}],vlines:vl,xt:[30,35,40,45,50,55,60,65,70],xlabel:'number of heads'});
+  const cT=(isFinite(cLo)?f(cLo,1)+' < ':'')+'Y'+(isFinite(cHi)?' < '+f(cHi,1):'');
+  const zL=isFinite(cLo)?((cLo-mu)/sd):null,zU=isFinite(cHi)?((cHi-mu)/sd):null;
+  const incl=hi<lo?'no integers':(lo<=0?'0':lo)+' to '+(hi>=n?'100':hi)+' inclusive';
+  $('s13f').innerHTML=`${dTxt} &nbsp;→&nbsp; integers ${incl} &nbsp;→&nbsp; ${cT}<br>`+(hi<lo?'Empty event: probability 0.':`z: ${zL!==null?f(zL,2):'−∞'} to ${zU!==null?f(zU,2):'+∞'}`);
+  setText('s13ex1',exact.toFixed(4));setText('s13c',corr.toFixed(4));setText('s13u',unc.toFixed(4));
+}
+['s13a','s13b'].forEach(id=>$(id).addEventListener('input',r13));
+seg($('s13type'),'t',t=>{s13t=t;r13();});
+$('s13ex').addEventListener('click',()=>{s13t='ab';press($('s13type'),'t','ab');$('s13a').value=45;$('s13b').value=55;r13();});
+
+/* ===== Station 14 ===== */
+function r14(){let L=+$('s14L').value,U=+$('s14U').value;setText('s14Lo',L.toFixed(2));setText('s14Uo',U.toFixed(2));if(U<L)[L,U]=[U,L];
+  const m=55.25,sd=Math.sqrt(2.1125),sw=0.10*Math.sqrt(65)+0.15*Math.sqrt(65);
+  const P=Phi((U-m)/sd)-Phi((L-m)/sd),Pw=Phi((U-m)/sw)-Phi((L-m)/sw);
+  plot($('s14svg'),{x0:48,x1:62,y1:pdf(m,m,sd)*1.12,yt:[],
+    shade:[{a:L,b:U,f:x=>pdf(x,m,sd)}],curves:[{f:x=>pdf(x,m,sw),cls:'bad'},{f:x=>pdf(x,m,sd)}],
+    vlines:[{x:m,cls:'soft',top:pdf(m,m,sd)*1.06,label:'55.25',dy:-4}],
+    xt:[48,50,52,54,56,58,60,62],xlabel:'combined machine time S (h)'});
+  $('s14f').innerHTML=`<i>z<sub>L</sub></i> = <span class="frac"><span>${L} − 55.25</span><span>1.4534</span></span> ≈ ${f((L-m)/sd,4)}, &nbsp; <i>z<sub>U</sub></i> = <span class="frac"><span>${U} − 55.25</span><span>1.4534</span></span> ≈ ${f((U-m)/sd,4)}`;
+  setText('s14p',P.toFixed(4));setText('s14w',Pw.toFixed(4));
+}
+['s14L','s14U'].forEach(id=>$(id).addEventListener('input',r14));
+$('s14ex').addEventListener('click',()=>{$('s14L').value=50;$('s14U').value=55;r14();});
+
+/* reveals */
+document.querySelectorAll('[data-rev]').forEach(b=>b.addEventListener('click',()=>{const el=$(b.dataset.rev);el.hidden=!el.hidden;b.textContent=el.hidden?'Reveal':'Hide';}));
+
+/* initial draw */
+r1();r2();r2b();gen3();r4();r5();r8();r9();r11();r12();r13();r14();
+draw7(1);draw7(300);
+$('s11toss').click();
+</script>
+
+</body></html>
